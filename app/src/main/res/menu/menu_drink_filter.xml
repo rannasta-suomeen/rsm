@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="all">
+        <item
+            android:id="@+id/menuDrinkFilterCocktail"
+            android:checked="true"
+            android:title="@string/cocktail" />
+        <item
+            android:id="@+id/menuDrinkFilterShot"
+            android:checked="true"
+            android:title="@string/shot" />
+        <item
+            android:id="@+id/menuDrinkFilterPunch"
+            android:checked="true"
+            android:title="@string/punch" />
+    <item
+        android:id="@+id/menuDrinkFilterMakeable"
+        android:title="@string/makeable"
+        android:checked="true"
+        />
+    </group>
+</menu>

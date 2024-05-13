@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group>
+        <item
+            android:title="@string/products"
+            android:id="@+id/menuMainProducts"/>
+        <item
+            android:title="@string/drinks"
+            android:id="@+id/menuMainDrinks"/>
+        <item
+            android:title="@string/charts"
+            android:id="@+id/menuMainCharts"
+            />
+    </group>
+    <group android:enabled="true">
+        <item
+            android:title="@string/storage"
+            android:id="@+id/menuMainStorage"/>
+        <item
+            android:title="@string/settings"
+            android:id="@+id/menuMainSettings"/>
+    </group>
+</menu>
