@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/gray">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageViewProduct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:minWidth="100dp"
+            android:minHeight="150dp"
+            android:scaleX="2.0"
+            android:scaleY="2.0"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_baseline_wine_bar_24" />
+
+        <TextView
+            android:id="@+id/textViewProductName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:text="Bols Blue Curacao"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/textViewRetailer"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/imageViewProduct"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textViewProductPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="19.99€"
+            android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@+id/textViewProductVolume"
+            app:layout_constraintTop_toTopOf="@+id/textViewProductVolume" />
+
+        <TextView
+            android:id="@+id/textViewProductVolume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="50 cl"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageViewProduct"
+            app:layout_constraintTop_toBottomOf="@+id/textViewProductName" />
+
+        <TextView
+            android:id="@+id/textViewProductAbv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="20%"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textViewProductVolume"
+            app:layout_constraintTop_toBottomOf="@+id/textViewProductVolume"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/textViewRetailer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:text="Alko"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textViewProductName" />
+
+        <TextView
+            android:id="@+id/textViewProductFsd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="5 fsd"
+            android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@+id/textViewProductAbv"
+            app:layout_constraintTop_toBottomOf="@+id/textViewProductVolume" />
+
+        <TextView
+            android:id="@+id/textViewProductPpl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="39.98€/l"
+            android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@+id/textViewProductPrice"
+            app:layout_constraintTop_toTopOf="@+id/textViewProductPrice" />
+
+        <TextView
+            android:id="@+id/textViewProductPps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/aer"
+            android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@+id/textViewProductFsd"
+            app:layout_constraintTop_toTopOf="@+id/textViewProductFsd" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

@@ -1,28 +1,26 @@
 package com.rannasta_suomeen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.rannasta_suomeen.data_classes.DrinkPreview
+import com.rannasta_suomeen.data_classes.DrinkRecipe
 
 class DrinkPreviewAdapter: RecyclerView.Adapter<DrinkPreviewAdapter.DrinkPreviewViewHolder>() {
 
-    private var items: List<DrinkPreview> = listOf()
+    private var items: List<DrinkRecipe> = listOf()
 
     class DrinkPreviewViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
-        fun bind(item: DrinkPreview){
-            Log.d("Debug", "Bound $item")
+        fun bind(item: DrinkRecipe){
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewName).text = item.name
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(item.fsd(), R.string.shots)
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewPrice).text = displayDecimal(item.price, R.string.price)
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAbv).text = displayDecimal(item.abv, R.string.abv)
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewVolume).text = itemView.resources.getString(R.string.volume, item.volume)
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(item.standard_servings, R.string.shots)
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewPrice).text = displayDecimal(item.price(), R.string.price)
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAbv).text = displayDecimal(item.abv_average, R.string.abv)
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewVolume).text = itemView.resources.getString(R.string.volume, item.total_volume/10)
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewType).text = item.type.toString()
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAer).text = displayDecimal(item.aer(), R.string.aer)
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAer).text = displayDecimal(item.pricePerServing(), R.string.aer)
         }
         private fun displayDecimal(x: Double, stringId: Int): String{
             val number = String.format("%.1f", x)
@@ -31,7 +29,7 @@ class DrinkPreviewAdapter: RecyclerView.Adapter<DrinkPreviewAdapter.DrinkPreview
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitItems(input: List<DrinkPreview>){
+    fun submitItems(input: List<DrinkRecipe>){
         items = input
         notifyDataSetChanged()
     }

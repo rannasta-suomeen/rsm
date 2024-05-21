@@ -28,7 +28,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="1,5 Shots"
+            android:text="1.5 Shots"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textViewDrinkPreviewVolume"
@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="1,2€"
+            android:text="1.2€"
 
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/textViewDrinkPreviewShots"
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="16cl"
+            android:text="160ml"
 
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/textViewDrinkPreviewAbv"
@@ -109,10 +109,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="1.3 aer"
+            android:text="1.3 €/serving"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/textViewDrinkPreviewPrice"
             app:layout_constraintStart_toEndOf="@+id/textViewDrinkPreviewPrice"
             app:layout_constraintTop_toTopOf="@+id/textViewDrinkPreviewPrice" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

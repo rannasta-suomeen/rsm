@@ -8,5 +8,9 @@
         android:name="com.rannasta_suomeen.main_fragments.DrinksFragment"
         android:label="FragmentDrinks"
     />
+    <fragment
+        android:id="@+id/fragmentProducts"
+        android:name="com.rannasta_suomeen.main_fragments.ProductsFragment"
+        android:label="FragmentProducts"/>
 
 </navigation>

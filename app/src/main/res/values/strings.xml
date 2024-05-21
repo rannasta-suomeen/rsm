@@ -7,19 +7,21 @@
     <string name="storage">Storage</string>
     <string name="price">%1$s €</string>
     <string name="volume">%1$d cl</string>
-    <string name="aer">%1$s aer</string>
+    <string name="aer">%1$s €/fsd</string>
+    <string name="ppl">%1$s €/l</string>
     <string name="abv">%1$s%%</string>
     <string name="shots">%1$s fsd</string>
     <string name="cocktail">Cocktail</string>
     <string name="shot">Shot</string>
     <string name="punch">Punch</string>
     <string name="makeable">Makeable</string>
+    <string name="remember_me">Remember me</string>
     <string-array name="drinks_possible_sort">
         <item>Name</item>
         <item>Abv</item>
         <item>Price</item>
         <item>Volume</item>
         <item>Fsd</item>
-        <item>Aer</item>
+        <item>Pps</item>
     </string-array>
 </resources>

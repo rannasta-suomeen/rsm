@@ -13,30 +13,37 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.DrinkPreviewAdapter
+import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.R
-import com.rannasta_suomeen.data_classes.DrinkPreview
+import com.rannasta_suomeen.data_classes.DrinkRecipe
 import com.rannasta_suomeen.data_classes.DrinkType
-import com.rannasta_suomeen.data_classes.SortDrinkPreview
+import com.rannasta_suomeen.data_classes.sortDrinkPreview
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 
 class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
 
     private val drinkPreviewAdapter = DrinkPreviewAdapter()
-    private val drinkListFull = listOf<DrinkPreview>(
-        DrinkPreview("Pina Colada", DrinkType.Cocktail, 20,7.5,1.155),
-        DrinkPreview("Kelkka", DrinkType.Cocktail, 18,14.888,1.573),
-        DrinkPreview("I miss her -shot", DrinkType.Shot, 4,65.375,0.988)
-    ).sortedBy { it.abv }
-
-    private lateinit var popupMenu: PopupMenu
+    private var drinkListFull = listOf<DrinkRecipe>().sortedBy { it.abv_average }
 
     private var drinkListFiltered = drinkListFull
 
-    private var sortType = DrinkPreview.SortTypes.Aer
+    private var sortType = DrinkRecipe.SortTypes.Pps
     private var sortByAsc = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         updateSelection()
+
+        val res = CoroutineScope(Dispatchers.IO).async {
+            val res = NetworkController.tryNTimes(5, Unit, NetworkController::getDrinks)
+            drinkListFull = res.getOrNull()?: listOf()
+            drinkListFiltered = drinkListFull
+            requireActivity().runOnUiThread{
+                updateSelection()
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -74,9 +81,9 @@ class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSel
                     if (!i.isChecked){
                         tList.removeAll { d ->
                             when (i.itemId){
-                                R.id.menuDrinkFilterCocktail -> d.type == DrinkType.Cocktail
-                                R.id.menuDrinkFilterPunch -> d.type == DrinkType.Punch
-                                R.id.menuDrinkFilterShot -> d.type == DrinkType.Shot
+                                R.id.menuDrinkFilterCocktail -> d.type == DrinkType.cocktail
+                                R.id.menuDrinkFilterPunch -> d.type == DrinkType.punch
+                                R.id.menuDrinkFilterShot -> d.type == DrinkType.shot
                                 // TODO implement this
                                 R.id.menuDrinkFilterMakeable -> false
                                 else -> false
@@ -93,17 +100,17 @@ class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSel
     }
 
     private fun updateSelection(){
-        drinkPreviewAdapter.submitItems(SortDrinkPreview(drinkListFiltered, sortType, sortByAsc))
+        drinkPreviewAdapter.submitItems(sortDrinkPreview(drinkListFiltered, sortType, sortByAsc))
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
          sortType = when (p0!!.getItemAtPosition(p2)){
-             "Abv" ->  DrinkPreview.SortTypes.Abv
-             "Volume" -> DrinkPreview.SortTypes.Volume
-             "Aer" ->  DrinkPreview.SortTypes.Aer
-             "Fsd" -> DrinkPreview.SortTypes.Fsd
-             "Price" -> DrinkPreview.SortTypes.Price
-             "Name" -> DrinkPreview.SortTypes.Name
+             "Abv" ->  DrinkRecipe.SortTypes.Abv
+             "Volume" -> DrinkRecipe.SortTypes.Volume
+             "Pps" ->  DrinkRecipe.SortTypes.Pps
+             "Fsd" -> DrinkRecipe.SortTypes.Fsd
+             "Price" -> DrinkRecipe.SortTypes.Price
+             "Name" -> DrinkRecipe.SortTypes.Name
             else -> {throw IllegalArgumentException("Unknown thing to sort by")}
         }
         updateSelection()
