@@ -11,7 +11,6 @@ import com.rannasta_suomeen.data_classes.Product
 
 class PopupFilter(
     activity: FragmentActivity,
-    private val parent: View,
     private val updateFun: () -> Unit
 ) {
 
@@ -77,8 +76,8 @@ class PopupFilter(
         }
     }
 
-    fun show(){
-        window.showAtLocation(this.parent, Gravity.TOP, 0, 0)
+    fun show(parent: View){
+        window.showAtLocation(parent, Gravity.TOP, 0, 0)
     }
 
     fun filter(list: List<Product>): List<Product>{

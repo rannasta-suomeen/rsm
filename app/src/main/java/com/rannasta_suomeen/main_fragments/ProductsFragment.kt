@@ -10,19 +10,18 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.rannasta_suomeen.NetworkController
-import com.rannasta_suomeen.PopupFilter
-import com.rannasta_suomeen.ProductAdapter
-import com.rannasta_suomeen.R
+import com.rannasta_suomeen.*
 import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.data_classes.Product.SortTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class ProductsFragment : Fragment(R.layout.fragment_products), AdapterView.OnItemSelectedListener {
 
     private val productAdapter = ProductAdapter()
+    private lateinit var productRepository: ProductRepository
     private var productListFull = listOf<Product>().sortedBy {it.name}
 
     private var sortType = SortTypes.Pps
@@ -32,13 +31,16 @@ class ProductsFragment : Fragment(R.layout.fragment_products), AdapterView.OnIte
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        productRepository = ProductRepository(this.requireContext(), NetworkController)
 
-        val res = CoroutineScope(Dispatchers.IO).async {
-            val res = NetworkController.tryNTimes(5, Pair(100000, 0), NetworkController::getProducts)
-            productListFull = res.getOrNull()?: listOf()
-            Log.d("Products", "Got ${productListFull.size} products")
-            requireActivity().runOnUiThread{
-                updateSelection()
+        filterMenu = PopupFilter(requireActivity(), ::updateSelection)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            productRepository.dataFlow.collect{
+                productListFull = it
+                requireActivity().runOnUiThread{
+                    updateSelection()
+                }
             }
         }
     }
@@ -56,8 +58,6 @@ class ProductsFragment : Fragment(R.layout.fragment_products), AdapterView.OnIte
         spinner.onItemSelectedListener = this
         val filterButton = view.findViewById<ImageButton>(R.id.imageButtonDrinkFilter)
 
-        filterMenu = PopupFilter(requireActivity(), filterButton, ::updateSelection)
-
         val sortByDirButton = view.findViewById<ImageButton>(R.id.imageButtonDrinkSortDir)
         sortByDirButton.setOnClickListener {
             sortByAsc = !sortByAsc
@@ -70,7 +70,7 @@ class ProductsFragment : Fragment(R.layout.fragment_products), AdapterView.OnIte
         }
 
         filterButton.setOnClickListener {
-            filterMenu.show()
+            filterMenu.show(filterButton)
         }
     }
 

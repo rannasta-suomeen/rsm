@@ -69,7 +69,7 @@ object NetworkController {
      * @param _payload An empty parameter to fit with rest of the architecture
      * @return Result, either a list of [DrinkRecipe] or an [Error]
      */
-    suspend fun getDrinks(_payload: Unit): Result<List<DrinkRecipe>>{
+    fun getDrinks(_payload: Unit): Result<List<DrinkRecipe>>{
         val request = Request.Builder().url("$serverAddress/drinks").get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
@@ -82,7 +82,7 @@ object NetworkController {
      * @param payload a [Pair] of Limit and Offset
      * @return Result, either a list of [Product] or an [Error]
      */
-    suspend fun getProducts(payload: Pair<Int, Int> ): Result<List<Product>>{
+    fun getProducts(payload: Pair<Int, Int> ): Result<List<Product>>{
         val request = Request.Builder().url("$serverAddress/products?limit=${payload.first}&offset=${payload.second}&name=%%").get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
@@ -96,7 +96,7 @@ object NetworkController {
      * @param function that deals with a successful response that returns [R]
      * @return Result, either a [R] or a [Error]
      */
-    private suspend fun<R> makeTokenRequest(rb: Request.Builder, function: (Response) -> R): Result<R>{
+    private fun<R> makeTokenRequest(rb: Request.Builder, function: (Response) -> R): Result<R>{
         try {
             while (jwtToken == null) {
                 /* no-op */

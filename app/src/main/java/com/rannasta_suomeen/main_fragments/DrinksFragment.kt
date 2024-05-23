@@ -1,6 +1,7 @@
 package com.rannasta_suomeen.main_fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ImageButton
@@ -13,20 +14,21 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.DrinkPreviewAdapter
+import com.rannasta_suomeen.DrinkRepository
 import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.DrinkRecipe
 import com.rannasta_suomeen.data_classes.DrinkType
 import com.rannasta_suomeen.data_classes.sortDrinkPreview
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.takeWhile
 
 class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
 
     private val drinkPreviewAdapter = DrinkPreviewAdapter()
-    private var drinkListFull = listOf<DrinkRecipe>().sortedBy { it.abv_average }
-
+    private lateinit var drinkRepository: DrinkRepository
+    private var drinkListFull = listOf<DrinkRecipe>()
     private var drinkListFiltered = drinkListFull
 
     private var sortType = DrinkRecipe.SortTypes.Pps
@@ -34,14 +36,14 @@ class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        drinkRepository = DrinkRepository(requireContext(),NetworkController)
         updateSelection()
 
-        val res = CoroutineScope(Dispatchers.IO).async {
-            val res = NetworkController.tryNTimes(5, Unit, NetworkController::getDrinks)
-            drinkListFull = res.getOrNull()?: listOf()
-            drinkListFiltered = drinkListFull
-            requireActivity().runOnUiThread{
-                updateSelection()
+        CoroutineScope(Dispatchers.IO).launch {
+            drinkRepository.dataFlow.collect{
+                drinkListFull = it
+                drinkListFiltered = drinkListFull
+                requireActivity().runOnUiThread { updateSelection() }
             }
         }
     }
