@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 class ProductsFragment : Fragment(R.layout.fragment_products), AdapterView.OnItemSelectedListener {
 
-    private val productAdapter = ProductAdapter()
+    private lateinit var productAdapter: ProductAdapter
     private lateinit var productRepository: ProductRepository
     private var productListFull = listOf<Product>().sortedBy {it.name}
 
@@ -32,6 +32,7 @@ class ProductsFragment : Fragment(R.layout.fragment_products), AdapterView.OnIte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         productRepository = ProductRepository(this.requireContext(), NetworkController)
+        productAdapter = ProductAdapter(requireContext())
 
         filterMenu = PopupFilter(requireActivity(), ::updateSelection)
 
@@ -47,7 +48,6 @@ class ProductsFragment : Fragment(R.layout.fragment_products), AdapterView.OnIte
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
 
         val recyclerViewDrinks = view.findViewById<RecyclerView>(R.id.recyclerViewPreviewDrinks)
         recyclerViewDrinks.layoutManager = LinearLayoutManager(this.context)

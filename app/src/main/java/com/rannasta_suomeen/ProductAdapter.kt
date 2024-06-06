@@ -1,20 +1,24 @@
 package com.rannasta_suomeen
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.data_classes.Product
 import com.rannasta_suomeen.data_classes.from
-import com.rannasta_suomeen.data_classes.from_category
+import kotlinx.coroutines.*
 
-class ProductAdapter: RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
+class ProductAdapter(context: Context): RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
     private var items: List<Product> = listOf()
+    private val imageRepository = ImageRepository(context)
 
-    class ProductViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
+    class ProductViewHolder(itemView: View, private val imageRepository: ImageRepository):RecyclerView.ViewHolder(itemView){
         fun bind(item: Product){
             itemView.findViewById<TextView>(R.id.textViewProductName).text = item.name
             itemView.findViewById<TextView>(R.id.textViewProductPrice).text = displayDecimal(item.price, R.string.price)
@@ -25,6 +29,13 @@ class ProductAdapter: RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
             itemView.findViewById<TextView>(R.id.textViewProductPpl).text = displayDecimal(item.unit_price, R.string.ppl)
             itemView.findViewById<TextView>(R.id.textViewProductPps).text = displayDecimal(item.pps(), R.string.aer)
             itemView.findViewById<TextView>(R.id.textViewProductSubcategory).text = from(item.subcategory_id).toString()
+            itemView.findViewById<ImageView>(R.id.imageViewProduct).setImageResource(R.drawable.ic_baseline_wine_bar_24)
+            CoroutineScope(Dispatchers.IO).launch {
+                val img = imageRepository.getImage(item.img)
+                CoroutineScope(Dispatchers.Main).launch {
+                    itemView.findViewById<ImageView>(R.id.imageViewProduct).setImageBitmap(img)
+                }
+            }
         }
 
         private fun displayDecimal(x: Double, stringId: Int): String{
@@ -42,7 +53,7 @@ class ProductAdapter: RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val layout = R.layout.item_product
         val itemView = LayoutInflater.from(parent.context).inflate(layout, parent,false)
-        return ProductViewHolder(itemView)
+        return ProductViewHolder(itemView, imageRepository)
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {

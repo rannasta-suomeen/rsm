@@ -12,15 +12,12 @@
 
         <ImageView
             android:id="@+id/imageViewProduct"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="120dp"
+            android:layout_height="150dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:minWidth="100dp"
-            android:minHeight="150dp"
-            android:scaleX="2.0"
-            android:scaleY="2.0"
+            android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
