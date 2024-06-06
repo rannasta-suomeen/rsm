@@ -1,5 +1,6 @@
 package com.rannasta_suomeen.data_classes
 
+import android.util.Log
 import kotlin.math.roundToInt
 
 /** Kotlin equivalent of the RSM product */
@@ -11,8 +12,8 @@ data class Product(
     val img: String,
     /// Volume of the product in L
     val volume: Double,
-    val categoryId: Int,
-    val subcategoryId: Int,
+    val category_id: Int,
+    val subcategory_id: Int,
     val abv: Double,
     val aer: Double,
     val unit_price: Double,
@@ -20,6 +21,9 @@ data class Product(
     val count: Int,
     val retailer: Retailer
 ){
+    init {
+        Log.d("Drink", "Created drink with id $id, $category_id, $subcategory_id")
+    }
     enum class SortTypes{
         Name, Price, Volume, Abv, Pps, UnitPrice, Count, Fsd
     }

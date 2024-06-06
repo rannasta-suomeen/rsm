@@ -1,20 +1,41 @@
 package com.rannasta_suomeen
 
+
+import android.app.Activity
+import android.database.Cursor
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.PopupMenu
 import android.widget.PopupWindow
+import androidx.appcompat.app.AlertDialog
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentActivity
-import com.rannasta_suomeen.data_classes.Product
+import com.rannasta_suomeen.data_classes.*
+import java.lang.ref.Reference
+import kotlin.jvm.internal.MutablePropertyReference
 
 class PopupFilter(
-    activity: FragmentActivity,
+    private val activity: FragmentActivity,
     private val updateFun: () -> Unit
 ) {
 
     private var window: PopupWindow
+
+    private inline fun <reified T: Any> multiOptionDialog(items: List<T>, title: String, crossinline endfun: (Array<T>) -> Unit): AlertDialog {
+        val dialog = AlertDialog.Builder(activity)
+
+        dialog.setTitle(title)
+        val booleanArray = items.map { true }.toBooleanArray()
+        dialog.setMultiChoiceItems(items.map { it.toString() }.toTypedArray(),booleanArray){_,_,_->}
+        dialog.setPositiveButton("Ok"){ x, y ->
+            endfun(items.zip(booleanArray.toTypedArray()).filter { it.second }.map { it.first }.toTypedArray())
+        }
+        dialog.setNegativeButton("Cancel"){ _, _->}
+        return dialog.create()
+    }
 
     class Settings(
         var name: String?,
@@ -24,9 +45,12 @@ class PopupFilter(
         var volMax: Int?,
         var priceMin: Double?,
         var priceMax: Double?,
-    )
+        var retailers: List<Retailer>
+    ){
+        var selectedSubcategory: Array<Subcategory> = Subcategory.values()
+    }
 
-    private var settings: Settings = Settings(null,null, null,null,null,null, null)
+    private var settings: Settings = Settings(null,null, null,null,null,null, null, listOf(Retailer.alko, Retailer.superalko))
 
     init{
         val view = activity.layoutInflater.inflate(R.layout.popup_product_filer, null)
@@ -54,12 +78,21 @@ class PopupFilter(
         val priceMin = ed(R.id.editTextPriceMin)
         val priceMax = ed(R.id.editTextPriceMax)
 
-        // TODO(Implement categories)
-        val buttonCategory: Button = t(R.id.buttonCategory)
-        val buttonSubCategory: Button = t(R.id.buttonSub)
-        val buttonRetailer: Button = t(R.id.buttonRetailer)
 
+        val buttonRetailer: Button = t(R.id.buttonRetailer)
         val buttonDismiss: Button = t(R.id.buttonProductFilterOk)
+
+        val buttonCategory: Button = view.findViewById(R.id.buttonCategory)
+        val categoryDialog = multiOptionDialog(Subcategory.values().toList(),"Choose categories"){settings.selectedSubcategory = it}
+
+        val retailerDialog = multiOptionDialog(Retailer.values().toList(),"Choose Retailers"){settings.retailers = it.toList()}
+
+        buttonCategory.setOnClickListener {
+            categoryDialog.show()
+        }
+        buttonRetailer.setOnClickListener {
+            retailerDialog.show()
+        }
 
         buttonDismiss.setOnClickListener {
             this.settings.name = nameSelect.text.toString()
@@ -71,6 +104,7 @@ class PopupFilter(
 
             this.settings.priceMin = priceMin.text.toString().toDoubleOrNull()
             this.settings.priceMax = priceMax.text.toString().toDoubleOrNull()
+
             updateFun()
             window.dismiss()
         }
@@ -99,6 +133,6 @@ class PopupFilter(
         quickRemove(settings.volMin){it.volumeCl()<settings.volMin!!}
         quickRemove(settings.volMax){it.volumeCl()>settings.volMax!!}
 
-        return mutList.toList()
+        return mutList.filter { settings.selectedSubcategory.contains(from(it.subcategory_id)) }.filter { settings.retailers.contains(it.retailer) }
     }
 }

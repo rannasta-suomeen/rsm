@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.data_classes.Product
+import com.rannasta_suomeen.data_classes.from
+import com.rannasta_suomeen.data_classes.from_category
 
 class ProductAdapter: RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
@@ -22,6 +24,7 @@ class ProductAdapter: RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
             itemView.findViewById<TextView>(R.id.textViewProductFsd).text = displayDecimal(item.fsd(), R.string.shots)
             itemView.findViewById<TextView>(R.id.textViewProductPpl).text = displayDecimal(item.unit_price, R.string.ppl)
             itemView.findViewById<TextView>(R.id.textViewProductPps).text = displayDecimal(item.pps(), R.string.aer)
+            itemView.findViewById<TextView>(R.id.textViewProductSubcategory).text = from(item.subcategory_id).toString()
         }
 
         private fun displayDecimal(x: Double, stringId: Int): String{
