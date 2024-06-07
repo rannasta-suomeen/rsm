@@ -1,23 +1,18 @@
-package com.rannasta_suomeen
+package com.rannasta_suomeen.storage
 
 import android.content.Context
 import android.util.Log
-import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
+import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.data_classes.DrinkRecipe
 import com.rannasta_suomeen.data_classes.Product
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.Optional
-import kotlin.reflect.typeOf
 
 private const val DRINKFILENAME = "drinks"
 private const val PRODUCTFILENAME = "products"
@@ -38,7 +33,7 @@ abstract class GenericRepository<R,T>(context: Context, networkController: Netwo
                 memoryCopy = Optional.ofNullable(t)
                 // TODO There is a (small) performance improvement in starting the network request BEFORE making the file fetch
                 if (!syncedFromInternet){
-                    val res = networkController.tryNTimes(5,input,getFn)
+                    val res = NetworkController.tryNTimes(5, input, getFn)
                     if (res.isSuccess){
                         val t = res.getOrThrow()
                         emit(t)
@@ -59,7 +54,8 @@ abstract class GenericRepository<R,T>(context: Context, networkController: Netwo
     }
 }
 
-class DrinkRepository(context: Context, networkController: NetworkController):GenericRepository<DrinkRecipe, Unit>(context, networkController){
+class DrinkRepository(context: Context, networkController: NetworkController):
+    GenericRepository<DrinkRecipe, Unit>(context, networkController){
     override val file = File(context.filesDir, DRINKFILENAME)
     override val input = Unit
     override val getFn = networkController::getDrinks

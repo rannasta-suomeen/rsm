@@ -2,7 +2,6 @@ package com.rannasta_suomeen
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.data_classes.Product
 import com.rannasta_suomeen.data_classes.from
+import com.rannasta_suomeen.storage.ImageRepository
 import kotlinx.coroutines.*
 
 class ProductAdapter(context: Context): RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {

@@ -1,7 +1,6 @@
 package com.rannasta_suomeen.main_fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ImageButton
@@ -14,15 +13,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.DrinkPreviewAdapter
-import com.rannasta_suomeen.DrinkRepository
+import com.rannasta_suomeen.storage.DrinkRepository
 import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.DrinkRecipe
 import com.rannasta_suomeen.data_classes.DrinkType
 import com.rannasta_suomeen.data_classes.sortDrinkPreview
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.takeWhile
 
 class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
 

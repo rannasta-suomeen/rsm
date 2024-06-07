@@ -1,6 +1,6 @@
 package com.rannasta_suomeen.data_classes
 
-import com.rannasta_suomeen.Settings
+import com.rannasta_suomeen.storage.Settings
 
 /**
  This is the equivalent of the RS-Struct Recipe

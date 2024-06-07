@@ -1,21 +1,16 @@
-package com.rannasta_suomeen
+package com.rannasta_suomeen.popup_windows
 
 
-import android.app.Activity
-import android.database.Cursor
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.PopupMenu
 import android.widget.PopupWindow
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentActivity
+import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.*
-import java.lang.ref.Reference
-import kotlin.jvm.internal.MutablePropertyReference
 
 class PopupFilter(
     private val activity: FragmentActivity,

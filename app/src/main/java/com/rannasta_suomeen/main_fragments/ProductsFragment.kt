@@ -1,7 +1,6 @@
 package com.rannasta_suomeen.main_fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ImageButton
@@ -13,9 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.*
 import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.data_classes.Product.SortTypes
+import com.rannasta_suomeen.popup_windows.PopupFilter
+import com.rannasta_suomeen.storage.ProductRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class ProductsFragment : Fragment(R.layout.fragment_products), AdapterView.OnItemSelectedListener {

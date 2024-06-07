@@ -1,10 +1,11 @@
-package com.rannasta_suomeen
+package com.rannasta_suomeen.storage
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toBitmap
+import com.rannasta_suomeen.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -38,7 +39,7 @@ class ImageRepository(private val c: Context) {
                 continue
             }
         }
-        val drawable = AppCompatResources.getDrawable(c,R.drawable.ic_baseline_wine_bar_24)
+        val drawable = AppCompatResources.getDrawable(c, R.drawable.ic_baseline_wine_bar_24)
         return drawable!!.toBitmap()
     }
 

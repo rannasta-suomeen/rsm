@@ -1,4 +1,4 @@
-package com.rannasta_suomeen
+package com.rannasta_suomeen.storage
 
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
