@@ -67,6 +67,46 @@ data class DrinkRecipe(
     }
 }
 
+/**
+ * Class to represent a drink with all of its information
+ */
+data class DrinkTotal(val drink: DrinkRecipe, val ingredients: List<DrinkIngredient>)
+
+/**
+ * Class to represent an ingredient for a single drink
+ * @param amount
+ * @param ingredient
+ */
+data class DrinkIngredient(val amount: Int, val ingredient: GeneralIngredient)
+
+/**
+ * Class to represent a ingredient in general
+ */
+data class GeneralIngredient(
+    val type: IngredientType,
+    val author_id: Int,
+    val name: String,
+
+    val category: Category?,
+
+    /** Volume of the drink in ml*/
+    val total_volume : Int,
+    val standard_servings: Double,
+    val price_per_serving: Double,
+
+    val abv_average: Double,
+    val abv_max: Double,
+    val abv_min: Double,
+)
+
+enum class IngredientType{
+    LightAlcoholProduct,
+    StrongAlcoholProduct,
+    Common,
+    Mixer,
+    Grocery,
+}
+
 fun sortDrinkPreview(list: List<DrinkRecipe>, type: DrinkRecipe.SortTypes, asc: Boolean): List<DrinkRecipe>{
     var sortedAsc = when (type){
         DrinkRecipe.SortTypes.Name -> list.sortedBy { it.name }

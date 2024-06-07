@@ -33,7 +33,7 @@ class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        drinkRepository = DrinkRepository(requireContext(),NetworkController)
+        drinkRepository = DrinkRepository(requireContext())
         updateSelection()
 
         CoroutineScope(Dispatchers.IO).launch {

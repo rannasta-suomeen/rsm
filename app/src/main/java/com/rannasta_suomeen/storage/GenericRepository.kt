@@ -17,7 +17,7 @@ import java.util.Optional
 private const val DRINKFILENAME = "drinks"
 private const val PRODUCTFILENAME = "products"
 
-abstract class GenericRepository<R,T>(context: Context, networkController: NetworkController) {
+abstract class GenericRepository<R,T>() {
     private var memoryCopy: Optional<List<R>> = Optional.empty()
     private var syncedFromInternet = false
     abstract val input: T
@@ -54,11 +54,11 @@ abstract class GenericRepository<R,T>(context: Context, networkController: Netwo
     }
 }
 
-class DrinkRepository(context: Context, networkController: NetworkController):
-    GenericRepository<DrinkRecipe, Unit>(context, networkController){
+class DrinkRepository(context: Context):
+    GenericRepository<DrinkRecipe, Unit>(){
     override val file = File(context.filesDir, DRINKFILENAME)
     override val input = Unit
-    override val getFn = networkController::getDrinks
+    override val getFn = NetworkController::getDrinks
 
     override fun loadFromFile(): List<DrinkRecipe>?{
         return try{
@@ -75,10 +75,10 @@ class DrinkRepository(context: Context, networkController: NetworkController):
     }
 }
 
-class ProductRepository(context: Context, networkController: NetworkController): GenericRepository<Product, Pair<Int, Int>>(context,networkController){
+class ProductRepository(context: Context): GenericRepository<Product, Pair<Int, Int>>(){
     override val file: File = File(context.filesDir, PRODUCTFILENAME)
-    override val input = Pair(10000,0)
-    override val getFn = networkController::getProducts
+    override val input = Pair(100000,0)
+    override val getFn = NetworkController::getProducts
 
     override fun loadFromFile(): List<Product>?{
         return try{

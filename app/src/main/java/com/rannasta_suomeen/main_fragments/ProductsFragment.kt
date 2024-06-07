@@ -31,7 +31,7 @@ class ProductsFragment : Fragment(R.layout.fragment_products), AdapterView.OnIte
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        productRepository = ProductRepository(this.requireContext(), NetworkController)
+        productRepository = ProductRepository(this.requireContext())
         productAdapter = ProductAdapter(requireContext())
 
         filterMenu = PopupFilter(requireActivity(), ::updateSelection)
