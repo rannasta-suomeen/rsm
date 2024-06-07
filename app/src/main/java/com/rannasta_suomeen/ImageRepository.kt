@@ -1,10 +1,9 @@
 package com.rannasta_suomeen
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,15 +15,18 @@ class ImageRepository(private val c: Context) {
     private val imageMap: HashMap<String, ByteArray> = hashMapOf()
 
     private suspend fun loadFromInternetUnsafe(url: String): Bitmap{
-        val b = withContext(Dispatchers.IO) {
+        val stream = withContext(Dispatchers.IO) {
             withContext(Dispatchers.IO) {
                 withContext(Dispatchers.IO) {
                     URL(url).openConnection()
                 }.getInputStream()
-            }.readAllBytes()
+            }
+        }
+        val b = stream.readBytes()
+        withContext(Dispatchers.IO) {
+            stream.close()
         }
         imageMap[url] = b
-        Log.d("Images", "Size of image is: ${b.size}")
         return BitmapFactory.decodeByteArray(b,0,b.size)
     }
 
@@ -36,7 +38,7 @@ class ImageRepository(private val c: Context) {
                 continue
             }
         }
-        val drawable = c.getDrawable(R.drawable.ic_baseline_wine_bar_24)
+        val drawable = AppCompatResources.getDrawable(c,R.drawable.ic_baseline_wine_bar_24)
         return drawable!!.toBitmap()
     }
 
