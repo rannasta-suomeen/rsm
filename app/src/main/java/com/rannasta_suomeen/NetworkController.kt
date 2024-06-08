@@ -2,7 +2,9 @@ package com.rannasta_suomeen
 
 import android.util.Log
 import com.google.gson.Gson
-import com.rannasta_suomeen.data_classes.DrinkRecipe
+import com.rannasta_suomeen.data_classes.DrinkInfo
+import com.rannasta_suomeen.data_classes.GeneralIngredient
+import com.rannasta_suomeen.data_classes.IngredientsForDrink
 import com.rannasta_suomeen.data_classes.Product
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -77,13 +79,13 @@ object NetworkController {
 
     /** Makes a request and returns a list of all drinks
      * @param _payload An empty parameter to fit with rest of the architecture
-     * @return Result, either a list of [DrinkRecipe] or an [Error]
+     * @return Result, either a list of [DrinkInfo] or an [Error]
      */
-    fun getDrinks(_payload: Unit): Result<List<DrinkRecipe>> {
+    fun getDrinks(_payload: Unit): Result<List<DrinkInfo>> {
         val request = Request.Builder().url("$serverAddress/drinks").get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
-            val list = Gson().fromJson(s, Array<DrinkRecipe>::class.java)
+            val list = Gson().fromJson(s, Array<DrinkInfo>::class.java)
             list.toList()
         }
     }
@@ -99,6 +101,34 @@ object NetworkController {
         return makeTokenRequest(request) {
             val s = it.body?.string()
             val list = Gson().fromJson(s, Array<Product>::class.java)
+            list.toList()
+        }
+    }
+
+    /** Makes a request and returns a list of all drink recipes
+     * @return Result, either a list of [IngredientsForDrink] or [Error]
+     */
+    fun getDrinkRecipes(_payload: Unit):Result<List<IngredientsForDrink>>{
+        val request = Request.Builder()
+            .url("$serverAddress/recipes")
+            .get()
+        return makeTokenRequest(request){
+            val s = it.body?.string()
+            val list = Gson().fromJson(s, Array<IngredientsForDrink>::class.java)
+            list.toList()
+        }
+    }
+
+    /** Makes a request and returns a list of all ingredients
+     * @return Result, either a list of [GeneralIngredient] or [Error]
+     */
+    fun getIngredients(_payload: Unit):Result<List<GeneralIngredient>>{
+        val request = Request.Builder()
+            .url("$serverAddress/ingredients")
+            .get()
+        return makeTokenRequest(request){
+            val s = it.body?.string()
+            val list = Gson().fromJson(s, Array<GeneralIngredient>::class.java)
             list.toList()
         }
     }

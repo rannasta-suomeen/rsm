@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textViewRecipeDrinkName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:text="Tropical depression"
+            android:textSize="34sp"
+            app:layout_constraintEnd_toStartOf="@+id/imageView2"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Amount"
+            app:layout_constraintEnd_toEndOf="@+id/editTextRecipeParts"
+            app:layout_constraintStart_toStartOf="@+id/editTextRecipeParts"
+            app:layout_constraintTop_toBottomOf="@+id/textViewRecipePrice" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Volume[cl]"
+            app:layout_constraintEnd_toEndOf="@+id/editTextRecipeVolume"
+            app:layout_constraintStart_toStartOf="@+id/editTextRecipeVolume"
+            app:layout_constraintTop_toTopOf="@+id/textView2" />
+
+        <EditText
+            android:id="@+id/editTextRecipeParts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:ems="3"
+            android:hint="1.0"
+            android:textAlignment="center"
+            android:inputType="numberDecimal"
+            android:singleLine="true"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonRemoveAmount"
+            app:layout_constraintStart_toEndOf="@+id/buttonRemoveAmount"
+            app:layout_constraintTop_toTopOf="@+id/buttonRemoveAmount" />
+
+        <EditText
+            android:id="@+id/editTextRecipeVolume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:ems="3"
+            android:textAlignment="center"
+            android:hint="4"
+            android:inputType="numberDecimal"
+            android:singleLine="true"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonRemoveVolume"
+            app:layout_constraintEnd_toStartOf="@+id/buttonAddVolume"
+            app:layout_constraintTop_toTopOf="@+id/buttonRemoveVolume" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonRemoveAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2"
+            app:srcCompat="@drawable/ic_baseline_arrow_drop_down_24" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonAddAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/editTextRecipeParts"
+            app:layout_constraintStart_toEndOf="@+id/editTextRecipeParts"
+            app:layout_constraintTop_toTopOf="@id/editTextRecipeParts"
+            app:srcCompat="@drawable/ic_baseline_arrow_drop_up_24" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonRemoveVolume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            app:layout_constraintEnd_toStartOf="@+id/editTextRecipeVolume"
+            app:layout_constraintTop_toTopOf="@+id/buttonAddAmount"
+            app:srcCompat="@drawable/ic_baseline_arrow_drop_down_24" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonAddVolume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/editTextRecipeVolume"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/editTextRecipeParts"
+            app:srcCompat="@drawable/ic_baseline_arrow_drop_up_24" />
+
+        <TextView
+            android:id="@+id/textViewRecipeAbv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/abv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider3" />
+
+        <TextView
+            android:id="@+id/textViewRecipeFsd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/shots"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewRecipeAbv"
+            app:layout_constraintStart_toEndOf="@+id/textViewRecipeAbv"
+            app:layout_constraintTop_toTopOf="@+id/textViewRecipeAbv" />
+
+        <TextView
+            android:id="@+id/textViewRecipeAer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/aer"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewRecipeFsd"
+            app:layout_constraintStart_toEndOf="@+id/textViewRecipeFsd"
+            app:layout_constraintTop_toTopOf="@+id/textViewRecipeFsd" />
+
+        <TextView
+            android:id="@+id/textViewRecipePrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/price"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewRecipeAer"
+            app:layout_constraintStart_toEndOf="@+id/textView8"
+            app:layout_constraintTop_toTopOf="@+id/textViewRecipeAer"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="TextView"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewRecipeAer"
+            app:layout_constraintStart_toEndOf="@+id/textViewRecipeAer"
+            app:layout_constraintTop_toTopOf="@+id/textViewRecipeAer" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:scaleX="2"
+            android:scaleY="2"
+            app:layout_constraintEnd_toEndOf="@+id/textView9"
+            app:layout_constraintStart_toStartOf="@+id/textView9"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_baseline_check_24"
+            app:tint="@color/green" />
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/cocktail"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewDrinkParts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:listitem="@layout/item_recipe_part"
+            tools:itemCount="4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonRemoveAmount" />
+
+        <TextView
+            android:id="@+id/textView10"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="1. Add a shot of vodka\n2. Add a shot of vodka\n3. Add a shot of vodka\n4. Add a shot of vodka"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recyclerViewDrinkParts" />
+
+        <Button
+            android:id="@+id/buttonRecipeDrink"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/teal_700"
+            android:text="Dokaa"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

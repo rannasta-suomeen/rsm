@@ -14,26 +14,28 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.DrinkPreviewAdapter
 import com.rannasta_suomeen.storage.DrinkRepository
-import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.R
-import com.rannasta_suomeen.data_classes.DrinkRecipe
+import com.rannasta_suomeen.data_classes.DrinkInfo
+import com.rannasta_suomeen.data_classes.DrinkTotal
 import com.rannasta_suomeen.data_classes.DrinkType
 import com.rannasta_suomeen.data_classes.sortDrinkPreview
+import com.rannasta_suomeen.storage.TotalDrinkRepository
 import kotlinx.coroutines.*
 
 class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
 
-    private val drinkPreviewAdapter = DrinkPreviewAdapter()
-    private lateinit var drinkRepository: DrinkRepository
-    private var drinkListFull = listOf<DrinkRecipe>()
+    private lateinit var drinkPreviewAdapter: DrinkPreviewAdapter
+    private lateinit var drinkRepository: TotalDrinkRepository
+    private var drinkListFull = listOf<DrinkTotal>()
     private var drinkListFiltered = drinkListFull
 
-    private var sortType = DrinkRecipe.SortTypes.Pps
+    private var sortType = DrinkInfo.SortTypes.Pps
     private var sortByAsc = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        drinkPreviewAdapter = DrinkPreviewAdapter(requireActivity())
         super.onCreate(savedInstanceState)
-        drinkRepository = DrinkRepository(requireContext())
+        drinkRepository = TotalDrinkRepository(requireContext())
         updateSelection()
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -78,7 +80,8 @@ class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSel
                 val tList = drinkListFull.toMutableList()
                 for (i in popupMenu.menu){
                     if (!i.isChecked){
-                        tList.removeAll { d ->
+                        tList.removeAll { r ->
+                            val d = r.drink
                             when (i.itemId){
                                 R.id.menuDrinkFilterCocktail -> d.type == DrinkType.cocktail
                                 R.id.menuDrinkFilterPunch -> d.type == DrinkType.punch
@@ -104,12 +107,12 @@ class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSel
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
          sortType = when (p0!!.getItemAtPosition(p2)){
-             "Abv" ->  DrinkRecipe.SortTypes.Abv
-             "Volume" -> DrinkRecipe.SortTypes.Volume
-             "Pps" ->  DrinkRecipe.SortTypes.Pps
-             "Fsd" -> DrinkRecipe.SortTypes.Fsd
-             "Price" -> DrinkRecipe.SortTypes.Price
-             "Name" -> DrinkRecipe.SortTypes.Name
+             "Abv" ->  DrinkInfo.SortTypes.Abv
+             "Volume" -> DrinkInfo.SortTypes.Volume
+             "Pps" ->  DrinkInfo.SortTypes.Pps
+             "Fsd" -> DrinkInfo.SortTypes.Fsd
+             "Price" -> DrinkInfo.SortTypes.Price
+             "Name" -> DrinkInfo.SortTypes.Name
             else -> {throw IllegalArgumentException("Unknown thing to sort by")}
         }
         updateSelection()
