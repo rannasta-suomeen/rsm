@@ -34,7 +34,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textViewRecipePrice" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/textViewRecipeVolumeInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Volume[cl]"
@@ -70,44 +70,48 @@
             app:layout_constraintEnd_toStartOf="@+id/buttonAddVolume"
             app:layout_constraintTop_toTopOf="@+id/buttonRemoveVolume" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <ImageButton
             android:id="@+id/buttonRemoveAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:clickable="true"
+            android:background="@drawable/shape_half_circle_left"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2"
             app:srcCompat="@drawable/ic_baseline_arrow_drop_down_24" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <ImageButton
             android:id="@+id/buttonAddAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:clickable="true"
+            android:background="@drawable/shape_half_circle_right"
             app:layout_constraintBottom_toBottomOf="@+id/editTextRecipeParts"
             app:layout_constraintStart_toEndOf="@+id/editTextRecipeParts"
             app:layout_constraintTop_toTopOf="@id/editTextRecipeParts"
             app:srcCompat="@drawable/ic_baseline_arrow_drop_up_24" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <ImageButton
             android:id="@+id/buttonRemoveVolume"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:background="@drawable/shape_half_circle_left"
             android:clickable="true"
             app:layout_constraintEnd_toStartOf="@+id/editTextRecipeVolume"
             app:layout_constraintTop_toTopOf="@+id/buttonAddAmount"
             app:srcCompat="@drawable/ic_baseline_arrow_drop_down_24" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <ImageButton
             android:id="@+id/buttonAddVolume"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:clickable="true"
+            android:background="@drawable/shape_half_circle_right"
             app:layout_constraintBottom_toBottomOf="@+id/editTextRecipeVolume"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/editTextRecipeParts"

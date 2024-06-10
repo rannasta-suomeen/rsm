@@ -1,6 +1,7 @@
 package com.rannasta_suomeen.data_classes
 
 import com.rannasta_suomeen.storage.Settings
+import java.text.DecimalFormat
 
 /**
  * Class to represent a ingredient in general. This is the kotlin equivalent of the rs class Incredient
@@ -33,14 +34,14 @@ data class GeneralIngredient(
         return when (Settings.prefAlko){
             true -> {
                 when (alko_product_count > 0) {
-                    true -> alko_price_average
-                    false -> superalko_price_average
+                    true -> (alko_price_average + alko_price_min)/2
+                    false -> (superalko_price_average + superalko_price_min)/2
                 }
             }
             false ->{
                 when (superalko_product_count > 0){
-                    true -> superalko_price_average
-                    false -> alko_price_average
+                    true -> (superalko_price_average + superalko_price_min)/2
+                    false -> (alko_price_average + alko_price_min)/2
                 }
             }
         }
@@ -99,5 +100,42 @@ data class IngredientsForDrinkPointer(
 }
 
 enum class UnitType{
-    cl, ml, oz, kpl
+    cl, ml, oz, kpl;
+
+    fun convert(amount: Int, newUnit: UnitType): Double{
+        val ml = this.convertToMl(amount.toDouble())
+        return newUnit.convertFromMl(ml)
+    }
+
+    fun displayInDesiredUnit(amount: Int, desiredUnit: UnitType): String{
+        if (this == kpl) {
+            return "$amount kpl"
+        }
+        val converted = this.convert(amount, desiredUnit)
+        val unit = when (desiredUnit){
+            cl -> "cl"
+            ml -> "ml"
+            oz -> "oz"
+            kpl -> throw IllegalArgumentException("Unreachable")
+        }
+        return String.format("%.1f $unit", converted)
+    }
+
+    fun convertToMl(amount: Double): Double{
+        return when (this){
+            cl -> amount*10
+            ml -> amount
+            oz -> 29.57352956*amount
+            kpl -> throw IllegalArgumentException("Cant convert Kpl to ml")
+        }
+    }
+
+    fun convertFromMl(amount: Double): Double{
+        return when (this){
+            cl -> amount / 10
+            ml -> amount
+            oz -> 0.03381402270*amount
+            kpl -> throw IllegalArgumentException("Cant convert ml to kpl")
+        }
+    }
 }

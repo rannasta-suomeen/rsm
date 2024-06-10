@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.data_classes.DrinkInfo
 import com.rannasta_suomeen.data_classes.DrinkTotal
+import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.popup_windows.PopupDrink
 
 class DrinkPreviewAdapter(val activity: Activity): RecyclerView.Adapter<DrinkPreviewAdapter.DrinkPreviewViewHolder>() {
@@ -22,7 +23,7 @@ class DrinkPreviewAdapter(val activity: Activity): RecyclerView.Adapter<DrinkPre
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(item.standard_servings, R.string.shots)
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewPrice).text = displayDecimal(item.price(), R.string.price)
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAbv).text = displayDecimal(item.abv_average, R.string.abv)
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewVolume).text = itemView.resources.getString(R.string.volume, item.total_volume/10)
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewVolume).text = UnitType.ml.displayInDesiredUnit(i.drink.total_volume, UnitType.cl)
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewType).text = item.type.toString()
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAer).text = displayDecimal(item.pricePerServing(), R.string.aer)
             itemView.setOnClickListener {
