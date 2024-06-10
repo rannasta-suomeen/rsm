@@ -7,12 +7,14 @@ import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.IngredientsForDrink
 import com.rannasta_suomeen.data_classes.Product
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import okhttp3.internal.wait
 import java.io.IOException
 import java.net.ConnectException
 import java.net.URL
@@ -81,7 +83,7 @@ object NetworkController {
      * @param _payload An empty parameter to fit with rest of the architecture
      * @return Result, either a list of [DrinkInfo] or an [Error]
      */
-    fun getDrinks(_payload: Unit): Result<List<DrinkInfo>> {
+    suspend fun getDrinks(_payload: Unit): Result<List<DrinkInfo>> {
         val request = Request.Builder().url("$serverAddress/drinks").get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
@@ -94,7 +96,7 @@ object NetworkController {
      * @param payload a [Pair] of Limit and Offset
      * @return Result, either a list of [Product] or an [Error]
      */
-    fun getProducts(_payload: Unit): Result<List<Product>> {
+    suspend fun getProducts(_payload: Unit): Result<List<Product>> {
         val request = Request.Builder()
             .url("$serverAddress/products")
             .get()
@@ -108,7 +110,7 @@ object NetworkController {
     /** Makes a request and returns a list of all drink recipes
      * @return Result, either a list of [IngredientsForDrink] or [Error]
      */
-    fun getDrinkRecipes(_payload: Unit):Result<List<IngredientsForDrink>>{
+    suspend fun getDrinkRecipes(_payload: Unit):Result<List<IngredientsForDrink>>{
         val request = Request.Builder()
             .url("$serverAddress/recipes")
             .get()
@@ -122,7 +124,7 @@ object NetworkController {
     /** Makes a request and returns a list of all ingredients
      * @return Result, either a list of [GeneralIngredient] or [Error]
      */
-    fun getIngredients(_payload: Unit):Result<List<GeneralIngredient>>{
+    suspend fun getIngredients(_payload: Unit):Result<List<GeneralIngredient>>{
         val request = Request.Builder()
             .url("$serverAddress/ingredients")
             .get()
@@ -138,10 +140,11 @@ object NetworkController {
      * @param function that deals with a successful response that returns [R]
      * @return Result, either a [R] or a [Error]
      */
-    private fun <R> makeTokenRequest(rb: Request.Builder, function: (Response) -> R): Result<R> {
+    private suspend fun <R> makeTokenRequest(rb: Request.Builder, function: (Response) -> R): Result<R> {
         try {
             while (jwtToken == null) {
                 /* no-op */
+                delay(100)
             }
             val request = rb.header("authorization", jwtToken!!).build()
             client.newCall(request).execute().use {

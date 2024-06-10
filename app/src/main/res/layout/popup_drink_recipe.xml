@@ -150,19 +150,9 @@
             android:layout_marginStart="8dp"
             android:text="@string/price"
             app:layout_constraintBottom_toBottomOf="@+id/textViewRecipeAer"
-            app:layout_constraintStart_toEndOf="@+id/textView8"
+            app:layout_constraintStart_toEndOf="@+id/textViewRecipeAer"
             app:layout_constraintTop_toTopOf="@+id/textViewRecipeAer"
             app:layout_constraintVertical_bias="0.0" />
-
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="TextView"
-            app:layout_constraintBottom_toBottomOf="@+id/textViewRecipeAer"
-            app:layout_constraintStart_toEndOf="@+id/textViewRecipeAer"
-            app:layout_constraintTop_toTopOf="@+id/textViewRecipeAer" />
 
         <ImageView
             android:id="@+id/imageView2"
@@ -215,7 +205,7 @@
             app:layout_constraintTop_toBottomOf="@+id/buttonRemoveAmount" />
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/textViewRecipeDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -238,7 +228,7 @@
             android:text="Dokaa"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView10" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewRecipeDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

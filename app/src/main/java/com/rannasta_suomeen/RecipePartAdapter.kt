@@ -19,7 +19,8 @@ class RecipePartAdapter(context: Context): RecyclerView.Adapter<RecipePartAdapte
             with(itemView) {
                 findViewById<TextView>(R.id.textViewRecipePartName).text = item.name
                 findViewById<TextView>(R.id.textViewRecipePartVolume).text = itemView.resources.getString(R.string.volume, item.amount)
-                findViewById<TextView>(R.id.textViewRecipePartPrice).text = displayDecimal(item.ingredient.price(),R.string.price)
+                findViewById<TextView>(R.id.textViewRecipePartPrice).text = displayDecimal(item.ingredient.price()/(item.amount*100),R.string.price)
+                findViewById<TextView>(R.id.textViewRecipePartAer).text = displayDecimal(item.ingredient.price(),R.string.ppl)
             }
         }
 

@@ -25,19 +25,15 @@ abstract class GenericRepository<R,T>(context: Context, fn: String) {
     private var syncedFromInternet = false
     abstract val input: T
     private val file: File =  File(context.filesDir, fn)
-    abstract val getFn: (T) -> Result<List<R>>
+    abstract val getFn: suspend (T) -> Result<List<R>>
     // BECAUSE FUCK YOU KOTLIN
     abstract val type: Class<Array<R>>
-
 
     val dataFlow: Flow<List<R>> = flow{
         when (memoryCopy.isPresent){
             true -> emit(memoryCopy.get())
             false -> {
                 val t = loadFromFile()
-                if (t == null){
-                    Log.d("Storage", "t is null")
-                }
                 t?.let { emit(it) }
                 memoryCopy = Optional.ofNullable(t)
                 // TODO There is a (small) performance improvement in starting the network request BEFORE making the file fetch
@@ -71,7 +67,6 @@ abstract class GenericRepository<R,T>(context: Context, fn: String) {
     }
 
     private fun writeToFile(list: List<R>){
-        Log.d("Storage", "Ran write to file for $list")
         file.writeText(Gson().toJson(list))
     }
 }
@@ -130,7 +125,6 @@ class TotalDrinkRepository(context: Context) {
                 }
             }
             launch {
-                Log.d("Storage", "Got past first flow")
                 ingRepo.dataFlow.collect {
                     ingredientList = it
                     emitCurrent()
