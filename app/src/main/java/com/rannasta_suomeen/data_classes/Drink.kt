@@ -17,6 +17,12 @@ data class DrinkInfo(
 
     val recipe_id: Int,
 
+    val alko_price_per_serving: Double,
+    val superalko_price_per_serving: Double,
+
+    val alko_aer: Double,
+    val superalko_aer: Double,
+
     /** Volume of the drink in ml*/
     val total_volume : Int,
     val standard_servings: Double,

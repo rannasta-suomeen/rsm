@@ -4,17 +4,16 @@ import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
-import com.google.gson.reflect.TypeToken
 import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.data_classes.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
-import java.lang.reflect.Type
 import java.util.Optional
-import kotlin.reflect.typeOf
 
 private const val DRINKFILENAME = "drinks"
 private const val PRODUCTFILENAME = "products"
@@ -36,6 +35,9 @@ abstract class GenericRepository<R,T>(context: Context, fn: String) {
             true -> emit(memoryCopy.get())
             false -> {
                 val t = loadFromFile()
+                if (t == null){
+                    Log.d("Storage", "t is null")
+                }
                 t?.let { emit(it) }
                 memoryCopy = Optional.ofNullable(t)
                 // TODO There is a (small) performance improvement in starting the network request BEFORE making the file fetch
@@ -57,6 +59,7 @@ abstract class GenericRepository<R,T>(context: Context, fn: String) {
     private fun loadFromFile(): List<R>?{
         return try{
             val t: Array<R> = Gson().fromJson(file.readText(), type)
+            Log.d("Storage", "Loaded ${t.size}")
             t.toList()
         } catch (e: FileNotFoundException){
             null
@@ -68,7 +71,7 @@ abstract class GenericRepository<R,T>(context: Context, fn: String) {
     }
 
     private fun writeToFile(list: List<R>){
-        Log.d("Storage", "Ran write to file")
+        Log.d("Storage", "Ran write to file for $list")
         file.writeText(Gson().toJson(list))
     }
 }
@@ -100,32 +103,46 @@ class IngredientForDrinkRepository(context: Context): GenericRepository<Ingredie
     override val type = Array<IngredientsForDrink>::class.java
 }
 
-class TotalDrinkRepository(context: Context){
+class TotalDrinkRepository(context: Context) {
     private val ingRepo = IngredientRepository(context)
     private val recipeRepo = IngredientForDrinkRepository(context)
-    private var drinkRepository = DrinkRepository(context)
+    private val drinkRepository = DrinkRepository(context)
     private var ingredientList: List<GeneralIngredient> = listOf()
     private var recipeList: List<IngredientsForDrink> = listOf()
     private var drinkList: List<DrinkInfo> = listOf()
 
-    val dataFlow:Flow<List<DrinkTotal>> = flow {
-        suspend fun emitCurrent(){
-            emit(recipeList.mapNotNull { ings ->
-                drinkList.find{it.recipe_id == ings.recipe_id}?.let { ings.toPointer(ingredientList)
-                    ?.let { it1 -> DrinkTotal(it, it1) } }
-            })
-        }
-        drinkRepository.dataFlow.collect{
-            drinkList = it
-            emitCurrent()
-        }
-        ingRepo.dataFlow.collect{
-            ingredientList = it
-            emitCurrent()
-        }
-        recipeRepo.dataFlow.collect{
-            recipeList = it
-            emitCurrent()
+    val dataFlow: MutableSharedFlow<List<DrinkTotal>> = MutableSharedFlow()
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            suspend fun emitCurrent() {
+                dataFlow.emit(recipeList.mapNotNull { ings ->
+                    drinkList.find { it.recipe_id == ings.recipe_id }?.let {
+                        ings.toPointer(ingredientList)
+                            ?.let { it1 -> DrinkTotal(it, it1) }
+                    }
+                })
+            }
+            launch {
+                drinkRepository.dataFlow.collect {
+                    drinkList = it
+                    emitCurrent()
+                }
+            }
+            launch {
+                Log.d("Storage", "Got past first flow")
+                ingRepo.dataFlow.collect {
+                    ingredientList = it
+                    emitCurrent()
+                }
+            }
+            launch {
+                recipeRepo.dataFlow.collect {
+                    recipeList = it
+                    emitCurrent()
+                }
+            }
         }
     }
+
 }
