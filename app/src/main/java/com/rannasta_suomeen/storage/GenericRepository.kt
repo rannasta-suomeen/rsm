@@ -75,13 +75,15 @@ abstract class GenericRepository<R,T>(context: Context, fn: String) {
 
 class DrinkRepository(context: Context):
     GenericRepository<DrinkInfo, Unit>(context, DRINKFILENAME){
-    override val input = Unit
     override val getFn = NetworkController::getDrinks
     override val type = Array<DrinkInfo>::class.java
+    override val input: Unit = Unit
+
 }
 
-class ProductRepository(context: Context): GenericRepository<Product, Pair<Int, Int>>(context, PRODUCTFILENAME){
-    override val input = Pair(100000,0)
+class ProductRepository(context: Context):
+    GenericRepository<Product, Unit>(context, PRODUCTFILENAME){
+    override val input: Unit = Unit
     override val getFn = NetworkController::getProducts
     override val type = Array<Product>::class.java
 }

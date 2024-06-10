@@ -18,14 +18,13 @@ data class Product(
     val aer: Double,
     val unit_price: Double,
     val checksum: String,
-    val count: Int,
     val retailer: Retailer
 ){
     init {
         Log.d("Drink", "Created drink with id $id, $category_id, $subcategory_id")
     }
     enum class SortTypes{
-        Name, Price, Volume, Abv, Pps, UnitPrice, Count, Fsd
+        Name, Price, Volume, Abv, Pps, UnitPrice, Fsd
     }
 
     fun pps(): Double{
@@ -55,7 +54,6 @@ fun sort(list: List<Product>, type: Product.SortTypes, asc: Boolean): List<Produ
         Product.SortTypes.Abv -> list.sortedBy {it.abv}
         Product.SortTypes.Pps -> list.sortedBy { it.pps() }
         Product.SortTypes.UnitPrice -> list.sortedBy { it.unit_price }
-        Product.SortTypes.Count -> list.sortedBy { it.count }
         Product.SortTypes.Fsd -> list.sortedBy { it.fsd() }
     }
     if (!asc){sortedAsc = sortedAsc.reversed()}

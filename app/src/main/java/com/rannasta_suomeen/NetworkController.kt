@@ -94,9 +94,9 @@ object NetworkController {
      * @param payload a [Pair] of Limit and Offset
      * @return Result, either a list of [Product] or an [Error]
      */
-    fun getProducts(payload: Pair<Int, Int>): Result<List<Product>> {
+    fun getProducts(_payload: Unit): Result<List<Product>> {
         val request = Request.Builder()
-            .url("$serverAddress/products?limit=${payload.first}&offset=${payload.second}&name=%%")
+            .url("$serverAddress/products")
             .get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
