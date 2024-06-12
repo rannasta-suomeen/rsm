@@ -42,8 +42,6 @@ data class Product(
     companion object{
         const val FSD_CL = 1.6f
     }
-
-
 }
 
 fun sort(list: List<Product>, type: Product.SortTypes, asc: Boolean): List<Product>{

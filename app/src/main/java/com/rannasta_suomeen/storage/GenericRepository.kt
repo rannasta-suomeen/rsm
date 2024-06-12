@@ -19,6 +19,8 @@ private const val DRINKFILENAME = "drinks"
 private const val PRODUCTFILENAME = "products"
 private const val INGREDIENTFILENAME = "ingredients"
 private const val INGREDIENTFORDRINKFILENAME = "drink_ingredients"
+private const val INGREDIENTPRODUCTFILTERFILENAME = "ingredient_product_filter"
+private const val INVENTORYFILENAME = "inventory"
 
 abstract class GenericRepository<R,T>(context: Context, fn: String) {
     private var memoryCopy: Optional<List<R>> = Optional.empty()
@@ -76,7 +78,6 @@ class DrinkRepository(context: Context):
     override val getFn = NetworkController::getDrinks
     override val type = Array<DrinkInfo>::class.java
     override val input: Unit = Unit
-
 }
 
 class ProductRepository(context: Context):
@@ -96,6 +97,18 @@ class IngredientForDrinkRepository(context: Context): GenericRepository<Ingredie
     override val getFn = NetworkController::getDrinkRecipes
     override val input = Unit
     override val type = Array<IngredientsForDrink>::class.java
+}
+
+class ProductToIngredientRepository(context: Context): GenericRepository<IngredientProductFilter, Unit>(context, INGREDIENTPRODUCTFILTERFILENAME){
+    override val getFn = NetworkController::getProductIngredientFilter
+    override val input = Unit
+    override val type = Array<IngredientProductFilter>::class.java
+}
+
+class InventoryRepository(context: Context): GenericRepository<InventoryItem, Unit>(context, INVENTORYFILENAME){
+    override val getFn = TODO()
+    override val input = Unit
+    override val type = Array<InventoryItem>::class.java
 }
 
 class TotalDrinkRepository(context: Context) {

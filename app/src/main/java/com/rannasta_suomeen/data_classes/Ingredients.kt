@@ -121,7 +121,7 @@ enum class UnitType{
         return String.format("%.1f $unit", converted)
     }
 
-    fun convertToMl(amount: Double): Double{
+    private fun convertToMl(amount: Double): Double{
         return when (this){
             cl -> amount*10
             ml -> amount
@@ -130,7 +130,7 @@ enum class UnitType{
         }
     }
 
-    fun convertFromMl(amount: Double): Double{
+    private fun convertFromMl(amount: Double): Double{
         return when (this){
             cl -> amount / 10
             ml -> amount
@@ -139,3 +139,22 @@ enum class UnitType{
         }
     }
 }
+
+class IngredientProductFilter(
+    val ingredient_id: Int,
+    val product_ids: Array<Int>,
+){
+    fun toPointer(ingredientList: HashMap<Int, GeneralIngredient>,productList: HashMap<Int, Product>): IngredientProductFilterPointer?{
+        val ingredient = ingredientList[ingredient_id]
+        val products = product_ids.map{ productList[it] }
+        if (ingredient != null && !products.contains(null)){
+            return IngredientProductFilterPointer(ingredient, products.map { it!! })
+        }
+        return null
+    }
+}
+
+class IngredientProductFilterPointer(
+    val ingredient: GeneralIngredient,
+    val products: List<Product>,
+)

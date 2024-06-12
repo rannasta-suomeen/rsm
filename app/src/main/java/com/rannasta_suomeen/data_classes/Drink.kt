@@ -76,7 +76,17 @@ data class DrinkInfo(
 /**
  * Class to represent a drink with all of its information
  */
-data class DrinkTotal(val drink: DrinkInfo, val ingredients: IngredientsForDrinkPointer)
+data class DrinkTotal(val drink: DrinkInfo, val ingredients: IngredientsForDrinkPointer){
+    // TODO: Change to hashmaps for faster performace
+    fun missingIngredients(inventory: List<InventoryItem>,helper:  HashMap<Int, IngredientProductFilter>): Int{
+        return ingredients.recipeParts.fold(0) { acc, x ->
+            when (inventory.find { helper[x.ingredient.id]?.product_ids?.contains(it.product_id) == true } != null){
+                true -> acc
+                false -> acc + 1
+            }
+        }
+    }
+}
 
 fun sortDrinkPreview(list: List<DrinkTotal>, type: DrinkInfo.SortTypes, asc: Boolean): List<DrinkTotal>{
     var sortedAsc = when (type){

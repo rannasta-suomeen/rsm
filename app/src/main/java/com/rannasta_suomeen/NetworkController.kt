@@ -2,10 +2,7 @@ package com.rannasta_suomeen
 
 import android.util.Log
 import com.google.gson.Gson
-import com.rannasta_suomeen.data_classes.DrinkInfo
-import com.rannasta_suomeen.data_classes.GeneralIngredient
-import com.rannasta_suomeen.data_classes.IngredientsForDrink
-import com.rannasta_suomeen.data_classes.Product
+import com.rannasta_suomeen.data_classes.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -92,8 +89,21 @@ object NetworkController {
         }
     }
 
+    /** Makes a request and returns a list of all IngredientProductFilters
+     * @param _payload An empty parameter to fit with rest of the architecture
+     * @return Result, either a list of [IngredientProductFilter] or [Error]
+     */
+    suspend fun getProductIngredientFilter(_payload: Unit): Result<List<IngredientProductFilter>>{
+        val request = Request.Builder().url("$serverAddress/ingprofilter").get()
+        return makeTokenRequest(request){
+            val s = it.body?.string()
+            val list = Gson().fromJson(s, Array<IngredientProductFilter>::class.java)
+            list.toList()
+        }
+    }
+
     /** Makes a request and returns a list of all drinks
-     * @param payload a [Pair] of Limit and Offset
+     * @param _payload An empty parameter to fit with rest of the architecture
      * @return Result, either a list of [Product] or an [Error]
      */
     suspend fun getProducts(_payload: Unit): Result<List<Product>> {
@@ -108,6 +118,7 @@ object NetworkController {
     }
 
     /** Makes a request and returns a list of all drink recipes
+     * @param _payload An empty parameter to fit with rest of the architecture
      * @return Result, either a list of [IngredientsForDrink] or [Error]
      */
     suspend fun getDrinkRecipes(_payload: Unit):Result<List<IngredientsForDrink>>{
@@ -122,6 +133,7 @@ object NetworkController {
     }
 
     /** Makes a request and returns a list of all ingredients
+     * @param _payload An empty parameter to fit with rest of the architecture
      * @return Result, either a list of [GeneralIngredient] or [Error]
      */
     suspend fun getIngredients(_payload: Unit):Result<List<GeneralIngredient>>{
