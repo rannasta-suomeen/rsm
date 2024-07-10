@@ -15,7 +15,7 @@
     </group>
     <group android:enabled="true">
         <item
-            android:title="@string/storage"
+            android:title="@string/cabinets"
             android:id="@+id/menuMainStorage"/>
         <item
             android:title="@string/settings"

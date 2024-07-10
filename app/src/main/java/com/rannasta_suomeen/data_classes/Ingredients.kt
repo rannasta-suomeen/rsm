@@ -1,7 +1,6 @@
 package com.rannasta_suomeen.data_classes
 
 import com.rannasta_suomeen.storage.Settings
-import java.text.DecimalFormat
 
 /**
  * Class to represent a ingredient in general. This is the kotlin equivalent of the rs class Incredient
@@ -30,8 +29,8 @@ data class GeneralIngredient(
 ){
     val standard_servings = abv_average
 
-    fun price(): Double{
-        return when (Settings.prefAlko){
+    fun price(s: Settings): Double{
+        return when (s.prefAlko){
             true -> {
                 when (alko_product_count > 0) {
                     true -> (alko_price_average + alko_price_min)/2
@@ -49,11 +48,11 @@ data class GeneralIngredient(
 }
 
 enum class IngredientType{
-    LightAlcoholProduct,
-    StrongAlcoholProduct,
-    Common,
-    Mixer,
-    Grocery,
+    light_alcohol_product,
+    strong_alcohol_product,
+    common,
+    mixer,
+    grocery,
 }
 
 /**
@@ -104,6 +103,11 @@ enum class UnitType{
 
     fun convert(amount: Int, newUnit: UnitType): Double{
         val ml = this.convertToMl(amount.toDouble())
+        return newUnit.convertFromMl(ml)
+    }
+
+    fun convert(amount: Double, newUnit: UnitType): Double{
+        val ml = this.convertToMl(amount)
         return newUnit.convertFromMl(ml)
     }
 

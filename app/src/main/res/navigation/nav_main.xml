@@ -12,5 +12,10 @@
         android:id="@+id/fragmentProducts"
         android:name="com.rannasta_suomeen.main_fragments.ProductsFragment"
         android:label="FragmentProducts"/>
+    <fragment
+        android:id="@+id/fragmentCabinets"
+        android:name="com.rannasta_suomeen.main_fragments.CabinetFragment"
+        android:label="FragmentCabinets"
+        />
 
 </navigation>

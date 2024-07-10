@@ -1,6 +1,7 @@
 package com.rannasta_suomeen.popup_windows
 
 
+import android.app.Activity
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,7 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.*
 
 class PopupFilter(
-    private val activity: FragmentActivity,
+    private val activity: Activity,
     private val updateFun: () -> Unit
 ) {
 

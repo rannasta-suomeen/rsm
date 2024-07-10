@@ -19,10 +19,14 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.navigation.NavigationView
-import com.rannasta_suomeen.storage.EncryptedStorage
+import com.rannasta_suomeen.main_fragments.CabinetFragment
+import com.rannasta_suomeen.main_fragments.DrinksFragment
+import com.rannasta_suomeen.main_fragments.ProductsFragment
+import com.rannasta_suomeen.storage.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -30,33 +34,52 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawer: DrawerLayout
     private lateinit var navController : NavController
     private lateinit var  encryptedStorage: EncryptedStorage
+    private lateinit var imageRepository: ImageRepository
+    private lateinit var totalCabinetRepository: TotalCabinetRepository
+    private lateinit var settings: Settings
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val target = when(item.itemId){
-            R.id.menuMainProducts -> R.id.fragmentProducts
+            R.id.menuMainProducts -> ProductsFragment(this, imageRepository, settings, totalCabinetRepository)
             R.id.menuMainCharts -> TODO()
-            R.id.menuMainDrinks -> R.id.fragmentDrinks
+            R.id.menuMainDrinks -> DrinksFragment(this, settings, totalCabinetRepository)
             R.id.menuMainSettings -> TODO()
-            R.id.menuMainStorage -> TODO()
+            R.id.menuMainStorage -> CabinetFragment(this, imageRepository, settings, totalCabinetRepository)
             else -> throw IllegalArgumentException("Attempted to navigate to ${item.itemId} witch is not possible")
         }
-        navController.navigate(target)
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.navHostFragmentMain, target)
+        transaction.commit()
         drawer.closeDrawer(GravityCompat.START)
         return true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        settings = Settings(this)
+        ingredientRepository = IngredientRepository(applicationContext)
+        productRepository = ProductRepository(applicationContext)
+        totalDrinkRepository = TotalDrinkRepository(applicationContext)
+        totalCabinetRepository = TotalCabinetRepository(applicationContext, settings)
         encryptedStorage = EncryptedStorage(applicationContext)
-        setupToken()
+        imageRepository = ImageRepository(applicationContext)
+
         setContentView(R.layout.layout_activity_main)
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbarMain)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            totalCabinetRepository.selectedCabinetFlow.collect{
+                runOnUiThread {
+                    toolbar.title = it?.name?:"No cabinet selected"
+                }
+            }
+        }
+        setupToken()
 
         val navHostFragment=supportFragmentManager.findFragmentById(R.id.navHostFragmentMain) as NavHostFragment
         navController = navHostFragment.findNavController()
         val navView = findViewById<NavigationView>(R.id.navViewMain)
-        val toolbar = findViewById<Toolbar>(R.id.toolbarMain)
-
-        toolbar.title = resources.getString(R.string.app_name)
 
         drawer = findViewById<DrawerLayout>(R.id.drawerLayoutMain)
         val toggle = ActionBarDrawerToggle(this,drawer,toolbar,0,0)

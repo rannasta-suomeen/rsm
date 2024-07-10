@@ -1,6 +1,7 @@
 package com.rannasta_suomeen.popup_windows
 
 import android.app.Activity
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -18,19 +19,19 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.RecipePartAdapter
 import com.rannasta_suomeen.data_classes.DrinkTotal
+import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.storage.DRINK_VOLUME_UNIT
 import com.rannasta_suomeen.storage.Settings
 import java.text.DecimalFormat
 import kotlin.math.max
 
-class PopupDrink(val drink: DrinkTotal, activity: Activity) {
+class PopupDrink(val drink: DrinkTotal, activity: Activity, owned: List<GeneralIngredient>,private val settings: Settings) {
 
     private var amount = 1.0
     private var window: PopupWindow
-    private var volume = DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, Settings.prefUnit) * amount
+    private var volume = DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, settings.prefUnit) * amount
     init {
-
-        val adapter = RecipePartAdapter(activity.applicationContext)
+        val adapter = RecipePartAdapter(activity.applicationContext, owned, settings)
         val view = activity.layoutInflater.inflate(R.layout.popup_drink_recipe, null)
 
         fun displayDecimal(x: Double, stringId: Int): String{
@@ -43,14 +44,14 @@ class PopupDrink(val drink: DrinkTotal, activity: Activity) {
         with(view) {
 
             findViewById<TextView>(R.id.textViewRecipeAbv).text = displayDecimal(drink.drink.abv_average, R.string.abv)
-            findViewById<TextView>(R.id.textViewRecipeAer).text = displayDecimal(drink.drink.pricePerServing(), R.string.aer)
+            findViewById<TextView>(R.id.textViewRecipeAer).text = displayDecimal(drink.drink.pricePerServing(settings), R.string.aer)
             val fsdView = findViewById<TextView>(R.id.textViewRecipeFsd)
             fsdView.text = displayDecimal(drink.drink.standard_servings, R.string.shots)
             val priceView = findViewById<TextView>(R.id.textViewRecipePrice)
-            priceView.text = displayDecimal(drink.drink.price(), R.string.price)
+            priceView.text = displayDecimal(drink.drink.price(settings), R.string.price)
             findViewById<TextView>(R.id.textViewRecipeDescription).text = drink.drink.info
             findViewById<TextView>(R.id.textViewRecipeDrinkName).text = drink.drink.name
-            findViewById<TextView>(R.id.textViewRecipeVolumeInfo).text = "Volume[${Settings.prefUnit}]"
+            findViewById<TextView>(R.id.textViewRecipeVolumeInfo).text = "Volume[${settings.prefUnit}]"
 
             val volCounter = findViewById<EditText>(R.id.editTextRecipeVolume)
             val amountCounter = findViewById<EditText>(R.id.editTextRecipeParts)
@@ -68,7 +69,7 @@ class PopupDrink(val drink: DrinkTotal, activity: Activity) {
             // Edit texts that change the data
             fun updateByAmount(){
                 volCounter.text.clear()
-                volume = DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, Settings.prefUnit) * amount
+                volume = DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, settings.prefUnit) * amount
                 volCounter.text.append(volume.toString())
                 priceView.text = displayDecimal(calculatePrice(), R.string.price)
                 fsdView.text = displayDecimal(drink.drink.standard_servings*amount, R.string.shots)
@@ -83,7 +84,7 @@ class PopupDrink(val drink: DrinkTotal, activity: Activity) {
             }
 
             fun updateByVolume(){
-                amount = volume/DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, Settings.prefUnit)
+                amount = volume/DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, settings.prefUnit)
                 val df = DecimalFormat("#.#")
                 amount = df.format(amount).toDouble()
                 amountCounter.text.clear()
@@ -125,12 +126,12 @@ class PopupDrink(val drink: DrinkTotal, activity: Activity) {
             }
 
         }
-        adapter.submitItems(drink.ingredients.recipeParts.toList())
+        adapter.submitItems(drink.ingredients.recipeParts.toList(), owned)
         adapter.submitAmount(amount)
     }
 
     private fun calculatePrice(): Double{
-        return drink.drink.price() * amount
+        return drink.drink.price(settings) * amount
     }
 
     fun show(parent: View){

@@ -4,7 +4,7 @@
     <string name="charts">Charts</string>
     <string name="drinks">Drinks</string>
     <string name="settings">Settings</string>
-    <string name="storage">Storage</string>
+    <string name="cabinets">Cabinets</string>
     <string name="price">%1$s €</string>
     <string name="volume">%1$d cl</string>
     <string name="aer">%1$s €/fsd</string>
@@ -16,6 +16,8 @@
     <string name="punch">Punch</string>
     <string name="makeable">Makeable</string>
     <string name="remember_me">Remember me</string>
+    <string name="pref_file_key">preferences</string>
+    <string name="no_cabinet_selected">No cabinet selected</string>
     <string-array name="drinks_possible_sort">
         <item>Name</item>
         <item>Abv</item>

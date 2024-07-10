@@ -1,26 +1,37 @@
 package com.rannasta_suomeen.storage
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.data_classes.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.Optional
+import com.rannasta_suomeen.NetworkController.CabinetOperation
+import com.rannasta_suomeen.NetworkController.AddItemToCabinet
+import com.rannasta_suomeen.NetworkController.RemoveItemFromCabinet
+import com.rannasta_suomeen.NetworkController.NewCabinet
+import com.rannasta_suomeen.NetworkController.DeleteCabinet
+import com.rannasta_suomeen.NetworkController.MakeItemUnusable
+import com.rannasta_suomeen.NetworkController.MakeItemUsable
+import com.rannasta_suomeen.NetworkController.tryNTimes
+import com.rannasta_suomeen.ingredientRepository
+import com.rannasta_suomeen.productRepository
 
 private const val DRINKFILENAME = "drinks"
 private const val PRODUCTFILENAME = "products"
 private const val INGREDIENTFILENAME = "ingredients"
 private const val INGREDIENTFORDRINKFILENAME = "drink_ingredients"
 private const val INGREDIENTPRODUCTFILTERFILENAME = "ingredient_product_filter"
-private const val INVENTORYFILENAME = "inventory"
+private const val CABINETSFILENAME = "cabinets"
+private const val NETACTIONFILENAME = "netactions"
 
 abstract class GenericRepository<R,T>(context: Context, fn: String) {
     private var memoryCopy: Optional<List<R>> = Optional.empty()
@@ -105,21 +116,254 @@ class ProductToIngredientRepository(context: Context): GenericRepository<Ingredi
     override val type = Array<IngredientProductFilter>::class.java
 }
 
-class InventoryRepository(context: Context): GenericRepository<InventoryItem, Unit>(context, INVENTORYFILENAME){
-    override val getFn = TODO()
-    override val input = Unit
-    override val type = Array<InventoryItem>::class.java
+class CabinetRepository(context: Context){
+    private var state: MutableList<CabinetStorable> = mutableListOf()
+    val stateFlow: MutableSharedFlow<List<CabinetStorable>> = MutableSharedFlow(1)
+    private var serverState: List<CabinetStorable> = listOf()
+    private val serverFlow = MutableSharedFlow<List<CabinetStorable>>()
+
+    private var netActionQueue: MutableList<CabinetOperation> = mutableListOf()
+    private val file = File(context.filesDir, CABINETSFILENAME)
+    private val netQueueFile = File(context.filesDir, NETACTIONFILENAME)
+
+    private val stateMutex = Mutex()
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            launch { serverFlow.collect{
+                // TODO: Add timestamps and use them
+                serverState = it
+                stateMutex.withLock {
+                    state = serverState.toMutableList()
+                    stateFlow.emit(state)
+                }
+            }}
+            stateMutex.withLock {
+                if (state.size == 0){
+                    state = Gson().fromJson(file.readText(), Array<CabinetStorable>::class.java).toMutableList()
+                    stateFlow.emit(state)
+                }
+            }
+            try {
+                // TODO: Make this parse netActionQueue from file, and regognice diffirent versions of netaction
+                // netActionQueue = Gson().fromJson(netQueueFile.readText(), Array<CabinetOperation>::class.java).toMutableList()
+            } catch (_: FileNotFoundException) {
+            } catch (_: JsonParseException){
+                Log.d("Storage", "Failed to parse $netQueueFile")
+                netQueueFile.delete()
+            }
+            tryNTimes(5, Unit, NetworkController::getCabinetsTotal).onSuccess { serverFlow.emit(it)}
+            while (true){
+                when(netActionQueue.isNotEmpty()){
+                    true -> processNetOperation(netActionQueue.first())
+                    false -> delay(100)
+                }
+            }
+        }
+    }
+
+    private suspend fun processNetOperation(oper: CabinetOperation){
+        // TODO: Add timestamps and use them
+       val res = when (oper){
+            is AddItemToCabinet -> NetworkController.tryNTimes(5,oper,NetworkController::insertCabinetProduct)
+            is DeleteCabinet  -> NetworkController.tryNTimes(5,oper,NetworkController::deleteCabinet)
+            is RemoveItemFromCabinet -> NetworkController.tryNTimes(5,oper,NetworkController::deleteCabinetProduct)
+            is MakeItemUnusable -> NetworkController.tryNTimes(5,oper,NetworkController::unusableCabinetProduct)
+            is MakeItemUsable -> NetworkController.tryNTimes(5,oper,NetworkController::usableCabinetProduct)
+            is NewCabinet -> NetworkController.tryNTimes(5,oper,NetworkController::createCabinet)
+            is NetworkController.ModifyCabinetProductAmount -> NetworkController.tryNTimes(5,oper,NetworkController::modifyCabinetProduct)
+        }
+        // TODO: Due to the function being suspend this may not allways remove the correct thing.
+        if (res.isSuccess){
+            netActionQueue.removeAt(0)
+            netQueueFile.writeText(Gson().toJson(netActionQueue))
+        }
+    }
+
+    private fun addActionToQueue(oper: CabinetOperation){
+        netActionQueue.add(oper)
+        CoroutineScope(Dispatchers.IO).launch {
+            netQueueFile.writeText(Gson().toJson(netActionQueue))
+        }
+    }
+
+    private fun updateState(fn: (MutableList<CabinetStorable>) -> Unit){
+        fn(state)
+        CoroutineScope(Dispatchers.IO).launch {
+            stateFlow.emit(state)
+            file.writeText(Gson().toJson(state))
+        }
+    }
+
+    fun newCabinet(c: NewCabinet){
+        // TODO: fix this does not work without internet with our current structure
+        CoroutineScope(Dispatchers.IO).launch {
+            NetworkController.tryNTimes(5,c,NetworkController::createCabinet).onSuccess {
+                stateMutex.withLock {
+                    state.add(CabinetStorable(it,c.name, mutableListOf()))
+                    stateFlow.emit(state.toList())
+                }
+            }
+        }
+    }
+
+    fun deleteCabinet(c: DeleteCabinet){
+        addActionToQueue(c)
+        updateState { it.removeIf { it.id == c.id } }
+    }
+
+    fun addItemToCabinet(c: AddItemToCabinet){
+        addActionToQueue(c)
+        updateState { it.find { it.id == c.id }?.let { it.products.add(CabinetProductCompact(c.pid,c.amount, true)) } }
+    }
+
+    fun removeItemFromCabinet(c: RemoveItemFromCabinet){
+        addActionToQueue(c)
+        updateState { it.find { it.id == c.id }?.let { it.products.removeIf { it.product_id == c.pid } } }
+    }
+
+    fun modifyCabinetProductAmount(c: NetworkController.ModifyCabinetProductAmount){
+        addActionToQueue(c)
+        updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.amount_ml = c.amount} } }
+    }
+
+    fun makeItemUsable(c: MakeItemUsable){
+        addActionToQueue(c)
+        updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.usable = true} } }
+    }
+
+    fun makeItemUnUsable(c: MakeItemUnusable){
+        addActionToQueue(c)
+        updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.usable = false} } }
+    }
+}
+
+class TotalCabinetRepository(context: Context, private val settings: Settings){
+    private val cabinetRepository = CabinetRepository(context)
+    private val productToIngredientRepository = ProductToIngredientRepository(context)
+
+    private var generalIngredientList: HashMap<Int,GeneralIngredient> = HashMap()
+    private var productMap:HashMap<Int, Product> = HashMap()
+    private var productIngredientList = listOf<IngredientProductFilter>()
+    private var productIngredientListPointer = listOf<IngredientProductFilterPointer>()
+    var cabinetList: List<CabinetStorable> = listOf()
+    private var lock = Mutex()
+
+    var selectedCabinetFlow: MutableSharedFlow<Cabinet?> = MutableSharedFlow(1)
+    var selectedCabinet: Cabinet? = null
+
+    val cabinetFlow: MutableSharedFlow<List<Cabinet>> = MutableSharedFlow(1)
+
+    val ownedProductFlow: MutableSharedFlow<List<GeneralIngredient>> = MutableSharedFlow(1)
+
+    private suspend fun emitCurrent() {
+        productIngredientListPointer = productIngredientList.mapNotNull { it.toPointer(generalIngredientList, productMap) }
+
+        cabinetFlow.emit(cabinetList.mapNotNull { cab ->
+            val t = cab.toCabinet(productMap)
+            if ((selectedCabinet == null && settings.cabinet == t?.id) || selectedCabinet?.id == t?.id){
+                selectedCabinet = t
+                selectedCabinetFlow.emit(t)
+            }
+            t
+        })
+        ownedProductFlow.emit(
+            productIngredientListPointer.filter {
+                it.products.find { p->
+                    selectedCabinet?.products?.map { it.product }?.find { it.id == p.id} != null
+                } != null
+            }.map { it.ingredient }
+        )
+    }
+
+    fun createCabinet(name: String) {
+        cabinetRepository.newCabinet(NewCabinet(name))
+    }
+
+    fun changeSelectedCabinet(cabinet: Cabinet?){
+        selectedCabinet = cabinet
+        if (cabinet != null) {
+            settings.cabinet = cabinet.id
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            emitCurrent()
+            selectedCabinetFlow.emit(selectedCabinet)
+        }
+    }
+
+    fun deleteCabinet(id: Int) {
+        cabinetRepository.deleteCabinet(DeleteCabinet(id))
+    }
+
+    fun addItemToCabinet(id: Int, pid: Int, amount: Int?) {
+        cabinetRepository.addItemToCabinet(AddItemToCabinet(id,pid, amount))
+    }
+
+    fun removeItemFromCabinet(id: Int, pid: Int) {
+        cabinetRepository.removeItemFromCabinet(RemoveItemFromCabinet(id,pid))
+    }
+
+    fun makeItemUsable(id: Int, pid: Int){
+        cabinetRepository.makeItemUsable(MakeItemUsable(id,pid))
+    }
+
+    fun makeItemUnusable(id: Int, pid: Int){
+        cabinetRepository.makeItemUnUsable(MakeItemUnusable(id, pid))
+    }
+
+    fun modifyCabinetProductAmount(id: Int, pid: Int, amount: Int?){
+        cabinetRepository.modifyCabinetProductAmount(NetworkController.ModifyCabinetProductAmount(id, pid, amount))
+    }
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            launch {
+                productRepository.dataFlow.collect {
+                    lock.withLock {
+                        it.forEach { p ->
+                            productMap[p.id] = p
+                        }
+                        emitCurrent()
+                    }
+                }
+            }
+            launch {
+                cabinetRepository.stateFlow.collect {
+                    lock.withLock {
+                        cabinetList = it
+                        emitCurrent()
+                    }
+                }
+            }
+            launch {
+                productToIngredientRepository.dataFlow.collect{
+                    lock.withLock {
+                        productIngredientList = it
+                        emitCurrent()
+                    }
+                }
+            }
+            launch {
+                ingredientRepository.dataFlow.collect{
+                    lock.withLock {
+                        generalIngredientList.clear()
+                        it.forEach { generalIngredientList[it.id] = it }
+                        emitCurrent()
+                    }
+                }
+            }
+        }
+    }
 }
 
 class TotalDrinkRepository(context: Context) {
-    private val ingRepo = IngredientRepository(context)
     private val recipeRepo = IngredientForDrinkRepository(context)
     private val drinkRepository = DrinkRepository(context)
     private var ingredientList: List<GeneralIngredient> = listOf()
     private var recipeList: List<IngredientsForDrink> = listOf()
     private var drinkList: List<DrinkInfo> = listOf()
 
-    val dataFlow: MutableSharedFlow<List<DrinkTotal>> = MutableSharedFlow()
+    val dataFlow: MutableSharedFlow<List<DrinkTotal>> = MutableSharedFlow(1)
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -138,7 +382,7 @@ class TotalDrinkRepository(context: Context) {
                 }
             }
             launch {
-                ingRepo.dataFlow.collect {
+                ingredientRepository.dataFlow.collect {
                     ingredientList = it
                     emitCurrent()
                 }
@@ -151,5 +395,4 @@ class TotalDrinkRepository(context: Context) {
             }
         }
     }
-
 }

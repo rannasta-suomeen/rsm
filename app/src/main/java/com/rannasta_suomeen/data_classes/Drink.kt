@@ -1,5 +1,6 @@
 package com.rannasta_suomeen.data_classes
 
+import android.util.Log
 import com.rannasta_suomeen.storage.Settings
 
 /**
@@ -51,8 +52,8 @@ data class DrinkInfo(
         Name, Type, Volume, Price, Fsd, Pps, Abv
     }
 
-    fun price(): Double{
-        return when (Settings.prefAlko){
+    fun price(settings: Settings): Double{
+        return when (settings.prefAlko){
             true -> {
                 when (available_alko) {
                     true -> alko_price_average
@@ -68,8 +69,8 @@ data class DrinkInfo(
         }
     }
 
-    fun pricePerServing(): Double{
-        return price()/standard_servings
+    fun pricePerServing(settings: Settings): Double{
+        return price(settings)/standard_servings
     }
 }
 
@@ -77,25 +78,29 @@ data class DrinkInfo(
  * Class to represent a drink with all of its information
  */
 data class DrinkTotal(val drink: DrinkInfo, val ingredients: IngredientsForDrinkPointer){
-    // TODO: Change to hashmaps for faster performace
-    fun missingIngredients(inventory: List<InventoryItem>,helper:  HashMap<Int, IngredientProductFilter>): Int{
-        return ingredients.recipeParts.fold(0) { acc, x ->
-            when (inventory.find { helper[x.ingredient.id]?.product_ids?.contains(it.product_id) == true } != null){
-                true -> acc
-                false -> acc + 1
-            }
+
+    fun missingIngredientsAlcoholic(owned: List<GeneralIngredient>): Int{
+        Log.d("Counting", "Owned has: ${owned.map { it.id }} while needed are ${ingredients.recipeParts.map { it.ingredient.id }}")
+        return ingredients.recipeParts.map{ it.ingredient }.filter { it.type == IngredientType.light_alcohol_product || it.type == IngredientType.strong_alcohol_product }.count {
+            !owned.contains(it)
+        }
+    }
+
+    fun missingIngredientsNonAlcoholic(owned: List<GeneralIngredient>): Int{
+        return ingredients.recipeParts.map{ it.ingredient }.filter { it.type != IngredientType.light_alcohol_product && it.type != IngredientType.strong_alcohol_product }.count {
+            !owned.contains(it)
         }
     }
 }
 
-fun sortDrinkPreview(list: List<DrinkTotal>, type: DrinkInfo.SortTypes, asc: Boolean): List<DrinkTotal>{
+fun sortDrinkPreview(list: List<DrinkTotal>, type: DrinkInfo.SortTypes, asc: Boolean, settings: Settings): List<DrinkTotal>{
     var sortedAsc = when (type){
         DrinkInfo.SortTypes.Name -> list.sortedBy { it.drink.name }
         DrinkInfo.SortTypes.Type -> list.sortedBy { it.drink.type }
         DrinkInfo.SortTypes.Volume -> list.sortedBy { it.drink.total_volume }
-        DrinkInfo.SortTypes.Price -> list.sortedBy { it.drink.price() }
+        DrinkInfo.SortTypes.Price -> list.sortedBy { it.drink.price(settings) }
         DrinkInfo.SortTypes.Fsd -> list.sortedBy { it.drink.standard_servings }
-        DrinkInfo.SortTypes.Pps -> list.sortedBy { it.drink.pricePerServing() }
+        DrinkInfo.SortTypes.Pps -> list.sortedBy { it.drink.pricePerServing(settings) }
         DrinkInfo.SortTypes.Abv -> list.sortedBy { it.drink.abv_average }
     }
 

@@ -1,6 +1,8 @@
 package com.rannasta_suomeen.main_fragments
 
+import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ImageButton
@@ -12,37 +14,43 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.rannasta_suomeen.DrinkPreviewAdapter
+import com.rannasta_suomeen.*
 import com.rannasta_suomeen.storage.DrinkRepository
-import com.rannasta_suomeen.R
-import com.rannasta_suomeen.data_classes.DrinkInfo
-import com.rannasta_suomeen.data_classes.DrinkTotal
-import com.rannasta_suomeen.data_classes.DrinkType
-import com.rannasta_suomeen.data_classes.sortDrinkPreview
+import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.storage.Settings
+import com.rannasta_suomeen.storage.TotalCabinetRepository
 import com.rannasta_suomeen.storage.TotalDrinkRepository
 import kotlinx.coroutines.*
 
-class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
+class DrinksFragment(val activity: Activity, private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository) : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
 
     private lateinit var drinkPreviewAdapter: DrinkPreviewAdapter
-    private lateinit var drinkRepository: TotalDrinkRepository
     private var drinkListFull = listOf<DrinkTotal>()
     private var drinkListFiltered = drinkListFull
+    private var ownedIngredients = listOf<GeneralIngredient>()
 
     private var sortType = DrinkInfo.SortTypes.Pps
     private var sortByAsc = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        drinkPreviewAdapter = DrinkPreviewAdapter(requireActivity())
+        drinkPreviewAdapter = DrinkPreviewAdapter(activity, settings)
         super.onCreate(savedInstanceState)
-        drinkRepository = TotalDrinkRepository(requireContext())
         updateSelection()
 
         CoroutineScope(Dispatchers.IO).launch {
-            drinkRepository.dataFlow.collect{
-                drinkListFull = it
-                drinkListFiltered = drinkListFull
-                requireActivity().runOnUiThread { updateSelection() }
+            launch {
+                totalDrinkRepository.dataFlow.collect{
+                    drinkListFull = it
+                    drinkListFiltered = drinkListFull
+                    activity.runOnUiThread { updateSelection() }
+                }
+            }
+            totalCabinetRepository.ownedProductFlow.collect{
+                ownedIngredients = it
+                Log.d("Drinks", "Owned ingredients are: $ownedIngredients")
+                activity.runOnUiThread {
+                    updateSelection()
+                }
             }
         }
     }
@@ -68,7 +76,6 @@ class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSel
             sortByDirButton.setImageResource(img)
             updateSelection()
         }
-
         val filterButton = view.findViewById<ImageButton>(R.id.imageButtonDrinkFilter)
         val popupMenu = PopupMenu(filterButton.context,filterButton,GravityCompat.START)
         popupMenu.inflate(R.menu.menu_drink_filter)
@@ -86,8 +93,7 @@ class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSel
                                 R.id.menuDrinkFilterCocktail -> d.type == DrinkType.cocktail
                                 R.id.menuDrinkFilterPunch -> d.type == DrinkType.punch
                                 R.id.menuDrinkFilterShot -> d.type == DrinkType.shot
-                                // TODO implement this
-                                R.id.menuDrinkFilterMakeable -> false
+                                R.id.menuDrinkFilterMakeable -> r.missingIngredientsAlcoholic(ownedIngredients) != 0
                                 else -> false
                             }
                         }
@@ -102,7 +108,7 @@ class DrinksFragment : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSel
     }
 
     private fun updateSelection(){
-        drinkPreviewAdapter.submitItems(sortDrinkPreview(drinkListFiltered, sortType, sortByAsc))
+        drinkPreviewAdapter.submitItems(sortDrinkPreview(drinkListFiltered, sortType, sortByAsc, settings), ownedIngredients)
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {

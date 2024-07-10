@@ -3,18 +3,16 @@ package com.rannasta_suomeen
 import android.util.Log
 import com.google.gson.Gson
 import com.rannasta_suomeen.data_classes.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import okhttp3.internal.wait
 import java.io.IOException
 import java.net.ConnectException
 import java.net.URL
+import java.time.Instant
 
 object NetworkController {
     private var jwtToken: String? = null
@@ -28,10 +26,21 @@ object NetworkController {
         class TokenError : Error("Token not valid")
         class CredentialsError : Error("Username or password is wrong")
         class NoCredentialsError : Error("No username, password or token given")
-        class RetryError : Error("Retried too many times, cause")
+        class RetryError(e: Throwable) : Error("Retried too many times, cause $e")
         class MiscError(code: Int, body: String) : Error("Error $code with body $body")
         class JsonError(s: String) : Error("Json $s could not be parsed")
     }
+
+    public sealed class CabinetOperation(){
+        val timestamp: Instant = Instant.now()
+    }
+    class NewCabinet(val name: String): CabinetOperation()
+    class DeleteCabinet(val id: Int): CabinetOperation()
+    class AddItemToCabinet(val id:Int, val pid: Int, val amount: Int?): CabinetOperation()
+    class ModifyCabinetProductAmount(val id: Int, val pid: Int, val amount: Int?): CabinetOperation()
+    class RemoveItemFromCabinet(val id:Int, val pid: Int): CabinetOperation()
+    class MakeItemUsable(val id:Int, val pid: Int): CabinetOperation()
+    class MakeItemUnusable(val id:Int, val pid: Int): CabinetOperation()
 
 
     /** Logs the user in. First item of the pair is the username, second is the password.
@@ -86,6 +95,162 @@ object NetworkController {
             val s = it.body?.string()
             val list = Gson().fromJson(s, Array<DrinkInfo>::class.java)
             list.toList()
+        }
+    }
+
+    /** Makes a request and tries to create a new cabinet
+     * @param payload String the name of the cabinet to create
+     * @return Result, either [Int] the id of the new cabinet or an [Error]
+     */
+    suspend fun createCabinet(payload: NewCabinet): Result<Int> {
+        val request = Request.Builder().url("$serverAddress/cabinet?name=${payload.name}").post("".toRequestBody())
+        return makeTokenRequest(request) {
+            val s = it.body?.string()
+            val list = Gson().fromJson(s, Int::class.java)
+            list
+        }
+    }
+
+    /** Makes a request and tries to delete a cabinet
+     * @param Cabinet Int, the id of the cabinet to delete
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun deleteCabinet(Cabinet: DeleteCabinet): Result<Unit> {
+        val request = Request.Builder().url("$serverAddress/cabinet/${Cabinet.id}").delete()
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+               Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
+        }
+    }
+
+    /** Makes a request and tries to get
+     * @return Result, either List of [CabinetCompact] or an [Error]
+     */
+    suspend fun getCabinets(_payload: Unit): Result<List<CabinetCompact>> {
+        val request = Request.Builder().url("$serverAddress/cabinet").get()
+        return makeTokenRequest(request) {
+            val s = it.body?.string()
+            val list = Gson().fromJson(s, Array<CabinetCompact>::class.java)
+            list.toList()
+        }
+    }
+
+    /** Makes a request and tries to delete a cabinet
+     * @param cabinet Int, the id of the cabinet to delete
+     * @return Result, either [Unit] or an [Error]
+     */
+    private suspend fun getCabinetProducts(cabinet: Int): Result<List<CabinetProductCompact>> {
+        val request = Request.Builder().url("$serverAddress/items/$cabinet").get()
+        return makeTokenRequest(request) {
+            val s = it.body?.string()
+            val list = Gson().fromJson(s, Array<CabinetProductCompact>::class.java)
+            list.toList()
+        }
+    }
+
+    /** Make a request and gets all cabinets owned by a user
+     * @return [Result] of [List] of [CabinetStorable]
+     */
+    suspend fun getCabinetsTotal(_payload: Unit, dispatcher: CoroutineDispatcher = Dispatchers.IO): Result<List<CabinetStorable>>{
+        val cabs = tryNTimes(5, Unit, ::getCabinets)
+        return cabs.map {
+            val t = it.map {
+                CoroutineScope(dispatcher).async {
+                    val products = tryNTimes(5,it.id,::getCabinetProducts)
+                    when (products.isSuccess){
+                        true -> it.toStorable(products.getOrThrow())
+                        false -> null
+                    }
+                }
+            }.awaitAll()
+            Log.d("Networking", "Got $t as cabinet state")
+            t.requireNoNulls()
+        }
+    }
+
+    /** Makes a request and tries to put a product into a cabinet
+     * @param payload [Pair] of a [Pair] and [Int]. First pair tells cabinet and product, second tell amount
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun insertCabinetProduct(payload: AddItemToCabinet): Result<Unit> {
+        val amountStr = when(payload.amount == null){
+            true -> ""
+            false -> "\\${payload.amount}"
+        }
+        val request = Request.Builder().url("$serverAddress/items/${payload.id}/${payload.pid}$amountStr").put("".toRequestBody())
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+                Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
+        }
+    }
+
+    /** Makes a request and tries to delete a product from a cabinet
+     * @param payload [Pair] of a [Int] and [Int]. Cabinet and product.
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun deleteCabinetProduct(payload: RemoveItemFromCabinet): Result<Unit> {
+        val request = Request.Builder().url("$serverAddress/items/${payload.id}/${payload.pid}").delete()
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+                Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
+        }
+    }
+
+    /** Makes a request and tries to modify the amount of a product in a cabinet
+     * @param payload [Pair] of a [Pair] and [Int]. First pair tells cabinet and product, second tell amount
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun modifyCabinetProduct(payload: ModifyCabinetProductAmount): Result<Unit> {
+        val amountStr = when(payload.amount == null){
+            true -> ""
+            false -> "\\${payload.amount}"
+        }
+        val request = Request.Builder().url("$serverAddress/items/${payload.id}/${payload.pid}$amountStr").post("".toRequestBody())
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+                Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
+        }
+    }
+
+    /** Makes a request and tries to make a product usable
+     * @param payload [Pair] of a [Int] and [Int]. Cabinet and product.
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun usableCabinetProduct(payload: MakeItemUsable): Result<Unit> {
+        val request = Request.Builder().url("$serverAddress/items/usable/${payload.id}/${payload.pid}").post("".toRequestBody())
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+                Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
+        }
+    }
+
+    /** Makes a request and tries to make a product unusable
+     * @param payload [Pair] of a [Int] and [Int]. Cabinet and product.
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun unusableCabinetProduct(payload: MakeItemUnusable): Result<Unit> {
+        val request = Request.Builder().url("$serverAddress/items/usable/${payload.id}/${payload.pid}").delete()
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+                Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
         }
     }
 
@@ -198,17 +363,28 @@ object NetworkController {
         payload: T,
         function: suspend (T) -> Result<R>
     ): Result<R> {
-        if (n == 0) {
-            return Result.failure(Error.RetryError())
-        }
+
         val res = function(payload)
         return when (res.isSuccess) {
             true -> res
             false -> {
                 when (res.exceptionOrNull()) {
-                    is Error.NetworkError -> tryNTimes(n - 1, payload, function)
-                    is Error.MiscError -> tryNTimes(n - 1, payload, function)
+                    is Error.NetworkError -> {
+                        if (n == 0) {
+                        return Result.failure(Error.RetryError(res.exceptionOrNull()!!))
+                    }
+                        tryNTimes(n - 1, payload, function)
+                    }
+                    is Error.MiscError -> {
+                        if (n == 0) {
+                            return Result.failure(Error.RetryError(res.exceptionOrNull()!!))
+                        }
+                        tryNTimes(n - 1, payload, function)
+                    }
                     is Error.NoCredentialsError -> {
+                        if (n == 0) {
+                            return Result.failure(Error.RetryError(res.exceptionOrNull()!!))
+                        }
                         tryNTimes(n - 1, payload, function)
                     }
                     else -> {
