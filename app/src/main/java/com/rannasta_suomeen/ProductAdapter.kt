@@ -64,7 +64,6 @@ class ProductAdapter(
                 itemView.setOnClickListener {
                     val popup = PopupProductAdd(item, totalCabinetRepository,imageRepository, activity, settings)
                     popup.show(it)
-                    // TODO: Fix updating of the underlying view, when data is changed in this.
                 }
                 itemView.setOnLongClickListener {
                     with(totalCabinetRepository) {
