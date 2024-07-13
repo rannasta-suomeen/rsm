@@ -3,8 +3,11 @@ package com.rannasta_suomeen.storage
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
+import com.google.gson.JsonSerializer
 import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.data_classes.*
 import kotlinx.coroutines.*
@@ -14,13 +17,8 @@ import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.Optional
+import com.rannasta_suomeen.NetworkController.CabinetOperation.*
 import com.rannasta_suomeen.NetworkController.CabinetOperation
-import com.rannasta_suomeen.NetworkController.AddItemToCabinet
-import com.rannasta_suomeen.NetworkController.RemoveItemFromCabinet
-import com.rannasta_suomeen.NetworkController.NewCabinet
-import com.rannasta_suomeen.NetworkController.DeleteCabinet
-import com.rannasta_suomeen.NetworkController.MakeItemUnusable
-import com.rannasta_suomeen.NetworkController.MakeItemUsable
 import com.rannasta_suomeen.NetworkController.tryNTimes
 import com.rannasta_suomeen.ingredientRepository
 import com.rannasta_suomeen.productRepository
@@ -128,7 +126,10 @@ class CabinetRepository(context: Context){
 
     private val stateMutex = Mutex()
 
+    private val gson = jacksonObjectMapper()
+
     init {
+        gson.findAndRegisterModules()
         CoroutineScope(Dispatchers.IO).launch {
             launch { serverFlow.collect{
                 // TODO: Add timestamps and use them
@@ -145,13 +146,15 @@ class CabinetRepository(context: Context){
                 }
             }
             try {
-                // TODO: Make this parse netActionQueue from file, and regognice diffirent versions of netaction
-                // netActionQueue = Gson().fromJson(netQueueFile.readText(), Array<CabinetOperation>::class.java).toMutableList()
+                netActionQueue =
+                    gson.readerForArrayOf(CabinetOperation::class.java).readValue(netQueueFile.readText(), Array<CabinetOperation>::class.java)
+                        .toMutableList()
             } catch (_: FileNotFoundException) {
             } catch (_: JsonParseException){
                 Log.d("Storage", "Failed to parse $netQueueFile")
                 netQueueFile.delete()
             }
+
             tryNTimes(5, Unit, NetworkController::getCabinetsTotal).onSuccess { serverFlow.emit(it)}
             while (true){
                 when(netActionQueue.isNotEmpty()){
@@ -171,19 +174,23 @@ class CabinetRepository(context: Context){
             is MakeItemUnusable -> NetworkController.tryNTimes(5,oper,NetworkController::unusableCabinetProduct)
             is MakeItemUsable -> NetworkController.tryNTimes(5,oper,NetworkController::usableCabinetProduct)
             is NewCabinet -> NetworkController.tryNTimes(5,oper,NetworkController::createCabinet)
-            is NetworkController.ModifyCabinetProductAmount -> NetworkController.tryNTimes(5,oper,NetworkController::modifyCabinetProduct)
+            is ModifyCabinetProductAmount -> NetworkController.tryNTimes(5,oper,NetworkController::modifyCabinetProduct)
         }
-        // TODO: Due to the function being suspend this may not allways remove the correct thing.
+        // TODO: Due to the function being suspend this may not always remove the correct thing.
         if (res.isSuccess){
             netActionQueue.removeAt(0)
-            netQueueFile.writeText(Gson().toJson(netActionQueue))
+            //TODO: Otherwise netaction queue is working, but does not update state correctly
+            updateState {  }
+            netQueueFile.writeText(gson.writerFor(Array<CabinetOperation>::class.java).writeValueAsString(netActionQueue.toTypedArray()))
+        } else {
+            delay(100)
         }
     }
 
     private fun addActionToQueue(oper: CabinetOperation){
         netActionQueue.add(oper)
         CoroutineScope(Dispatchers.IO).launch {
-            netQueueFile.writeText(Gson().toJson(netActionQueue))
+            netQueueFile.writeText(gson.writerFor(Array<CabinetOperation>::class.java).writeValueAsString(netActionQueue.toTypedArray()))
         }
     }
 
@@ -222,7 +229,7 @@ class CabinetRepository(context: Context){
         updateState { it.find { it.id == c.id }?.let { it.products.removeIf { it.product_id == c.pid } } }
     }
 
-    fun modifyCabinetProductAmount(c: NetworkController.ModifyCabinetProductAmount){
+    fun modifyCabinetProductAmount(c: ModifyCabinetProductAmount){
         addActionToQueue(c)
         updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.amount_ml = c.amount} } }
     }
@@ -235,6 +242,13 @@ class CabinetRepository(context: Context){
     fun makeItemUnUsable(c: MakeItemUnusable){
         addActionToQueue(c)
         updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.usable = false} } }
+    }
+
+    // TODO: Make this done
+    fun runNetQueueAction(c: CabinetOperation){
+        when (c){
+            is NewCabinet ->
+        }
     }
 }
 
@@ -312,7 +326,7 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
     }
 
     fun modifyCabinetProductAmount(id: Int, pid: Int, amount: Int?){
-        cabinetRepository.modifyCabinetProductAmount(NetworkController.ModifyCabinetProductAmount(id, pid, amount))
+        cabinetRepository.modifyCabinetProductAmount(ModifyCabinetProductAmount(id, pid, amount))
     }
 
     init {

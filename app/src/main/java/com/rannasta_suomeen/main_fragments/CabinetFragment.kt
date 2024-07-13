@@ -128,9 +128,9 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-        /*val item = spinnerAdapter.getItem(p2)
+        val item = spinnerAdapter.getItem(p2)
         totalCabinetRepository.changeSelectedCabinet(cabinetList.find { it.name == item })
-        changeSelectedCabinet()*/
+        changeSelectedCabinet()
     }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {

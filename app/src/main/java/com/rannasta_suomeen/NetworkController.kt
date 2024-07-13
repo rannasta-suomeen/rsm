@@ -1,7 +1,12 @@
 package com.rannasta_suomeen
 
 import android.util.Log
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.google.gson.Gson
+import com.google.gson.InstanceCreator
+import com.google.gson.annotations.SerializedName
+import com.rannasta_suomeen.NetworkController.CabinetOperation.*
 import com.rannasta_suomeen.data_classes.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -31,16 +36,28 @@ object NetworkController {
         class JsonError(s: String) : Error("Json $s could not be parsed")
     }
 
-    public sealed class CabinetOperation(){
+    // TODO: get rid of type string for its only used for JSON
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+    /*@JsonSubTypes({
+        @JsonSubTypes.Type(value = NewCabinet, name = "new"),
+        @JsonSubTypes.Type(value = DeleteCabinet, name = "del"),
+        @JsonSubTypes.Type(value = AddItemToCabinet, name = "add"),
+        @JsonSubTypes.Type(value = ModifyCabinetProductAmount, name = "mod"),
+        @JsonSubTypes.Type(value = RemoveItemFromCabinet, name = "rem"),
+        @JsonSubTypes.Type(value = MakeItemUsable, name = "use"),
+        @JsonSubTypes.Type(value = MakeItemUnusable, name = "unuse")
+
+    })*/
+    sealed class CabinetOperation{
         val timestamp: Instant = Instant.now()
+        class NewCabinet(val name: String): CabinetOperation()
+        class DeleteCabinet(val id: Int): CabinetOperation()
+        class AddItemToCabinet(val id:Int, val pid: Int, val amount: Int?): CabinetOperation()
+        class ModifyCabinetProductAmount(val id: Int, val pid: Int, val amount: Int?): CabinetOperation()
+        class RemoveItemFromCabinet(val id:Int, val pid: Int): CabinetOperation()
+        class MakeItemUsable(val id:Int, val pid: Int): CabinetOperation()
+        class MakeItemUnusable(val id:Int, val pid: Int): CabinetOperation()
     }
-    class NewCabinet(val name: String): CabinetOperation()
-    class DeleteCabinet(val id: Int): CabinetOperation()
-    class AddItemToCabinet(val id:Int, val pid: Int, val amount: Int?): CabinetOperation()
-    class ModifyCabinetProductAmount(val id: Int, val pid: Int, val amount: Int?): CabinetOperation()
-    class RemoveItemFromCabinet(val id:Int, val pid: Int): CabinetOperation()
-    class MakeItemUsable(val id:Int, val pid: Int): CabinetOperation()
-    class MakeItemUnusable(val id:Int, val pid: Int): CabinetOperation()
 
 
     /** Logs the user in. First item of the pair is the username, second is the password.
