@@ -11,9 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.IngredientsForDrinkPointer
 import com.rannasta_suomeen.storage.Settings
+import java.util.Locale
 import kotlin.math.roundToInt
 
-class RecipePartAdapter(context: Context, private val owned: List<GeneralIngredient>,private val settings: Settings): RecyclerView.Adapter<RecipePartAdapter.ProductViewHolder>() {
+class RecipePartAdapter(private val owned: List<GeneralIngredient>,private val settings: Settings): RecyclerView.Adapter<RecipePartAdapter.ProductViewHolder>() {
 
     private var items: List<IngredientsForDrinkPointer.RecipePartPointer> = listOf()
     private var amount: Double = 1.0
@@ -41,7 +42,7 @@ class RecipePartAdapter(context: Context, private val owned: List<GeneralIngredi
         }
 
         private fun displayDecimal(x: Double, stringId: Int): String{
-            val number = String.format("%.1f", x)
+            val number = String.format(Locale.UK,"%.1f", x)
             return itemView.resources.getString(stringId, number)
         }
     }

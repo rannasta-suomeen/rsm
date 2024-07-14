@@ -27,7 +27,7 @@ class PopupDrink(val drink: DrinkTotal, activity: Activity, owned: List<GeneralI
     private var window: PopupWindow
     private var volume = DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, settings.prefUnit) * amount
     init {
-        val adapter = RecipePartAdapter(activity.applicationContext, owned, settings)
+        val adapter = RecipePartAdapter(owned, settings)
         val view = activity.layoutInflater.inflate(R.layout.popup_drink_recipe, null)
 
         fun displayDecimal(x: Double, stringId: Int): String{
