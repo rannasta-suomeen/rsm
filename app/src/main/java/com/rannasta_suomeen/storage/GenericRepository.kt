@@ -1,15 +1,17 @@
 package com.rannasta_suomeen.storage
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
-import com.google.gson.JsonSerializer
 import com.rannasta_suomeen.NetworkController
+import com.rannasta_suomeen.NetworkController.CabinetOperation
+import com.rannasta_suomeen.NetworkController.CabinetOperation.*
+import com.rannasta_suomeen.NetworkController.tryNTimes
 import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.ingredientRepository
+import com.rannasta_suomeen.productRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
@@ -17,11 +19,6 @@ import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.Optional
-import com.rannasta_suomeen.NetworkController.CabinetOperation.*
-import com.rannasta_suomeen.NetworkController.CabinetOperation
-import com.rannasta_suomeen.NetworkController.tryNTimes
-import com.rannasta_suomeen.ingredientRepository
-import com.rannasta_suomeen.productRepository
 
 private const val DRINKFILENAME = "drinks"
 private const val PRODUCTFILENAME = "products"
@@ -141,8 +138,10 @@ class CabinetRepository(context: Context){
             }}
             stateMutex.withLock {
                 if (state.size == 0){
-                    state = Gson().fromJson(file.readText(), Array<CabinetStorable>::class.java).toMutableList()
-                    stateFlow.emit(state)
+                    try {
+                        state = Gson().fromJson(file.readText(), Array<CabinetStorable>::class.java).toMutableList()
+                        stateFlow.emit(state)
+                    } catch (e: java.io.FileNotFoundException){}
                 }
             }
             try {
@@ -245,11 +244,11 @@ class CabinetRepository(context: Context){
     }
 
     // TODO: Make this done
-    fun runNetQueueAction(c: CabinetOperation){
+    /*fun runNetQueueAction(c: CabinetOperation){
         when (c){
             is NewCabinet ->
         }
-    }
+    }*/
 }
 
 class TotalCabinetRepository(context: Context, private val settings: Settings){

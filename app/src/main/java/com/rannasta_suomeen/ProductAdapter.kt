@@ -2,28 +2,23 @@ package com.rannasta_suomeen
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.DialogInterface
-import android.graphics.Bitmap
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.data_classes.Product
 import com.rannasta_suomeen.data_classes.from
 import com.rannasta_suomeen.popup_windows.PopupProductAdd
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.TotalCabinetRepository
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ProductAdapter(
     private val activity: Activity,

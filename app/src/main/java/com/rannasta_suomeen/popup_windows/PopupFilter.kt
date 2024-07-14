@@ -9,9 +9,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.PopupWindow
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.FragmentActivity
 import com.rannasta_suomeen.R
-import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.data_classes.Product
+import com.rannasta_suomeen.data_classes.Retailer
+import com.rannasta_suomeen.data_classes.Subcategory
+import com.rannasta_suomeen.data_classes.from
 
 class PopupFilter(
     private val activity: Activity,

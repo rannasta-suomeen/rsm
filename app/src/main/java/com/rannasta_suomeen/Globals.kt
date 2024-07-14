@@ -1,6 +1,8 @@
 package com.rannasta_suomeen
 
-import com.rannasta_suomeen.storage.*
+import com.rannasta_suomeen.storage.IngredientRepository
+import com.rannasta_suomeen.storage.ProductRepository
+import com.rannasta_suomeen.storage.TotalDrinkRepository
 
 lateinit var totalDrinkRepository: TotalDrinkRepository
 lateinit var productRepository: ProductRepository

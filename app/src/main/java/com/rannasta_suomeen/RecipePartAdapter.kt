@@ -10,9 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.IngredientsForDrinkPointer
-import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.storage.Settings
-import kotlinx.coroutines.*
 import kotlin.math.roundToInt
 
 class RecipePartAdapter(context: Context, private val owned: List<GeneralIngredient>,private val settings: Settings): RecyclerView.Adapter<RecipePartAdapter.ProductViewHolder>() {
@@ -25,7 +23,8 @@ class RecipePartAdapter(context: Context, private val owned: List<GeneralIngredi
             with(itemView) {
                 findViewById<TextView>(R.id.textViewRecipePartName).text = item.name
                 findViewById<TextView>(R.id.textViewRecipePartVolume).text = item.unit.displayInDesiredUnit((item.amount * amount).roundToInt(), settings.prefUnit)
-                findViewById<TextView>(R.id.textViewRecipePartPrice).text = displayDecimal(amount * item.ingredient.price(settings)*item.unit.convert(item.amount,UnitType.cl)/100,R.string.price)
+                // TODO: make this show price per desired unit
+                findViewById<TextView>(R.id.textViewRecipePartPrice).text = displayDecimal(amount * item.price(settings),R.string.price)
                 findViewById<TextView>(R.id.textViewRecipePartAer).text = displayDecimal(item.ingredient.price(settings),R.string.ppl)
                 val img = findViewById<ImageView>(R.id.imageViewRecipePartOwned)
                 when (owned.contains(item.ingredient)){

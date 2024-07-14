@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.rannasta_suomeen.data_classes.DrinkInfo
 import com.rannasta_suomeen.data_classes.DrinkTotal
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.UnitType

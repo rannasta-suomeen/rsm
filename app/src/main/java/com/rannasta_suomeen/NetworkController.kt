@@ -1,11 +1,8 @@
 package com.rannasta_suomeen
 
 import android.util.Log
-import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.google.gson.Gson
-import com.google.gson.InstanceCreator
-import com.google.gson.annotations.SerializedName
 import com.rannasta_suomeen.NetworkController.CabinetOperation.*
 import com.rannasta_suomeen.data_classes.*
 import kotlinx.coroutines.*
@@ -22,8 +19,7 @@ import java.time.Instant
 object NetworkController {
     private var jwtToken: String? = null
 
-    // TODO: Temp address that is the host
-    private const val serverAddress: String = "http://10.0.2.2:8000"
+    private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
     private val client = OkHttpClient()
 
     sealed class Error(override val message: String) : Throwable() {
@@ -36,18 +32,7 @@ object NetworkController {
         class JsonError(s: String) : Error("Json $s could not be parsed")
     }
 
-    // TODO: get rid of type string for its only used for JSON
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-    /*@JsonSubTypes({
-        @JsonSubTypes.Type(value = NewCabinet, name = "new"),
-        @JsonSubTypes.Type(value = DeleteCabinet, name = "del"),
-        @JsonSubTypes.Type(value = AddItemToCabinet, name = "add"),
-        @JsonSubTypes.Type(value = ModifyCabinetProductAmount, name = "mod"),
-        @JsonSubTypes.Type(value = RemoveItemFromCabinet, name = "rem"),
-        @JsonSubTypes.Type(value = MakeItemUsable, name = "use"),
-        @JsonSubTypes.Type(value = MakeItemUnusable, name = "unuse")
-
-    })*/
     sealed class CabinetOperation{
         val timestamp: Instant = Instant.now()
         class NewCabinet(val name: String): CabinetOperation()

@@ -2,7 +2,6 @@ package com.rannasta_suomeen.main_fragments
 
 import android.app.Activity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ImageButton
@@ -11,12 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.rannasta_suomeen.*
-import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.ProductAdapter
+import com.rannasta_suomeen.R
+import com.rannasta_suomeen.data_classes.Product
 import com.rannasta_suomeen.data_classes.Product.SortTypes
+import com.rannasta_suomeen.data_classes.sort
 import com.rannasta_suomeen.popup_windows.PopupFilter
+import com.rannasta_suomeen.productRepository
 import com.rannasta_suomeen.storage.ImageRepository
-import com.rannasta_suomeen.storage.ProductRepository
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.TotalCabinetRepository
 import kotlinx.coroutines.CoroutineScope

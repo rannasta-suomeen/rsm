@@ -1,21 +1,17 @@
 package com.rannasta_suomeen.popup_windows
 
 import android.app.Activity
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
-import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.RecipePartAdapter
 import com.rannasta_suomeen.data_classes.DrinkTotal

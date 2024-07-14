@@ -14,13 +14,19 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.rannasta_suomeen.*
-import com.rannasta_suomeen.storage.DrinkRepository
-import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.DrinkPreviewAdapter
+import com.rannasta_suomeen.R
+import com.rannasta_suomeen.data_classes.DrinkInfo
+import com.rannasta_suomeen.data_classes.DrinkTotal
+import com.rannasta_suomeen.data_classes.DrinkType
+import com.rannasta_suomeen.data_classes.GeneralIngredient
+import com.rannasta_suomeen.data_classes.sortDrinkPreview
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.TotalCabinetRepository
-import com.rannasta_suomeen.storage.TotalDrinkRepository
-import kotlinx.coroutines.*
+import com.rannasta_suomeen.totalDrinkRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DrinksFragment(val activity: Activity, private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository) : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
 

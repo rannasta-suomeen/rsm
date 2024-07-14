@@ -22,11 +22,16 @@ import com.google.android.material.navigation.NavigationView
 import com.rannasta_suomeen.main_fragments.CabinetFragment
 import com.rannasta_suomeen.main_fragments.DrinksFragment
 import com.rannasta_suomeen.main_fragments.ProductsFragment
-import com.rannasta_suomeen.storage.*
+import com.rannasta_suomeen.storage.EncryptedStorage
+import com.rannasta_suomeen.storage.ImageRepository
+import com.rannasta_suomeen.storage.IngredientRepository
+import com.rannasta_suomeen.storage.ProductRepository
+import com.rannasta_suomeen.storage.Settings
+import com.rannasta_suomeen.storage.TotalCabinetRepository
+import com.rannasta_suomeen.storage.TotalDrinkRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -75,7 +80,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        setupToken()
 
         val navHostFragment=supportFragmentManager.findFragmentById(R.id.navHostFragmentMain) as NavHostFragment
         navController = navHostFragment.findNavController()
@@ -89,6 +93,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         navView.bringToFront()
         navView.setNavigationItemSelectedListener(this)
+        setupToken()
     }
 
     private fun setupToken(){

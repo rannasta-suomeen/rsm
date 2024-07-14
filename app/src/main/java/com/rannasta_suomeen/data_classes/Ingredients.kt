@@ -95,7 +95,15 @@ data class IngredientsForDrinkPointer(
         val amount: Int,
         val name: String,
         val unit: UnitType
-    )
+    ){
+        fun price(s: Settings): Double{
+            return when (unit){
+                UnitType.kpl -> amount*ingredient.price(s)
+                else -> ingredient.price(s)*unit.convert(amount,UnitType.cl)/100
+            }
+
+        }
+    }
 }
 
 enum class UnitType{
