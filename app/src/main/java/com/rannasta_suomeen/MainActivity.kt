@@ -19,9 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.navigation.NavigationView
-import com.rannasta_suomeen.main_fragments.CabinetFragment
-import com.rannasta_suomeen.main_fragments.DrinksFragment
-import com.rannasta_suomeen.main_fragments.ProductsFragment
+import com.rannasta_suomeen.main_fragments.FragmentFactory
 import com.rannasta_suomeen.storage.EncryptedStorage
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.IngredientRepository
@@ -45,22 +43,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val target = when(item.itemId){
-            R.id.menuMainProducts -> ProductsFragment(this, imageRepository, settings, totalCabinetRepository)
+            R.id.menuMainProducts -> R.id.fragmentProducts
             R.id.menuMainCharts -> TODO()
-            R.id.menuMainDrinks -> DrinksFragment(this, settings, totalCabinetRepository)
+            R.id.menuMainDrinks -> R.id.fragmentDrinks
             R.id.menuMainSettings -> TODO()
-            R.id.menuMainStorage -> CabinetFragment(this, imageRepository, settings, totalCabinetRepository)
+            R.id.menuMainStorage -> R.id.fragmentCabinets
             else -> throw IllegalArgumentException("Attempted to navigate to ${item.itemId} witch is not possible")
         }
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.navHostFragmentMain, target)
-        transaction.commit()
+        navController.navigate(target)
         drawer.closeDrawer(GravityCompat.START)
         return true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         settings = Settings(this)
         ingredientRepository = IngredientRepository(applicationContext)
         productRepository = ProductRepository(applicationContext)
@@ -68,6 +63,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         totalCabinetRepository = TotalCabinetRepository(applicationContext, settings)
         encryptedStorage = EncryptedStorage(applicationContext)
         imageRepository = ImageRepository(applicationContext)
+        supportFragmentManager.fragmentFactory = FragmentFactory(this, imageRepository, settings, totalCabinetRepository)
+        super.onCreate(savedInstanceState)
 
         setContentView(R.layout.layout_activity_main)
 
@@ -81,8 +78,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        val navHostFragment=supportFragmentManager.findFragmentById(R.id.navHostFragmentMain) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.navHostFragmentMain) as NavHostFragment
         navController = navHostFragment.findNavController()
+        navController.setGraph(R.navigation.nav_main)
         val navView = findViewById<NavigationView>(R.id.navViewMain)
 
         drawer = findViewById<DrawerLayout>(R.id.drawerLayoutMain)

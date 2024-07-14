@@ -3,8 +3,8 @@ package com.rannasta_suomeen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.Assert.*
 
 internal class NetworkControllerTest {
 

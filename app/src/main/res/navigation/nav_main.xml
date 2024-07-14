@@ -7,15 +7,45 @@
         android:id="@+id/fragmentDrinks"
         android:name="com.rannasta_suomeen.main_fragments.DrinksFragment"
         android:label="FragmentDrinks"
-    />
+    >
+        <action
+            android:id="@+id/action_fragmentDrinks_to_fragmentProducts"
+            app:destination="@id/fragmentProducts" />
+        <action
+            android:id="@+id/action_fragmentDrinks_to_fragmentCabinets"
+            app:destination="@id/fragmentCabinets" />
+        <action
+            android:id="@+id/action_fragmentDrinks_self"
+            app:destination="@id/fragmentDrinks" />
+    </fragment>
     <fragment
         android:id="@+id/fragmentProducts"
         android:name="com.rannasta_suomeen.main_fragments.ProductsFragment"
-        android:label="FragmentProducts"/>
+        android:label="FragmentProducts">
+        <action
+            android:id="@+id/action_fragmentProducts_to_fragmentCabinets"
+            app:destination="@id/fragmentCabinets" />
+        <action
+            android:id="@+id/action_fragmentProducts_to_fragmentDrinks"
+            app:destination="@id/fragmentDrinks" />
+        <action
+            android:id="@+id/action_fragmentProducts_self"
+            app:destination="@id/fragmentProducts" />
+    </fragment>
     <fragment
         android:id="@+id/fragmentCabinets"
         android:name="com.rannasta_suomeen.main_fragments.CabinetFragment"
         android:label="FragmentCabinets"
-        />
+        >
+        <action
+            android:id="@+id/action_fragmentCabinets_to_fragmentDrinks"
+            app:destination="@id/fragmentDrinks" />
+        <action
+            android:id="@+id/action_fragmentCabinets_to_fragmentProducts"
+            app:destination="@id/fragmentProducts" />
+        <action
+            android:id="@+id/action_fragmentCabinets_self"
+            app:destination="@id/fragmentCabinets" />
+    </fragment>
 
 </navigation>
