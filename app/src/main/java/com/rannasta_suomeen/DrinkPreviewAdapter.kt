@@ -12,14 +12,15 @@ import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.popup_windows.PopupDrink
 import com.rannasta_suomeen.storage.Settings
+import java.util.Locale
 
 class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings): RecyclerView.Adapter<DrinkPreviewAdapter.DrinkPreviewViewHolder>() {
 
     private var items: List<DrinkTotal> = listOf()
     private var owned: List<GeneralIngredient> = listOf()
 
-    class DrinkPreviewViewHolder(itemView: View,val activity: Activity,val owned: List<GeneralIngredient>, private val settings: Settings):RecyclerView.ViewHolder(itemView){
-        fun bind(i: DrinkTotal){
+    class DrinkPreviewViewHolder(itemView: View,val activity: Activity):RecyclerView.ViewHolder(itemView){
+        fun bind(i: DrinkTotal, owned:List<GeneralIngredient>, settings: Settings){
             val item = i.drink
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewName).text = item.name
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(item.standard_servings, R.string.shots)
@@ -35,7 +36,7 @@ class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings
             }
         }
         private fun displayDecimal(x: Double, stringId: Int): String{
-            val number = String.format("%.1f", x)
+            val number = String.format(Locale.UK,"%.1f", x)
             return itemView.resources.getString(stringId, number)
         }
     }
@@ -50,12 +51,12 @@ class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrinkPreviewViewHolder {
         val layout = R.layout.item_drink
         val itemView = LayoutInflater.from(parent.context).inflate(layout, parent,false)
-        return DrinkPreviewViewHolder(itemView, activity, owned, settings)
+        return DrinkPreviewViewHolder(itemView, activity)
     }
 
     override fun onBindViewHolder(holder: DrinkPreviewViewHolder, position: Int) {
         val item = items[position]
-        holder.bind(item)
+        holder.bind(item, owned, settings)
     }
 
     override fun getItemCount(): Int {

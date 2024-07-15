@@ -25,9 +25,10 @@ data class GeneralIngredient(
     val superalko_price_min: Double,
 
     val alko_product_count: Int,
-    val superalko_product_count: Int
+    val superalko_product_count: Int,
+    val use_static_filter: Boolean,
+    val static_filter: Int?
 ){
-    val standard_servings = abv_average
 
     fun price(s: Settings): Double{
         return when (s.prefAlko){

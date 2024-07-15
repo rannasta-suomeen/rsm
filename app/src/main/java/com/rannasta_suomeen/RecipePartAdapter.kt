@@ -13,13 +13,13 @@ import com.rannasta_suomeen.storage.Settings
 import java.util.Locale
 import kotlin.math.roundToInt
 
-class RecipePartAdapter(private val owned: List<GeneralIngredient>,private val settings: Settings): RecyclerView.Adapter<RecipePartAdapter.ProductViewHolder>() {
+class RecipePartAdapter(private var owned: List<GeneralIngredient>,private val settings: Settings): RecyclerView.Adapter<RecipePartAdapter.ProductViewHolder>() {
 
     private var items: List<IngredientsForDrinkPointer.RecipePartPointer> = listOf()
     private var amount: Double = 1.0
 
-    class ProductViewHolder(itemView: View, private val owned: List<GeneralIngredient>,private val settings: Settings):RecyclerView.ViewHolder(itemView){
-        fun bind(item: IngredientsForDrinkPointer.RecipePartPointer, amount: Double){
+    class ProductViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
+        fun bind(item: IngredientsForDrinkPointer.RecipePartPointer, amount: Double, owned: List<GeneralIngredient>, settings: Settings){
             with(itemView) {
                 findViewById<TextView>(R.id.textViewRecipePartName).text = item.name
                 findViewById<TextView>(R.id.textViewRecipePartVolume).text = item.unit.displayInDesiredUnit((item.amount * amount).roundToInt(), settings.prefUnit)
@@ -47,8 +47,9 @@ class RecipePartAdapter(private val owned: List<GeneralIngredient>,private val s
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitItems(input: List<IngredientsForDrinkPointer.RecipePartPointer>, o: List<GeneralIngredient>){
+    fun submitItems(input: List<IngredientsForDrinkPointer.RecipePartPointer>, ownedNew: List<GeneralIngredient>){
         items = input
+        owned = ownedNew
         notifyDataSetChanged()
     }
 
@@ -61,12 +62,12 @@ class RecipePartAdapter(private val owned: List<GeneralIngredient>,private val s
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val layout = R.layout.item_recipe_part
         val itemView = LayoutInflater.from(parent.context).inflate(layout, parent,false)
-        return ProductViewHolder(itemView, owned, settings)
+        return ProductViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val item = items[position]
-        holder.bind(item,amount)
+        holder.bind(item,amount, owned, settings)
     }
 
     override fun getItemCount(): Int {

@@ -1,6 +1,5 @@
 package com.rannasta_suomeen.data_classes
 
-import android.util.Log
 import com.rannasta_suomeen.storage.Settings
 
 /**
@@ -80,7 +79,6 @@ data class DrinkInfo(
 data class DrinkTotal(val drink: DrinkInfo, val ingredients: IngredientsForDrinkPointer){
 
     fun missingIngredientsAlcoholic(owned: List<GeneralIngredient>): Int{
-        Log.d("Counting", "Owned has: ${owned.map { it.id }} while needed are ${ingredients.recipeParts.map { it.ingredient.id }}")
         return ingredients.recipeParts.map{ it.ingredient }.filter { it.type == IngredientType.light_alcohol_product || it.type == IngredientType.strong_alcohol_product }.count {
             !owned.contains(it)
         }

@@ -46,12 +46,12 @@ abstract class GenericRepository<R,T>(context: Context, fn: String) {
                 memoryCopy = Optional.ofNullable(t)
                 // TODO There is a (small) performance improvement in starting the network request BEFORE making the file fetch
                 if (!syncedFromInternet){
-                    val res = NetworkController.tryNTimes(5, input, getFn)
+                    val res = tryNTimes(5, input, getFn)
                     if (res.isSuccess){
-                        val t = res.getOrThrow()
-                        emit(t)
-                        writeToFile(t)
-                        memoryCopy = Optional.of(t)
+                        val x = res.getOrThrow()
+                        emit(x)
+                        writeToFile(x)
+                        memoryCopy = Optional.of(x)
                         syncedFromInternet = true
                     }
                 }
@@ -141,7 +141,7 @@ class CabinetRepository(context: Context){
                     try {
                         state = Gson().fromJson(file.readText(), Array<CabinetStorable>::class.java).toMutableList()
                         stateFlow.emit(state)
-                    } catch (e: java.io.FileNotFoundException){}
+                    } catch (_: FileNotFoundException){}
                 }
             }
             try {
@@ -167,13 +167,13 @@ class CabinetRepository(context: Context){
     private suspend fun processNetOperation(oper: CabinetOperation){
         // TODO: Add timestamps and use them
        val res = when (oper){
-            is AddItemToCabinet -> NetworkController.tryNTimes(5,oper,NetworkController::insertCabinetProduct)
-            is DeleteCabinet  -> NetworkController.tryNTimes(5,oper,NetworkController::deleteCabinet)
-            is RemoveItemFromCabinet -> NetworkController.tryNTimes(5,oper,NetworkController::deleteCabinetProduct)
-            is MakeItemUnusable -> NetworkController.tryNTimes(5,oper,NetworkController::unusableCabinetProduct)
-            is MakeItemUsable -> NetworkController.tryNTimes(5,oper,NetworkController::usableCabinetProduct)
-            is NewCabinet -> NetworkController.tryNTimes(5,oper,NetworkController::createCabinet)
-            is ModifyCabinetProductAmount -> NetworkController.tryNTimes(5,oper,NetworkController::modifyCabinetProduct)
+            is AddItemToCabinet -> tryNTimes(5,oper,NetworkController::insertCabinetProduct)
+            is DeleteCabinet  -> tryNTimes(5,oper,NetworkController::deleteCabinet)
+            is RemoveItemFromCabinet -> tryNTimes(5,oper,NetworkController::deleteCabinetProduct)
+            is MakeItemUnusable -> tryNTimes(5,oper,NetworkController::unusableCabinetProduct)
+            is MakeItemUsable -> tryNTimes(5,oper,NetworkController::usableCabinetProduct)
+            is NewCabinet -> tryNTimes(5,oper,NetworkController::createCabinet)
+            is ModifyCabinetProductAmount -> tryNTimes(5,oper,NetworkController::modifyCabinetProduct)
         }
         // TODO: Due to the function being suspend this may not always remove the correct thing.
         if (res.isSuccess){
@@ -204,7 +204,7 @@ class CabinetRepository(context: Context){
     fun newCabinet(c: NewCabinet){
         // TODO: fix this does not work without internet with our current structure
         CoroutineScope(Dispatchers.IO).launch {
-            NetworkController.tryNTimes(5,c,NetworkController::createCabinet).onSuccess {
+            tryNTimes(5,c,NetworkController::createCabinet).onSuccess {
                 stateMutex.withLock {
                     state.add(CabinetStorable(it,c.name, mutableListOf()))
                     stateFlow.emit(state.toList())
@@ -220,7 +220,7 @@ class CabinetRepository(context: Context){
 
     fun addItemToCabinet(c: AddItemToCabinet){
         addActionToQueue(c)
-        updateState { it.find { it.id == c.id }?.let { it.products.add(CabinetProductCompact(c.pid,c.amount, true)) } }
+        updateState { it.find { it.id == c.id }?.products?.add(CabinetProductCompact(c.pid,c.amount, true)) }
     }
 
     fun removeItemFromCabinet(c: RemoveItemFromCabinet){
@@ -267,7 +267,7 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
 
     val cabinetFlow: MutableSharedFlow<List<Cabinet>> = MutableSharedFlow(1)
 
-    val ownedProductFlow: MutableSharedFlow<List<GeneralIngredient>> = MutableSharedFlow(1)
+    val ownedIngredientFlow: MutableSharedFlow<List<GeneralIngredient>> = MutableSharedFlow(1)
 
     private suspend fun emitCurrent() {
         productIngredientListPointer = productIngredientList.mapNotNull { it.toPointer(generalIngredientList, productMap) }
@@ -280,12 +280,15 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
             }
             t
         })
-        ownedProductFlow.emit(
-            productIngredientListPointer.filter {
-                it.products.find { p->
-                    selectedCabinet?.products?.map { it.product }?.find { it.id == p.id} != null
-                } != null
-            }.map { it.ingredient }
+        val owned = generalIngredientList.toList().map { it.second }.filter { it.use_static_filter && selectedCabinet?.products?.any { p-> p.product.subcategory_id == it.static_filter } == true }.toMutableList()
+        val ownedByFilter = productIngredientListPointer.filter {
+            it.products.find { p->
+                selectedCabinet?.products?.map { it.product }?.find { it.id == p.id} != null
+            } != null
+        }.map { it.ingredient }
+        owned.addAll(ownedByFilter)
+        ownedIngredientFlow.emit(
+            owned
         )
     }
 

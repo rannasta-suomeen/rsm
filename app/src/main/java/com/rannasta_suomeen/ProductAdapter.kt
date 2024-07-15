@@ -19,6 +19,7 @@ import com.rannasta_suomeen.storage.TotalCabinetRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class ProductAdapter(
     private val activity: Activity,
@@ -39,8 +40,8 @@ class ProductAdapter(
         private val imageRepository: ImageRepository,
         private val totalCabinetRepository: TotalCabinetRepository,
         private var activity: Activity,
-        private val settings: Settings):RecyclerView.ViewHolder(itemView){
-        fun bind(item: Product){
+        ):RecyclerView.ViewHolder(itemView){
+        fun bind(item: Product, settings: Settings){
             with(itemView){
                 findViewById<TextView>(R.id.textViewProductName).text = item.name
                 findViewById<TextView>(R.id.textViewProductPrice).text = displayDecimal(item.price, R.string.price)
@@ -82,7 +83,7 @@ class ProductAdapter(
         }
 
         private fun displayDecimal(x: Double, stringId: Int): String{
-            val number = String.format("%.1f", x)
+            val number = String.format(Locale.UK,"%.1f", x)
             return itemView.resources.getString(stringId, number)
         }
     }
@@ -103,12 +104,12 @@ class ProductAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val layout = R.layout.item_product
         val itemView = LayoutInflater.from(parent.context).inflate(layout, parent,false)
-        return ProductViewHolder(itemView, imageRepository, totalCabinetRepository, activity, settings)
+        return ProductViewHolder(itemView, imageRepository, totalCabinetRepository, activity)
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val item = items[position]
-        holder.bind(item)
+        holder.bind(item, settings)
     }
 
     override fun getItemCount(): Int {

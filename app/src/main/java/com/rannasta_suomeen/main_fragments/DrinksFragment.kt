@@ -51,7 +51,7 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
                     activity.runOnUiThread { updateSelection() }
                 }
             }
-            totalCabinetRepository.ownedProductFlow.collect{
+            totalCabinetRepository.ownedIngredientFlow.collect{
                 ownedIngredients = it
                 Log.d("Drinks", "Owned ingredients are: $ownedIngredients")
                 activity.runOnUiThread {
