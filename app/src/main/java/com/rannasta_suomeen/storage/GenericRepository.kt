@@ -154,14 +154,21 @@ class CabinetRepository(context: Context){
                 netQueueFile.delete()
             }
 
-            tryNTimes(5, Unit, NetworkController::getCabinetsTotal).onSuccess { serverFlow.emit(it)}
+            forceUpdate()
             while (true){
                 when(netActionQueue.isNotEmpty()){
                     true -> processNetOperation(netActionQueue.first())
-                    false -> delay(100)
+                    false -> {
+                        forceUpdate()
+                        delay(1000)
+                    }
                 }
             }
         }
+    }
+
+    private suspend fun forceUpdate(){
+        tryNTimes(5, Unit, NetworkController::getCabinetsTotal).onSuccess { serverFlow.emit(it)}
     }
 
     private suspend fun processNetOperation(oper: CabinetOperation){
@@ -201,12 +208,12 @@ class CabinetRepository(context: Context){
         }
     }
 
-    fun newCabinet(c: NewCabinet){
-        // TODO: fix this does not work without internet with our current structure
+    fun newCabinet(c: NewCabinet) {
+        // TODO: Make this work without internet
         CoroutineScope(Dispatchers.IO).launch {
-            tryNTimes(5,c,NetworkController::createCabinet).onSuccess {
+            tryNTimes(5, c, NetworkController::createCabinet).onSuccess {
                 stateMutex.withLock {
-                    state.add(CabinetStorable(it,c.name, mutableListOf()))
+                    state.add(CabinetStorable(it, c.name, mutableListOf()))
                     stateFlow.emit(state.toList())
                 }
             }
@@ -214,41 +221,49 @@ class CabinetRepository(context: Context){
     }
 
     fun deleteCabinet(c: DeleteCabinet){
-        addActionToQueue(c)
-        updateState { it.removeIf { it.id == c.id } }
+        runNetQueueAction(c)
     }
 
     fun addItemToCabinet(c: AddItemToCabinet){
-        addActionToQueue(c)
-        updateState { it.find { it.id == c.id }?.products?.add(CabinetProductCompact(c.pid,c.amount, true)) }
+        runNetQueueAction(c)
     }
 
     fun removeItemFromCabinet(c: RemoveItemFromCabinet){
-        addActionToQueue(c)
-        updateState { it.find { it.id == c.id }?.let { it.products.removeIf { it.product_id == c.pid } } }
+        runNetQueueAction(c)
     }
 
-    fun modifyCabinetProductAmount(c: ModifyCabinetProductAmount){
-        addActionToQueue(c)
-        updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.amount_ml = c.amount} } }
+    fun modifyCabinetProductAmount(c: ModifyCabinetProductAmount) {
+        runNetQueueAction(c)
     }
 
-    fun makeItemUsable(c: MakeItemUsable){
-        addActionToQueue(c)
-        updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.usable = true} } }
+        fun makeItemUsable(c: MakeItemUsable){
+        runNetQueueAction(c)
     }
 
     fun makeItemUnUsable(c: MakeItemUnusable){
-        addActionToQueue(c)
-        updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.usable = false} } }
+        runNetQueueAction(c)
     }
 
     // TODO: Make this done
-    /*fun runNetQueueAction(c: CabinetOperation){
+    private fun runNetQueueAction(c: CabinetOperation){
+        addActionToQueue(c)
         when (c){
-            is NewCabinet ->
+            is NewCabinet -> CoroutineScope(Dispatchers.IO).launch {
+                tryNTimes(5,c,NetworkController::createCabinet).onSuccess {
+                    stateMutex.withLock {
+                        state.add(CabinetStorable(it,c.name, mutableListOf()))
+                        stateFlow.emit(state.toList())
+                    }
+                }
+            }
+            is AddItemToCabinet -> updateState { it.find { it.id == c.id }?.products?.add(CabinetProductCompact(c.pid,c.amount, true)) }
+            is DeleteCabinet -> updateState { it.removeIf { it.id == c.id } }
+            is MakeItemUnusable -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.usable = false} } }
+            is MakeItemUsable -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.usable = true} } }
+            is ModifyCabinetProductAmount -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.amount_ml = c.amount} } }
+            is RemoveItemFromCabinet -> updateState { it.find { it.id == c.id }?.let { it.products.removeIf { it.product_id == c.pid } } }
         }
-    }*/
+    }
 }
 
 class TotalCabinetRepository(context: Context, private val settings: Settings){
