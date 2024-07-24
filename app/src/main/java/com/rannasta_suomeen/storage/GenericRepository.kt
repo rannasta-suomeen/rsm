@@ -182,12 +182,10 @@ class CabinetRepository(context: Context){
             is NewCabinet -> tryNTimes(5,oper,NetworkController::createCabinet)
             is ModifyCabinetProductAmount -> tryNTimes(5,oper,NetworkController::modifyCabinetProduct)
         }
-        // TODO: Due to the function being suspend this may not always remove the correct thing.
         if (res.isSuccess){
-            netActionQueue.removeAt(0)
-            //TODO: Otherwise netaction queue is working, but does not update state correctly
-            updateState {  }
+            netActionQueue.removeIf { it == oper }
             netQueueFile.writeText(gson.writerFor(Array<CabinetOperation>::class.java).writeValueAsString(netActionQueue.toTypedArray()))
+            runNetQueueAction(oper)
         } else {
             delay(100)
         }
@@ -221,32 +219,36 @@ class CabinetRepository(context: Context){
     }
 
     fun deleteCabinet(c: DeleteCabinet){
+        addActionToQueue(c)
         runNetQueueAction(c)
     }
 
     fun addItemToCabinet(c: AddItemToCabinet){
+        addActionToQueue(c)
         runNetQueueAction(c)
     }
 
     fun removeItemFromCabinet(c: RemoveItemFromCabinet){
+        addActionToQueue(c)
         runNetQueueAction(c)
     }
 
     fun modifyCabinetProductAmount(c: ModifyCabinetProductAmount) {
+        addActionToQueue(c)
         runNetQueueAction(c)
     }
 
         fun makeItemUsable(c: MakeItemUsable){
-        runNetQueueAction(c)
+            addActionToQueue(c)
+            runNetQueueAction(c)
     }
 
     fun makeItemUnUsable(c: MakeItemUnusable){
+        addActionToQueue(c)
         runNetQueueAction(c)
     }
 
-    // TODO: Make this done
     private fun runNetQueueAction(c: CabinetOperation){
-        addActionToQueue(c)
         when (c){
             is NewCabinet -> CoroutineScope(Dispatchers.IO).launch {
                 tryNTimes(5,c,NetworkController::createCabinet).onSuccess {
