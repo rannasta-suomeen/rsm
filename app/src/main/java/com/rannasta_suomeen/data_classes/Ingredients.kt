@@ -1,6 +1,7 @@
 package com.rannasta_suomeen.data_classes
 
 import com.rannasta_suomeen.storage.Settings
+import kotlin.math.roundToInt
 
 /**
  * Class to represent a ingredient in general. This is the kotlin equivalent of the rs class Incredient
@@ -131,7 +132,13 @@ enum class UnitType{
             oz -> "oz"
             kpl -> throw IllegalArgumentException("Unreachable")
         }
-        return String.format("%.1f $unit", converted)
+
+        // ml does not need to display decimals
+        return if (desiredUnit == ml){
+            String.format("%d $unit", converted.roundToInt())
+        } else {
+            String.format("%.1f $unit", converted)
+        }
     }
 
     private fun convertToMl(amount: Double): Double{
@@ -150,6 +157,10 @@ enum class UnitType{
             oz -> 0.03381402270*amount
             kpl -> throw IllegalArgumentException("Cant convert ml to kpl")
         }
+    }
+
+    fun listVolumeOptions(): List<Pair<UnitType, String>>{
+        return listOf(Pair(cl, "cl"), Pair(ml, "ml"), Pair(oz, "oz"))
     }
 }
 

@@ -27,6 +27,7 @@ class Settings(activity: Activity) {
             preferences.edit().putString(UNIT, t).apply()
         }
 
+    // Id of the cabinet last used
     var cabinet: Int
         get() = preferences.getInt(CABINET, 0)
         set(value) {

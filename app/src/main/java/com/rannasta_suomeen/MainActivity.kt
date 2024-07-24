@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.menuMainProducts -> R.id.fragmentProducts
             R.id.menuMainCharts -> TODO()
             R.id.menuMainDrinks -> R.id.fragmentDrinks
-            R.id.menuMainSettings -> TODO()
+            R.id.menuMainSettings -> R.id.fragmentSettings
             R.id.menuMainStorage -> R.id.fragmentCabinets
             else -> throw IllegalArgumentException("Attempted to navigate to ${item.itemId} witch is not possible")
         }

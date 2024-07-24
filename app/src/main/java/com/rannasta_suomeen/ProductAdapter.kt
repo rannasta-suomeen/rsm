@@ -45,7 +45,7 @@ class ProductAdapter(
             with(itemView){
                 findViewById<TextView>(R.id.textViewProductName).text = item.name
                 findViewById<TextView>(R.id.textViewProductPrice).text = displayDecimal(item.price, R.string.price)
-                findViewById<TextView>(R.id.textViewProductVolume).text = itemView.resources.getString(R.string.volume,item.volumeCl())
+                findViewById<TextView>(R.id.textViewProductVolume).text = item.volumeDesired(settings)
                 findViewById<TextView>(R.id.textViewProductAbv).text = displayDecimal(item.abv, R.string.abv)
                 findViewById<TextView>(R.id.textViewRetailer).text = item.retailer.toString()
                 findViewById<TextView>(R.id.textViewProductFsd).text = displayDecimal(item.fsd(), R.string.shots)

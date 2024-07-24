@@ -26,7 +26,7 @@ class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(item.standard_servings, R.string.shots)
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewPrice).text = displayDecimal(item.price(settings), R.string.price)
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAbv).text = displayDecimal(item.abv_average, R.string.abv)
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewVolume).text = UnitType.ml.displayInDesiredUnit(i.drink.total_volume, UnitType.cl)
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewVolume).text = UnitType.ml.displayInDesiredUnit(i.drink.total_volume, settings.prefUnit)
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewType).text = item.type.toString()
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAer).text = displayDecimal(item.pricePerServing(settings), R.string.aer)
             itemView.findViewById<TextView>(R.id.textViewDrinkMissingAlcohol).text = i.missingIngredientsAlcoholic(owned).toString()

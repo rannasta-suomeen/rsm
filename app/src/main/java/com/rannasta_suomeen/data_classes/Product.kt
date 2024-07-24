@@ -1,6 +1,7 @@
 package com.rannasta_suomeen.data_classes
 
 import android.util.Log
+import com.rannasta_suomeen.storage.Settings
 import kotlin.math.roundToInt
 
 /** Kotlin equivalent of the RSM product */
@@ -37,6 +38,10 @@ data class Product(
 
     fun volumeCl(): Int{
         return (volume * 100).roundToInt()
+    }
+
+    fun volumeDesired(settings: Settings): String{
+        return UnitType.cl.displayInDesiredUnit(volumeCl(), settings.prefUnit)
     }
 
     companion object{

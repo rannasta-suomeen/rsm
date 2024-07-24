@@ -47,5 +47,9 @@
             android:id="@+id/action_fragmentCabinets_self"
             app:destination="@id/fragmentCabinets" />
     </fragment>
+    <fragment
+        android:id="@+id/fragmentSettings"
+        android:name="com.rannasta_suomeen.main_fragments.SettingsFragment">
+    </fragment>
 
 </navigation>
