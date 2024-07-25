@@ -3,7 +3,7 @@ package com.rannasta_suomeen.data_classes
 import com.rannasta_suomeen.storage.Settings
 
 /**
- This is the equivalent of the RS-Struct Recipe
+ This is the equivalent of the RS-Struct RecipeRow
  */
 
 @Suppress("SpellCheckingInspection")
@@ -15,7 +15,7 @@ data class DrinkInfo(
     val name: String,
     val info: String,
 
-    val recipe_id: Int,
+    val tag_list: List<String>,
 
     val alko_price_per_serving: Double,
     val superalko_price_per_serving: Double,
@@ -24,9 +24,8 @@ data class DrinkInfo(
     val superalko_aer: Double,
 
     /** Volume of the drink in ml*/
-    val total_volume : Int,
+    val total_volume : Double,
     val standard_servings: Double,
-    val price_per_serving: Double,
 
     val abv_average: Double,
     val abv_max: Double,
@@ -46,7 +45,6 @@ data class DrinkInfo(
     val favorite_count: Int
 
 ){
-
     enum class SortTypes{
         Name, Type, Volume, Price, Fsd, Pps, Abv
     }
@@ -71,6 +69,7 @@ data class DrinkInfo(
     fun pricePerServing(settings: Settings): Double{
         return price(settings)/standard_servings
     }
+
 }
 
 /**

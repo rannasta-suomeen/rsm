@@ -22,7 +22,7 @@ class RecipePartAdapter(private var owned: List<GeneralIngredient>,private val s
         fun bind(item: IngredientsForDrinkPointer.RecipePartPointer, amount: Double, owned: List<GeneralIngredient>, settings: Settings){
             with(itemView) {
                 findViewById<TextView>(R.id.textViewRecipePartName).text = item.name
-                findViewById<TextView>(R.id.textViewRecipePartVolume).text = item.unit.displayInDesiredUnit((item.amount * amount).roundToInt(), settings.prefUnit)
+                findViewById<TextView>(R.id.textViewRecipePartVolume).text = item.unit.displayInDesiredUnit((item.amount * amount), settings.prefUnit)
                 // TODO: make this show price per desired unit
                 findViewById<TextView>(R.id.textViewRecipePartPrice).text = displayDecimal(amount * item.price(settings),R.string.price)
                 findViewById<TextView>(R.id.textViewRecipePartAer).text = displayDecimal(item.ingredient.price(settings),R.string.ppl)

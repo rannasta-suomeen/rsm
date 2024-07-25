@@ -36,8 +36,8 @@ data class Product(
         return volume * abv / FSD_CL
     }
 
-    fun volumeCl(): Int{
-        return (volume * 100).roundToInt()
+    fun volumeCl(): Double{
+        return (volume * 100)
     }
 
     fun volumeDesired(settings: Settings): String{

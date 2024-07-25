@@ -402,7 +402,7 @@ class TotalDrinkRepository(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             suspend fun emitCurrent() {
                 dataFlow.emit(recipeList.mapNotNull { ings ->
-                    drinkList.find { it.recipe_id == ings.recipe_id }?.let {
+                    drinkList.find { it.id == ings.recipe_id }?.let {
                         ings.toPointer(ingredientList)
                             ?.let { it1 -> DrinkTotal(it, it1) }
                     }

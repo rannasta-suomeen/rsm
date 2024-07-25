@@ -30,7 +30,7 @@ class ProductsFragment(private val activity: Activity, private val imageReposito
     private var productListFull = listOf<Product>().sortedBy {it.name}
 
     private var sortType = SortTypes.Pps
-    private var sortByAsc = false
+    private var sortByAsc = true
 
     private lateinit var filterMenu: PopupFilter
 
@@ -67,9 +67,14 @@ class ProductsFragment(private val activity: Activity, private val imageReposito
 
         val spinner = view.findViewById<Spinner>(R.id.spinnerDrinkSort)
         spinner.onItemSelectedListener = this
-        val filterButton = view.findViewById<ImageButton>(R.id.imageButtonDrinkFilter)
-
         val sortByDirButton = view.findViewById<ImageButton>(R.id.imageButtonDrinkSortDir)
+        val filterButton = view.findViewById<ImageButton>(R.id.imageButtonDrinkFilter)
+        val img  = when (sortByAsc){
+            true -> R.drawable.ic_baseline_arrow_drop_up_24
+            false -> R.drawable.ic_baseline_arrow_drop_down_24
+        }
+        sortByDirButton.setImageResource(img)
+
         sortByDirButton.setOnClickListener {
             sortByAsc = !sortByAsc
             val img  = when (sortByAsc){

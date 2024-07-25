@@ -1,81 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".main_fragments.DrinksFragment">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        tools:context=".main_fragments.DrinksFragment">
 
-        <TextView
-            android:id="@+id/textViewDrinkName"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/drinks"
-            android:textSize="20sp"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView2"
+            app:cardBackgroundColor="?colorPrimaryVariant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                        <ImageButton
+                            android:id="@+id/imageButtonDrinkFilter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_marginEnd="8dp"
+                            android:backgroundTint="#00FFFFFF"
+                            android:scaleX="1.5"
+                            android:scaleY="1.5"
+                            android:src="@drawable/ic_baseline_filter_list_24"
+                            app:layout_constraintBottom_toBottomOf="@+id/imageButtonDrinkSortDir"
+                            app:layout_constraintEnd_toStartOf="@+id/imageButtonDrinkSortDir"
+                            app:layout_constraintTop_toTopOf="@+id/imageButtonDrinkSortDir" />
+
+                        <View
+                            android:id="@+id/divider"
+                            android:layout_width="0dp"
+                            android:layout_height="2dp"
+                            android:background="?android:attr/listDivider"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/imageButtonDrinkSortDir" />
+
+                        <ImageButton
+                            android:id="@+id/imageButtonDrinkSortDir"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:backgroundTint="#00FFFFFF"
+                            android:src="@drawable/ic_baseline_arrow_drop_down_24"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/textViewDrinkName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:text="@string/drinks"
+                            android:textSize="20sp"
+                            app:layout_constraintBottom_toBottomOf="@+id/imageButtonDrinkSortDir"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <Spinner
+                            android:id="@+id/spinnerDrinkSort"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:backgroundTint="#00FFFFFF"
+                            android:entries="@array/drinks_possible_sort"
+                            app:layout_constraintEnd_toStartOf="@+id/imageButtonDrinkFilter"
+                            app:layout_constraintStart_toEndOf="@+id/textViewDrinkName"
+                            app:layout_constraintTop_toTopOf="@+id/textViewDrinkName" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewPreviewDrinks"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider"
+            app:layout_constraintTop_toBottomOf="@id/cardView2"
+            app:layout_constraintVertical_bias="0.0"
             tools:itemCount="4"
             tools:listitem="@layout/item_drink" />
 
-        <View
-            android:id="@+id/divider"
-            android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginTop="8dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewDrinkName" />
-
-        <ImageButton
-            android:id="@+id/imageButtonDrinkSortDir"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:backgroundTint="#00FFFFFF"
-            android:src="@drawable/ic_baseline_arrow_drop_down_24"
-            app:layout_constraintBottom_toTopOf="@+id/divider"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Spinner
-            android:id="@+id/spinnerDrinkSort"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:backgroundTint="#00FFFFFF"
-            android:entries="@array/drinks_possible_sort"
-            app:layout_constraintBottom_toTopOf="@+id/divider"
-            app:layout_constraintEnd_toStartOf="@+id/imageButtonDrinkFilter"
-            app:layout_constraintStart_toEndOf="@+id/textViewDrinkName"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/imageButtonDrinkFilter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#00FFFFFF"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
-            android:src="@drawable/ic_baseline_filter_list_24"
-            app:layout_constraintBottom_toBottomOf="@+id/imageButtonDrinkSortDir"
-            app:layout_constraintEnd_toStartOf="@+id/imageButtonDrinkSortDir"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -121,7 +121,7 @@ enum class UnitType{
         return newUnit.convertFromMl(ml)
     }
 
-    fun displayInDesiredUnit(amount: Int, desiredUnit: UnitType): String{
+    fun displayInDesiredUnit(amount: Double, desiredUnit: UnitType): String{
         if (this == kpl) {
             return "$amount kpl"
         }

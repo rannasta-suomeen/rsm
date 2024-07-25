@@ -20,6 +20,7 @@ object NetworkController {
     private var jwtToken: String? = null
 
     private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
+    //private const val serverAddress: String = "http://10.0.2.2:8000"
     private val client = OkHttpClient()
 
     sealed class Error(override val message: String) : Throwable() {
@@ -96,6 +97,7 @@ object NetworkController {
         return makeTokenRequest(request) {
             val s = it.body?.string()
             val list = Gson().fromJson(s, Array<DrinkInfo>::class.java)
+            Log.d("Drinks", "Drinks: ${list.toList().size}")
             list.toList()
         }
     }

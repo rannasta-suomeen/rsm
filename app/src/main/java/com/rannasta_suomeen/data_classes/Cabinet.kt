@@ -56,7 +56,7 @@ class Infinite: OwnedAmount(){
 class Some(val x: Int): OwnedAmount(){
     override fun show(settings: Settings): String {
         Log.d("Owned", "Amount_ml is: $x")
-        return UnitType.ml.displayInDesiredUnit(x,settings.prefUnit)
+        return UnitType.ml.displayInDesiredUnit(x.toDouble(),settings.prefUnit)
     }
 }
 

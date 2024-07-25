@@ -36,7 +36,7 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
     private var ownedIngredients = listOf<GeneralIngredient>()
 
     private var sortType = DrinkInfo.SortTypes.Pps
-    private var sortByAsc = false
+    private var sortByAsc = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         drinkPreviewAdapter = DrinkPreviewAdapter(activity, settings)
@@ -53,7 +53,6 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
             }
             totalCabinetRepository.ownedIngredientFlow.collect{
                 ownedIngredients = it
-                Log.d("Drinks", "Owned ingredients are: $ownedIngredients")
                 activity.runOnUiThread {
                     updateSelection()
                 }
@@ -73,6 +72,11 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
         spinner.onItemSelectedListener = this
 
         val sortByDirButton = view.findViewById<ImageButton>(R.id.imageButtonDrinkSortDir)
+        val img  = when (sortByAsc){
+            true -> R.drawable.ic_baseline_arrow_drop_up_24
+            false -> R.drawable.ic_baseline_arrow_drop_down_24
+        }
+        sortByDirButton.setImageResource(img)
         sortByDirButton.setOnClickListener {
             sortByAsc = !sortByAsc
             val img  = when (sortByAsc){
