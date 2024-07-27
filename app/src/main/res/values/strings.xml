@@ -7,6 +7,7 @@
     <string name="cabinets">Cabinets</string>
     <string name="price">%1$s €</string>
     <string name="volume">%1$d cl</string>
+    <string name="volumeUnit">Volume[%1$s]</string>
     <string name="aer">%1$s €/fsd</string>
     <string name="ppl">%1$s €/l</string>
     <string name="abv">%1$s%%</string>
