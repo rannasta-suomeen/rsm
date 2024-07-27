@@ -19,6 +19,8 @@ import java.time.Instant
 object NetworkController {
     private var jwtToken: String? = null
     private val jackson = jacksonObjectMapper()
+    private var username: String? = null
+    private var password: String? = null
 
     //private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
     private const val serverAddress: String = "http://10.0.2.2:8000"
@@ -56,8 +58,10 @@ object NetworkController {
      */
     suspend fun login(payload: Pair<String, String>): Result<Unit> {
         val user = payload.first
-        val password = payload.second
-        val body: RequestBody = (user + "\n" + password).toRequestBody()
+        val pwd = payload.second
+        username = user
+        password = pwd
+        val body: RequestBody = (user + "\n" + pwd).toRequestBody()
         val request = Request.Builder().url("$serverAddress/login").post(body).build()
         try {
             client.newCall(request).execute().use {
@@ -394,6 +398,14 @@ object NetworkController {
                             return Result.failure(Error.RetryError(res.exceptionOrNull()!!))
                         }
                         tryNTimes(n - 1, payload, function)
+                    }
+                    is Error.TokenError -> {
+                        if (username!= null && password != null){
+                            login(Pair(username!!, password!!))
+                            tryNTimes(n-1, payload, function)
+                        } else {
+                            return res
+                        }
                     }
                     else -> {
                         return res
