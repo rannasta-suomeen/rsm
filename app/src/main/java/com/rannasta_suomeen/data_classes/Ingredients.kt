@@ -114,8 +114,14 @@ data class IngredientsForDrinkPointer(
     }
 }
 
+// TODO: Rename using normal names and json @Annotations
 enum class UnitType{
-    cl, ml, oz, kpl;
+    cl,
+    ml,
+    oz,
+    kpl,
+    tl,
+    dash;
 
     fun convert(amount: Int, newUnit: UnitType): Double{
         val ml = this.convertToMl(amount.toDouble())
@@ -137,6 +143,8 @@ enum class UnitType{
             ml -> "ml"
             oz -> "oz"
             kpl -> throw IllegalArgumentException("Unreachable")
+            tl -> "tl"
+            dash -> throw IllegalArgumentException("Unreachable")
         }
 
         // ml does not need to display decimals
@@ -153,6 +161,8 @@ enum class UnitType{
             ml -> amount
             oz -> 29.57352956*amount
             kpl -> throw IllegalArgumentException("Cant convert Kpl to ml")
+            tl -> 15*amount
+            dash -> 0.625 * amount
         }
     }
 
@@ -162,11 +172,13 @@ enum class UnitType{
             ml -> amount
             oz -> 0.03381402270*amount
             kpl -> throw IllegalArgumentException("Cant convert ml to kpl")
+            tl -> 0.06666666666*amount
+            dash -> 1.6*amount
         }
     }
 
     fun listVolumeOptions(): List<Pair<UnitType, String>>{
-        return listOf(Pair(cl, "cl"), Pair(ml, "ml"), Pair(oz, "oz"))
+        return listOf(Pair(cl, "cl"), Pair(ml, "ml"), Pair(oz, "oz"), Pair(tl, "tl"))
     }
 }
 
