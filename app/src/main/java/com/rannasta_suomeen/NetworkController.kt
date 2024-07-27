@@ -2,7 +2,7 @@ package com.rannasta_suomeen
 
 import android.util.Log
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.google.gson.Gson
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.rannasta_suomeen.NetworkController.CabinetOperation.*
 import com.rannasta_suomeen.data_classes.*
 import kotlinx.coroutines.*
@@ -18,10 +18,15 @@ import java.time.Instant
 
 object NetworkController {
     private var jwtToken: String? = null
+    private val jackson = jacksonObjectMapper()
 
-    private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
-    //private const val serverAddress: String = "http://10.0.2.2:8000"
+    //private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
+    private const val serverAddress: String = "http://10.0.2.2:8000"
     private val client = OkHttpClient()
+
+    init {
+        jackson.findAndRegisterModules()
+    }
 
     sealed class Error(override val message: String) : Throwable() {
         class NetworkError : Error("No network")
@@ -96,7 +101,7 @@ object NetworkController {
         val request = Request.Builder().url("$serverAddress/drinks").get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
-            val list = Gson().fromJson(s, Array<DrinkInfo>::class.java)
+            val list = jackson.readerForArrayOf(DrinkInfo::class.java).readValue(s,Array<DrinkInfo>::class.java)
             Log.d("Drinks", "Drinks: ${list.toList().size}")
             list.toList()
         }
@@ -110,7 +115,7 @@ object NetworkController {
         val request = Request.Builder().url("$serverAddress/cabinet?name=${payload.name}").post("".toRequestBody())
         return makeTokenRequest(request) {
             val s = it.body?.string()
-            val list = Gson().fromJson(s, Int::class.java)
+            val list = jackson.readValue(s,Int::class.java)
             list
         }
     }
@@ -137,12 +142,12 @@ object NetworkController {
         val request = Request.Builder().url("$serverAddress/cabinet").get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
-            val list = Gson().fromJson(s, Array<CabinetCompact>::class.java)
+            val list = jackson.readerForArrayOf(CabinetCompact::class.java).readValue(s,Array<CabinetCompact>::class.java)
             list.toList()
         }
     }
 
-    /** Makes a request and tries to delete a cabinet
+    /** Makes a request and tries to get products for a cabinet
      * @param cabinet Int, the id of the cabinet to delete
      * @return Result, either [Unit] or an [Error]
      */
@@ -150,7 +155,7 @@ object NetworkController {
         val request = Request.Builder().url("$serverAddress/items/$cabinet").get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
-            val list = Gson().fromJson(s, Array<CabinetProductCompact>::class.java)
+            val list = jackson.readerForArrayOf(CabinetProductCompact::class.java).readValue(s,Array<CabinetProductCompact>::class.java)
             list.toList()
         }
     }
@@ -170,8 +175,7 @@ object NetworkController {
                     }
                 }
             }.awaitAll()
-            Log.d("Networking", "Got $t as cabinet state")
-            t.requireNoNulls()
+            t.filterNotNull()
         }
     }
 
@@ -266,7 +270,7 @@ object NetworkController {
         val request = Request.Builder().url("$serverAddress/ingprofilter").get()
         return makeTokenRequest(request){
             val s = it.body?.string()
-            val list = Gson().fromJson(s, Array<IngredientProductFilter>::class.java)
+            val list = jackson.readerForArrayOf(IngredientProductFilter::class.java).readValue(s,Array<IngredientProductFilter>::class.java)
             list.toList()
         }
     }
@@ -281,7 +285,7 @@ object NetworkController {
             .get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
-            val list = Gson().fromJson(s, Array<Product>::class.java)
+            val list = jackson.readerForArrayOf(Product::class.java).readValue(s,Array<Product>::class.java)
             list.toList()
         }
     }
@@ -296,7 +300,7 @@ object NetworkController {
             .get()
         return makeTokenRequest(request){
             val s = it.body?.string()
-            val list = Gson().fromJson(s, Array<IngredientsForDrink>::class.java)
+            val list = jackson.readerForArrayOf(IngredientsForDrink::class.java).readValue(s,Array<IngredientsForDrink>::class.java)
             list.toList()
         }
     }
@@ -311,7 +315,7 @@ object NetworkController {
             .get()
         return makeTokenRequest(request){
             val s = it.body?.string()
-            val list = Gson().fromJson(s, Array<GeneralIngredient>::class.java)
+            val list = jackson.readerForArrayOf(GeneralIngredient::class.java).readValue(s,Array<GeneralIngredient>::class.java)
             list.toList()
         }
     }

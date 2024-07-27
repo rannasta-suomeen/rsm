@@ -1,8 +1,11 @@
 package com.rannasta_suomeen.data_classes
 
 import android.util.Log
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.rannasta_suomeen.storage.Settings
 
+@JsonIgnoreProperties(value = ["owner_id", "access_key"])
 data class CabinetCompact(
     val id: Int,
     val name: String,
@@ -12,6 +15,7 @@ data class CabinetCompact(
     }
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class CabinetProductCompact(
     val product_id: Int,
     var amount_ml: Int?,
@@ -28,6 +32,7 @@ data class CabinetProduct(
     var usable: Boolean,
 )
 
+@JsonIgnoreProperties(value = ["owner_id"])
 data class CabinetStorable(
     val id:Int,
     val name: String,
@@ -61,6 +66,7 @@ class Some(val x: Int): OwnedAmount(){
 }
 
 
+@JsonIgnoreProperties(value = ["owner_id"])
 data class Cabinet(
     val id: Int,
     val name: String,

@@ -3,13 +3,18 @@ package com.rannasta_suomeen.storage
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.gson.Gson
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.UnitType
 
 val DRINK_VOLUME_UNIT = UnitType.ml
 
 class Settings(activity: Activity) {
+    private val jackson = jacksonObjectMapper()
+
+    init {
+        jackson.findAndRegisterModules()
+    }
 
     var prefAlko: Boolean
         get() = preferences.getBoolean(PREFALKO, false)
@@ -20,10 +25,10 @@ class Settings(activity: Activity) {
     var prefUnit: UnitType
         get() {
             val t = preferences.getString(UNIT, "cl")
-            return Gson().fromJson<UnitType>(t, UnitType::class.java)
+            return jackson.readValue(t, UnitType::class.java)
         }
         set(value) {
-            val t = Gson().toJson(value)
+            val t = jackson.writeValueAsString(value)
             preferences.edit().putString(UNIT, t).apply()
         }
 

@@ -2,9 +2,9 @@ package com.rannasta_suomeen.storage
 
 import android.content.Context
 import android.util.Log
+import com.fasterxml.jackson.databind.JsonMappingException
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.google.gson.Gson
-import com.google.gson.JsonParseException
 import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.NetworkController.CabinetOperation
 import com.rannasta_suomeen.NetworkController.CabinetOperation.*
@@ -18,6 +18,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.util.Optional
 
 private const val DRINKFILENAME = "drinks"
@@ -36,6 +37,11 @@ abstract class GenericRepository<R,T>(context: Context, fn: String) {
     abstract val getFn: suspend (T) -> Result<List<R>>
     // BECAUSE FUCK YOU KOTLIN
     abstract val type: Class<Array<R>>
+    val jackson = jacksonObjectMapper()
+
+    init {
+        jackson.findAndRegisterModules()
+    }
 
     val dataFlow: Flow<List<R>> = flow{
         when (memoryCopy.isPresent){
@@ -62,20 +68,20 @@ abstract class GenericRepository<R,T>(context: Context, fn: String) {
 
     private fun loadFromFile(): List<R>?{
         return try{
-            val t: Array<R> = Gson().fromJson(file.readText(), type)
+            val t: Array<R> = jackson.readValue(file.readText(),type)
             Log.d("Storage", "Loaded ${t.size}")
             t.toList()
         } catch (e: FileNotFoundException){
             null
         }
-        catch (e: JsonParseException){
+        catch (e: MissingKotlinParameterException){
             Log.d("Storage","Failed json parse")
             null
         }
     }
 
     private fun writeToFile(list: List<R>){
-        file.writeText(Gson().toJson(list))
+        file.writeText(jackson.writeValueAsString(list))
     }
 }
 
@@ -123,10 +129,10 @@ class CabinetRepository(context: Context){
 
     private val stateMutex = Mutex()
 
-    private val gson = jacksonObjectMapper()
+    private val jackson = jacksonObjectMapper()
 
     init {
-        gson.findAndRegisterModules()
+        jackson.findAndRegisterModules()
         CoroutineScope(Dispatchers.IO).launch {
             launch { serverFlow.collect{
                 // TODO: Add timestamps and use them
@@ -139,19 +145,25 @@ class CabinetRepository(context: Context){
             stateMutex.withLock {
                 if (state.size == 0){
                     try {
-                        state = Gson().fromJson(file.readText(), Array<CabinetStorable>::class.java).toMutableList()
+                        state = jackson.readerForArrayOf(CabinetStorable::class.java).readValue(file.readText(), Array<CabinetStorable>::class.java).toMutableList()
                         stateFlow.emit(state)
                     } catch (_: FileNotFoundException){}
                 }
             }
             try {
                 netActionQueue =
-                    gson.readerForArrayOf(CabinetOperation::class.java).readValue(netQueueFile.readText(), Array<CabinetOperation>::class.java)
+                    jackson.readerForArrayOf(CabinetOperation::class.java).readValue(netQueueFile.readText(), Array<CabinetOperation>::class.java)
                         .toMutableList()
-            } catch (_: FileNotFoundException) {
-            } catch (_: JsonParseException){
-                Log.d("Storage", "Failed to parse $netQueueFile")
-                netQueueFile.delete()
+            } catch (e: Exception) {
+                fun failParse() {
+                    Log.d("Storage", "Failed to parse $netQueueFile")
+                    netQueueFile.delete()
+                }
+                when (e) {
+                    is FileNotFoundException -> Unit
+                    is IOException -> failParse()
+                    else -> throw e
+                }
             }
 
             forceUpdate()
@@ -184,7 +196,7 @@ class CabinetRepository(context: Context){
         }
         if (res.isSuccess){
             netActionQueue.removeIf { it == oper }
-            netQueueFile.writeText(gson.writerFor(Array<CabinetOperation>::class.java).writeValueAsString(netActionQueue.toTypedArray()))
+            netQueueFile.writeText(jackson.writerFor(Array<CabinetOperation>::class.java).writeValueAsString(netActionQueue.toTypedArray()))
             runNetQueueAction(oper)
         } else {
             delay(100)
@@ -194,7 +206,7 @@ class CabinetRepository(context: Context){
     private fun addActionToQueue(oper: CabinetOperation){
         netActionQueue.add(oper)
         CoroutineScope(Dispatchers.IO).launch {
-            netQueueFile.writeText(gson.writerFor(Array<CabinetOperation>::class.java).writeValueAsString(netActionQueue.toTypedArray()))
+            netQueueFile.writeText(jackson.writerFor(Array<CabinetOperation>::class.java).writeValueAsString(netActionQueue.toTypedArray()))
         }
     }
 
@@ -202,7 +214,7 @@ class CabinetRepository(context: Context){
         fn(state)
         CoroutineScope(Dispatchers.IO).launch {
             stateFlow.emit(state)
-            file.writeText(Gson().toJson(state))
+            file.writeText(jackson.writeValueAsString(state))
         }
     }
 
@@ -402,7 +414,7 @@ class TotalDrinkRepository(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             suspend fun emitCurrent() {
                 dataFlow.emit(recipeList.mapNotNull { ings ->
-                    drinkList.find { it.id == ings.recipe_id }?.let {
+                    drinkList.find { it.recipe_id == ings.recipe_id }?.let {
                         ings.toPointer(ingredientList)
                             ?.let { it1 -> DrinkTotal(it, it1) }
                     }

@@ -3,13 +3,14 @@ package com.rannasta_suomeen.data_classes
 import com.rannasta_suomeen.storage.Settings
 
 /**
- This is the equivalent of the RS-Struct RecipeRow
+ This is the equivalent of the RS-Struct Recipe
  */
 
 @Suppress("SpellCheckingInspection")
 data class DrinkInfo(
     val id: Int,
     val type: DrinkType,
+    val recipe_id: Int,
 
     val author_id: Int,
     val name: String,
@@ -47,6 +48,15 @@ data class DrinkInfo(
 ){
     enum class SortTypes{
         Name, Type, Volume, Price, Fsd, Pps, Abv
+    }
+
+    fun displayTagList(): String{
+        return tag_list.fold(""){r, t ->
+            if (t != ""){
+                return@fold "$r#$t"
+            }
+            ""
+        }
     }
 
     fun price(settings: Settings): Double{

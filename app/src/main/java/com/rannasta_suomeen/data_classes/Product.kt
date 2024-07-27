@@ -21,9 +21,6 @@ data class Product(
     val checksum: String,
     val retailer: Retailer
 ){
-    init {
-        Log.d("Drink", "Created drink with id $id, $category_id, $subcategory_id")
-    }
     enum class SortTypes{
         Name, Price, Volume, Abv, Pps, UnitPrice, Fsd
     }

@@ -1,5 +1,7 @@
 package com.rannasta_suomeen.data_classes
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.rannasta_suomeen.storage.Settings
 import kotlin.math.roundToInt
 
@@ -11,7 +13,11 @@ data class GeneralIngredient(
     val type: IngredientType,
     val author_id: Int,
     val name: String,
+    @JsonSerialize(using = CategoryJson.CategorySerializer::class)
+    @JsonDeserialize(using = CategoryJson.CategoryDeserializer::class)
     val category: Category?,
+
+    val recipe_id: Int?,
 
     val abv_average: Double,
     val abv_max: Double,

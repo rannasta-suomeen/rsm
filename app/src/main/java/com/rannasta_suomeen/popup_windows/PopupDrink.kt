@@ -41,6 +41,7 @@ class PopupDrink(val drink: DrinkTotal, activity: Activity, owned: List<GeneralI
 
             findViewById<TextView>(R.id.textViewRecipeAbv).text = displayDecimal(drink.drink.abv_average, R.string.abv)
             findViewById<TextView>(R.id.textViewRecipeAer).text = displayDecimal(drink.drink.pricePerServing(settings), R.string.aer)
+            findViewById<TextView>(R.id.textViewRecipeTags).text = drink.drink.displayTagList()
             val fsdView = findViewById<TextView>(R.id.textViewRecipeFsd)
             fsdView.text = displayDecimal(drink.drink.standard_servings, R.string.shots)
             val priceView = findViewById<TextView>(R.id.textViewRecipePrice)

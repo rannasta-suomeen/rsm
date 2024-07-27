@@ -1,10 +1,60 @@
 package com.rannasta_suomeen.data_classes
 
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
+
 enum class Category{
-    strong_alcohol, wine, liquer, beer, cider, long_drink_cocktail, drink_mix
+    strong_alcohol, wine, liquer, beer, cider, long_drink_cocktail, drink_mix;
+
+    fun toId(): Int{
+        return when (this){
+            strong_alcohol -> 2
+            wine -> 3
+            liquer -> 4
+            beer -> 5
+            cider -> 6
+            long_drink_cocktail -> 7
+            drink_mix -> 8
+        }
+    }
 }
 
-fun from_category(id: Int): Category{
+object CategoryJson{
+
+    private val CATEGORY_FIELD_NAME = "category"
+
+    object CategorySerializer : JsonSerializer<Category>(){
+        override fun serialize(
+            value: Category,
+            gen: JsonGenerator,
+            serializers: SerializerProvider?
+        ) {
+            with(gen){
+                writeNumberField(CATEGORY_FIELD_NAME, value.toId())
+            }
+        }
+    }
+
+    object CategoryDeserializer : JsonDeserializer<Category?>(){
+        override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): Category? {
+            val node = p.readValueAsTree<JsonNode>()
+            val t = node.get(CATEGORY_FIELD_NAME)
+            if (t == null){
+                return null
+            } else {
+                val res = t.asInt()
+                return from_id(res)
+            }
+        }
+    }
+}
+
+fun from_id(id: Int): Category{
     return when (id){
         2 -> Category.strong_alcohol
         3 -> Category.wine
