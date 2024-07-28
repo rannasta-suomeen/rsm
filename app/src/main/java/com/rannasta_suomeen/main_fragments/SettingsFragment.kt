@@ -8,7 +8,6 @@ import android.widget.Spinner
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import com.rannasta_suomeen.R
-import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.storage.Settings
 

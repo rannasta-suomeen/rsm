@@ -8,9 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.data_classes.Product
+import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.data_classes.from
 import com.rannasta_suomeen.popup_windows.PopupProductAdd
 import com.rannasta_suomeen.storage.ImageRepository
@@ -20,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.math.roundToInt
 
 class ProductAdapter(
     private val activity: Activity,
@@ -91,6 +95,18 @@ class ProductAdapter(
     fun submitItems(input: List<Product>){
         items = input
         notifyDataSetChanged()
+    }
+
+    fun notifySwipe(viewHolder: ProductViewHolder, direction: Int){
+        val item = items[viewHolder.adapterPosition]
+        val amount = when (direction){
+            ItemTouchHelper.RIGHT -> null
+            ItemTouchHelper.LEFT -> item.volumeMl().roundToInt()
+            else -> null
+        }
+        totalCabinetRepository.addOrModifyToSelected(item.id, amount)
+        val displayAmount = amount?.let{UnitType.ml.displayInDesiredUnit(it.toDouble(), settings.prefUnit)}?: "Inf"
+        Toast.makeText(activity.baseContext, "Added $displayAmount of ${item.name}", Toast.LENGTH_SHORT).show()
     }
 
     private fun submitImageFound(url: String){

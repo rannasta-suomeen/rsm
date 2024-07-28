@@ -35,6 +35,10 @@ data class Product(
         return (volume * 100)
     }
 
+    fun volumeMl(): Double{
+        return (volume * 1000)
+    }
+
     fun volumeDesired(settings: Settings): String{
         return UnitType.cl.displayInDesiredUnit(volumeCl(), settings.prefUnit)
     }

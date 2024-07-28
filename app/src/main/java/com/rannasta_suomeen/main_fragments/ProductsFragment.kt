@@ -1,6 +1,7 @@
 package com.rannasta_suomeen.main_fragments
 
 import android.app.Activity
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -10,7 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.color.MaterialColors
 import com.rannasta_suomeen.ProductAdapter
+import com.rannasta_suomeen.ProductAdapterItemTouchHelper
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Product
 import com.rannasta_suomeen.data_classes.Product.SortTypes
@@ -37,7 +40,6 @@ class ProductsFragment(private val activity: Activity, private val imageReposito
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         productAdapter = ProductAdapter(activity, totalCabinetRepository, imageRepository, settings)
-
         filterMenu = PopupFilter(activity, ::updateSelection)
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -59,8 +61,9 @@ class ProductsFragment(private val activity: Activity, private val imageReposito
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        val helper = ProductAdapterItemTouchHelper(productAdapter, MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorPrimaryVariant, Color.GREEN), requireContext())
         val recyclerViewDrinks = view.findViewById<RecyclerView>(R.id.recyclerViewPreviewDrinks)
+        helper.attachToRecyclerView(recyclerViewDrinks)
         recyclerViewDrinks.layoutManager = LinearLayoutManager(this.context)
         recyclerViewDrinks.adapter = productAdapter
         recyclerViewDrinks.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))

@@ -249,9 +249,9 @@ class CabinetRepository(context: Context){
         runNetQueueAction(c)
     }
 
-        fun makeItemUsable(c: MakeItemUsable){
-            addActionToQueue(c)
-            runNetQueueAction(c)
+    fun makeItemUsable(c: MakeItemUsable){
+        addActionToQueue(c)
+        runNetQueueAction(c)
     }
 
     fun makeItemUnUsable(c: MakeItemUnusable){
@@ -335,11 +335,23 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
         }
     }
 
+    fun addOrModifyToSelected(pid: Int, amount: Int?) {
+        selectedCabinet?.let {
+            when(it.products.any { p-> p.product.id == pid }){
+                true -> modifyCabinetProductAmount(it.id, pid, amount)
+                false -> addItemToCabinet(it.id, pid, amount)
+            }
+        }
+    }
+
     fun deleteCabinet(id: Int) {
         cabinetRepository.deleteCabinet(DeleteCabinet(id))
     }
 
-    fun addItemToCabinet(id: Int, pid: Int, amount: Int?) {
+    /**
+     * Adds Selected product to selected cabinet. ATTENTION: Does not check that the cabinet does not have said product
+     */
+    private fun addItemToCabinet(id: Int, pid: Int, amount: Int?) {
         cabinetRepository.addItemToCabinet(AddItemToCabinet(id,pid, amount))
     }
 

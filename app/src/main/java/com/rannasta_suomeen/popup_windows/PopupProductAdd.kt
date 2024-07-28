@@ -49,49 +49,25 @@ class PopupProductAdd(private val product: Product,
 
             val switch = findViewById<SwitchCompat>(R.id.switchInvInfinite)
 
+
             findViewById<Button>(R.id.buttonInvAdd).setOnClickListener {
                 val t = parseVolume(edv.toString())
-                val isOwned = repo.selectedCabinet?.isOwned(product) == true
-
-                fun handleOperation(handler: (Int?)-> Unit){
-                    when (switch.isChecked) {
+                when (switch.isChecked) {
+                    true -> {
+                        repo.addOrModifyToSelected(product.id,null)
+                        window.dismiss()
+                    }
+                    false -> when(t.isSuccess){
                         true -> {
-                            handler(null)
+                            repo.addOrModifyToSelected(product.id,t.getOrThrow())
                             window.dismiss()
                         }
-                        false -> when(t.isSuccess){
-                            true -> {
-                                handler(t.getOrThrow())
-                                window.dismiss()
-                            }
-                            false -> Toast.makeText(context, "$edv is not a valid volume", Toast.LENGTH_SHORT).show()
-                        }
+                        false -> Toast.makeText(context, "$edv is not a valid volume", Toast.LENGTH_SHORT).show()
                     }
                 }
-
-                when(isOwned){
-                    true -> handleOperation (::modifyAmount)
-                    false -> handleOperation (::addToCabinet)
-                }
             }
-
             findViewById<TextView>(R.id.textViewInvOwned).text = repo.selectedCabinet?.owned(product)
                 ?.show(settings)
-        }
-    }
-
-    private fun addToCabinet(amount: Int?){
-        CoroutineScope(Dispatchers.IO).launch {
-            repo.selectedCabinet?.let {
-                repo.addItemToCabinet(it.id,product.id, amount)
-            }
-        }
-    }
-    private fun modifyAmount(amount: Int?){
-        CoroutineScope(Dispatchers.IO).launch {
-            repo.selectedCabinet?.let {
-                repo.modifyCabinetProductAmount(it.id, product.id, amount)
-            }
         }
     }
 

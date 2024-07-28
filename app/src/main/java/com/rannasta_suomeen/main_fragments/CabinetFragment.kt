@@ -2,6 +2,7 @@ package com.rannasta_suomeen.main_fragments
 
 import android.app.Activity
 import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -12,8 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rannasta_suomeen.ProductAdapter
+import com.rannasta_suomeen.ProductAdapterItemTouchHelper
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.storage.ImageRepository
@@ -52,6 +55,9 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = adapter
             recyclerView.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
+            val helper = ProductAdapterItemTouchHelper(adapter, MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimaryVariant, Color.GREEN),context)
+            helper.attachToRecyclerView(recyclerView)
+
             spinner.adapter = spinnerAdapter
             spinner.onItemSelectedListener = this@CabinetFragment
 
