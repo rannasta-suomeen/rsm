@@ -19,7 +19,7 @@ import com.rannasta_suomeen.storage.TotalCabinetRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Locale
+import java.util.*
 
 class ProductAdapter(
     private val activity: Activity,
@@ -55,7 +55,6 @@ class ProductAdapter(
                 findViewById<ImageView>(R.id.imageViewProduct).setImageResource(R.drawable.ic_baseline_wine_bar_24)
                 findViewById<ImageView>(R.id.imageViewProduct).setImageBitmap(imageRepository.getFromMemoryOrMiss(item.img))
                 findViewById<TextView>(R.id.textViewProductOwned).text = totalCabinetRepository.selectedCabinet?.owned(item)?.show(settings)
-
 
                 itemView.setOnClickListener {
                     val popup = PopupProductAdd(item, totalCabinetRepository,imageRepository, activity, settings)

@@ -116,7 +116,7 @@ fun sortDrinkPreview(list: List<DrinkTotal>, type: DrinkInfo.SortTypes, asc: Boo
 }
 
 enum class DrinkType {
-    cocktail, shot, punch
+    cocktail, shot, punch, generated
 }
 
 

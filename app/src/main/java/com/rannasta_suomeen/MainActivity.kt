@@ -20,13 +20,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.navigation.NavigationView
 import com.rannasta_suomeen.main_fragments.FragmentFactory
-import com.rannasta_suomeen.storage.EncryptedStorage
-import com.rannasta_suomeen.storage.ImageRepository
-import com.rannasta_suomeen.storage.IngredientRepository
-import com.rannasta_suomeen.storage.ProductRepository
-import com.rannasta_suomeen.storage.Settings
-import com.rannasta_suomeen.storage.TotalCabinetRepository
-import com.rannasta_suomeen.storage.TotalDrinkRepository
+import com.rannasta_suomeen.storage.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -44,7 +38,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val target = when(item.itemId){
             R.id.menuMainProducts -> R.id.fragmentProducts
-            R.id.menuMainCharts -> TODO()
+            R.id.menuMainCharts -> R.id.fragmentCharts
             R.id.menuMainDrinks -> R.id.fragmentDrinks
             R.id.menuMainSettings -> R.id.fragmentSettings
             R.id.menuMainStorage -> R.id.fragmentCabinets

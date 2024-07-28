@@ -1,8 +1,6 @@
 package com.rannasta_suomeen.data_classes
 
-import android.util.Log
 import com.rannasta_suomeen.storage.Settings
-import kotlin.math.roundToInt
 
 /** Kotlin equivalent of the RSM product */
 data class Product(

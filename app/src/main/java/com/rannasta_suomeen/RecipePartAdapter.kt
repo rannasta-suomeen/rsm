@@ -10,8 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.IngredientsForDrinkPointer
 import com.rannasta_suomeen.storage.Settings
-import java.util.Locale
-import kotlin.math.roundToInt
+import java.util.*
 
 class RecipePartAdapter(private var owned: List<GeneralIngredient>,private val settings: Settings): RecyclerView.Adapter<RecipePartAdapter.ProductViewHolder>() {
 

@@ -4,12 +4,7 @@ import android.app.Activity
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.PopupWindow
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Product
@@ -31,11 +26,6 @@ class PopupProductAdd(private val product: Product,
     private var window: PopupWindow
     init {
         val view = activity.layoutInflater.inflate(R.layout.popup_add_to_cabinet, null)
-
-        fun displayDecimal(x: Double, stringId: Int): String{
-            val number = String.format("%.1f", x)
-            return view.resources.getString(stringId, number)
-        }
 
         window = PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         window.isFocusable = true

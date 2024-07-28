@@ -4,19 +4,23 @@
         <item
             android:id="@+id/menuDrinkFilterCocktail"
             android:checked="true"
-            android:title="@string/cocktail" />
+            android:title="@string/cocktail"/>
         <item
             android:id="@+id/menuDrinkFilterShot"
             android:checked="true"
-            android:title="@string/shot" />
+            android:title="@string/shot"/>
         <item
             android:id="@+id/menuDrinkFilterPunch"
             android:checked="true"
-            android:title="@string/punch" />
-    <item
-        android:id="@+id/menuDrinkFilterMakeable"
-        android:title="@string/makeable"
-        android:checked="true"
-        />
+            android:title="@string/punch"/>
+        <item
+            android:id="@+id/menuDrinkFilterMakeable"
+            android:title="@string/unmakeble"
+            android:checked="true"/>
+        <item
+            android:id="@+id/menuDrinkFilterMakeableGrocery"
+            android:title="@string/unmakebleGrocery"
+            android:checked="true"/>
+
     </group>
 </menu>

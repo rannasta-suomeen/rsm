@@ -1,7 +1,6 @@
 package com.rannasta_suomeen.data_classes
 
 import android.util.Log
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.rannasta_suomeen.storage.Settings
 

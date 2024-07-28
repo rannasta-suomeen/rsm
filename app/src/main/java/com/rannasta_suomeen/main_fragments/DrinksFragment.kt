@@ -2,7 +2,7 @@ package com.rannasta_suomeen.main_fragments
 
 import android.app.Activity
 import android.os.Bundle
-import android.util.Log
+import android.view.Menu
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ImageButton
@@ -16,11 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.DrinkPreviewAdapter
 import com.rannasta_suomeen.R
-import com.rannasta_suomeen.data_classes.DrinkInfo
-import com.rannasta_suomeen.data_classes.DrinkTotal
-import com.rannasta_suomeen.data_classes.DrinkType
-import com.rannasta_suomeen.data_classes.GeneralIngredient
-import com.rannasta_suomeen.data_classes.sortDrinkPreview
+import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.TotalCabinetRepository
 import com.rannasta_suomeen.totalDrinkRepository
@@ -34,6 +30,7 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
     private var drinkListFull = listOf<DrinkTotal>()
     private var drinkListFiltered = drinkListFull
     private var ownedIngredients = listOf<GeneralIngredient>()
+    private lateinit var popupMenu: PopupMenu
 
     private var sortType = DrinkInfo.SortTypes.Pps
     private var sortByAsc = true
@@ -42,22 +39,6 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
         drinkPreviewAdapter = DrinkPreviewAdapter(activity, settings)
         super.onCreate(savedInstanceState)
         updateSelection()
-
-        CoroutineScope(Dispatchers.IO).launch {
-            launch {
-                totalDrinkRepository.dataFlow.collect{
-                    drinkListFull = it
-                    drinkListFiltered = drinkListFull
-                    activity.runOnUiThread { updateSelection() }
-                }
-            }
-            totalCabinetRepository.ownedIngredientFlow.collect{
-                ownedIngredients = it
-                activity.runOnUiThread {
-                    updateSelection()
-                }
-            }
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,39 +67,81 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
             sortByDirButton.setImageResource(img)
             updateSelection()
         }
+
         val filterButton = view.findViewById<ImageButton>(R.id.imageButtonDrinkFilter)
-        val popupMenu = PopupMenu(filterButton.context,filterButton,GravityCompat.START)
-        popupMenu.inflate(R.menu.menu_drink_filter)
-        filterButton.setOnClickListener {
-            popupMenu.setOnMenuItemClickListener { m ->
-                if (m.isCheckable){
-                    m.isChecked = !m.isChecked
+        popupMenu = PopupMenu(filterButton.context,filterButton,GravityCompat.START)
+        updatePopupMenu()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            launch {
+                totalDrinkRepository.dataFlow.collect{
+                    drinkListFull = it
+                    updatePopupMenu()
+                    drinkListFiltered = drinkListFull
+                    activity.runOnUiThread { updateSelection() }
                 }
-                val tList = drinkListFull.toMutableList()
-                for (i in popupMenu.menu){
-                    if (!i.isChecked){
-                        tList.removeAll { r ->
-                            val d = r.drink
-                            when (i.itemId){
-                                R.id.menuDrinkFilterCocktail -> d.type == DrinkType.cocktail
-                                R.id.menuDrinkFilterPunch -> d.type == DrinkType.punch
-                                R.id.menuDrinkFilterShot -> d.type == DrinkType.shot
-                                R.id.menuDrinkFilterMakeable -> r.missingIngredientsAlcoholic(ownedIngredients) != 0
-                                else -> false
-                            }
+            }
+            totalCabinetRepository.ownedIngredientFlow.collect{
+                ownedIngredients = it
+                activity.runOnUiThread {
+                    updateSelection()
+                }
+            }
+        }
+
+        popupMenu.setOnMenuItemClickListener { m ->
+            if (m.isCheckable){
+                m.isChecked = !m.isChecked
+            }
+            val tList = drinkListFull.toMutableList()
+            for (i in popupMenu.menu){
+                if (!i.isChecked){
+                    tList.removeAll { r ->
+                        val d = r.drink
+                        when (i.itemId){
+                            R.id.menuDrinkFilterCocktail -> d.type == DrinkType.cocktail
+                            R.id.menuDrinkFilterPunch -> d.type == DrinkType.punch
+                            R.id.menuDrinkFilterShot -> d.type == DrinkType.shot
+                            R.id.menuDrinkFilterMakeable -> r.missingIngredientsAlcoholic(ownedIngredients) != 0
+                            R.id.menuDrinkFilterMakeableGrocery -> r.missingIngredientsNonAlcoholic(ownedIngredients) != 0
+                            0 -> d.tag_list.contains(i.title)
+                            else -> false
                         }
                     }
                 }
-                drinkListFiltered = tList.toList()
-                updateSelection()
-                true
             }
+            drinkListFiltered = tList.toList()
+            updateSelection()
+            true
+        }
+
+        filterButton.setOnClickListener {
             popupMenu.show()
         }
     }
 
     private fun updateSelection(){
         drinkPreviewAdapter.submitItems(sortDrinkPreview(drinkListFiltered, sortType, sortByAsc, settings), ownedIngredients)
+    }
+
+    private fun updatePopupMenu(){
+        popupMenu.menu.clear()
+        popupMenu.inflate(R.menu.menu_drink_filter)
+        addTagsToFilterMenu(popupMenu.menu, findAllTags(drinkListFull))
+    }
+
+    private fun addTagsToFilterMenu(x: Menu, tags: List<String>){
+        tags.forEach {
+            val t = x.add(it)
+            t.isCheckable = true
+            t.isChecked = true
+        }
+    }
+
+    private fun findAllTags(drinksList: List<DrinkTotal>): List<String>{
+        val tagMap = mutableSetOf<String>()
+        drinksList.forEach {tagMap.addAll(it.drink.tag_list) }
+        return tagMap.toList()
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {

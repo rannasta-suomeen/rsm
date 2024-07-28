@@ -2,7 +2,6 @@ package com.rannasta_suomeen.storage
 
 import android.content.Context
 import android.util.Log
-import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.rannasta_suomeen.NetworkController
@@ -19,7 +18,7 @@ import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.util.Optional
+import java.util.*
 
 private const val DRINKFILENAME = "drinks"
 private const val PRODUCTFILENAME = "products"

@@ -14,6 +14,7 @@ class FragmentFactory(private val activity: Activity, private val imageRepositor
             DrinksFragment::class.java.name -> DrinksFragment(activity, settings, totalCabinetRepository)
             ProductsFragment::class.java.name -> ProductsFragment(activity, imageRepository, settings, totalCabinetRepository)
             SettingsFragment::class.java.name -> SettingsFragment(settings)
+            ChartsFragment::class.java.name -> ChartsFragment()
             else -> super.instantiate(classLoader, className)
         }
     }
