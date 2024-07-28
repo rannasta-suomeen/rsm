@@ -38,36 +38,37 @@ class ProductAdapterItemTouchHelper(recyclerView: ProductAdapter,color: Int, con
             actionState: Int,
             isCurrentlyActive: Boolean
         ) {
-            val iW = viewHolder.itemView
-            val paint = Paint()
-            paint.color = color
+            if (actionState == ACTION_STATE_SWIPE){
+                val iW = viewHolder.itemView
+                val paint = Paint()
+                paint.color = color
 
-            val iconHeight = iW.height / 3
+                val iconHeight = iW.height / 3
 
-            val data = when(dX>0){
-                true -> {
-                    Triple(
-                        RectF(iW.left.toFloat(),iW.top.toFloat(), dX, iW.bottom.toFloat()),
-                        VectorDrawableCompat.create(context.resources, R.drawable.ic_baseline_loop_24, null),
-                        iconHeight.toFloat()/2
-                    )
+                val data = when(dX>0){
+                    true -> {
+                        Triple(
+                            RectF(iW.left.toFloat(),iW.top.toFloat(), dX, iW.bottom.toFloat()),
+                            VectorDrawableCompat.create(context.resources, R.drawable.ic_baseline_loop_24, null),
+                            iconHeight.toFloat()/2
+                        )
+                    }
+                    false -> {
+                        Triple(
+                            RectF(iW.right.toFloat() + dX,iW.top.toFloat(),iW.right.toFloat(), iW.bottom.toFloat()),
+                            VectorDrawableCompat.create(context.resources, R.drawable.ic_baseline_wine_bar_24, null),
+                            iW.width.toFloat()-iconHeight*3/2
+                        )
+                    }
                 }
-                false -> {
-                    Triple(
-                        RectF(iW.right.toFloat() + dX,iW.top.toFloat(),iW.right.toFloat(), iW.bottom.toFloat()),
-                        VectorDrawableCompat.create(context.resources, R.drawable.ic_baseline_wine_bar_24, null),
-                        iW.width.toFloat()-iconHeight*3/2
-                    )
+                c.drawRect(data.first, paint)
+                data.second?.let {
+                    it.setBounds(0,0,iconHeight, iconHeight)
+                    c.save()
+                    c.translate(data.third, iW.top + (iW.height - iconHeight).toFloat()/2)
+                    it.draw(c)
                 }
             }
-            c.drawRect(data.first, paint)
-            data.second?.let {
-                it.setBounds(0,0,iconHeight, iconHeight)
-                c.save()
-                c.translate(data.third, iW.top + (iW.height - iconHeight).toFloat()/2)
-                it.draw(c)
-            }
-            // TODO: Fix a bug where deleting the item leaves this showing
             super.onChildDraw(c, recyclerView, viewHolder, dX/3, dY, actionState, isCurrentlyActive)
         }
     }
