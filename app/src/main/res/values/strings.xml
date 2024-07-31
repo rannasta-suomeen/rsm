@@ -17,6 +17,7 @@
     <string name="punch">Punch</string>
     <string name="unmakeble">Missing Alcohol</string>
     <string name="unmakebleGrocery">Missing Groceries</string>
+    <string name="tagless">Tagless</string>
     <string name="remember_me">Remember me</string>
     <string name="pref_file_key">preferences</string>
     <string name="no_cabinet_selected">No cabinet selected</string>

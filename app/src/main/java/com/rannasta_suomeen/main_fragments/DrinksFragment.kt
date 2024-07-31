@@ -60,11 +60,11 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
         sortByDirButton.setImageResource(img)
         sortByDirButton.setOnClickListener {
             sortByAsc = !sortByAsc
-            val img  = when (sortByAsc){
+            val imgDynamic  = when (sortByAsc){
                 true -> R.drawable.ic_baseline_arrow_drop_up_24
                 false -> R.drawable.ic_baseline_arrow_drop_down_24
             }
-            sortByDirButton.setImageResource(img)
+            sortByDirButton.setImageResource(imgDynamic)
             updateSelection()
         }
 
@@ -104,6 +104,7 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
                             R.id.menuDrinkFilterShot -> d.type == DrinkType.shot
                             R.id.menuDrinkFilterMakeable -> r.missingIngredientsAlcoholic(ownedIngredients) != 0
                             R.id.menuDrinkFilterMakeableGrocery -> r.missingIngredientsNonAlcoholic(ownedIngredients) != 0
+                            R.id.menuDrinkFilterTagless -> d.tag_list.isEmpty()
                             0 -> d.tag_list.contains(i.title)
                             else -> false
                         }

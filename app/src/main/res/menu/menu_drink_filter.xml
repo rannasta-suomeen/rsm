@@ -21,6 +21,10 @@
             android:id="@+id/menuDrinkFilterMakeableGrocery"
             android:title="@string/unmakebleGrocery"
             android:checked="true"/>
+        <item
+            android:id="@+id/menuDrinkFilterTagless"
+            android:title="@string/tagless"
+            android:checked="true"/>
 
     </group>
 </menu>
