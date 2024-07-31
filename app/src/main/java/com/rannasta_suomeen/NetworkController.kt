@@ -19,8 +19,9 @@ import java.time.Instant
 object NetworkController {
     private var jwtToken: String? = null
     private val jackson = jacksonObjectMapper()
-    private var username: String? = null
+    var username: String? = null
     private var password: String? = null
+    private var userId: Int? = null
 
     //private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
     private const val serverAddress: String = "http://10.0.2.2:8000"
@@ -51,7 +52,6 @@ object NetworkController {
         class MakeItemUsable(val id:Int, val pid: Int): CabinetOperation()
         class MakeItemUnusable(val id:Int, val pid: Int): CabinetOperation()
     }
-
 
     /** Logs the user in. First item of the pair is the username, second is the password.
      * @return Result.success(Unit) if successful, Result.failure(e)
@@ -151,36 +151,11 @@ object NetworkController {
         }
     }
 
-    /** Makes a request and tries to get products for a cabinet
-     * @param cabinet Int, the id of the cabinet to delete
-     * @return Result, either [Unit] or an [Error]
-     */
-    private suspend fun getCabinetProducts(cabinet: Int): Result<List<CabinetProductCompact>> {
-        val request = Request.Builder().url("$serverAddress/items/$cabinet").get()
-        return makeTokenRequest(request) {
-            val s = it.body?.string()
-            val list = jackson.readerForArrayOf(CabinetProductCompact::class.java).readValue(s,Array<CabinetProductCompact>::class.java)
-            list.toList()
-        }
-    }
-
     /** Make a request and gets all cabinets owned by a user
      * @return [Result] of [List] of [CabinetStorable]
      */
-    suspend fun getCabinetsTotal(_payload: Unit, dispatcher: CoroutineDispatcher = Dispatchers.IO): Result<List<CabinetStorable>>{
-        val cabs = tryNTimes(5, Unit, ::getCabinets)
-        return cabs.map {
-            val t = it.map {
-                CoroutineScope(dispatcher).async {
-                    val products = tryNTimes(5,it.id,::getCabinetProducts)
-                    when (products.isSuccess){
-                        true -> it.toStorable(products.getOrThrow())
-                        false -> null
-                    }
-                }
-            }.awaitAll()
-            t.filterNotNull()
-        }
+    suspend fun getCabinetsTotal(_payload: Unit, dispatcher: CoroutineDispatcher = Dispatchers.IO): Result<List<CabinetCompact>>{
+        return tryNTimes(5, Unit, ::getCabinets)
     }
 
     /** Makes a request and tries to put a product into a cabinet

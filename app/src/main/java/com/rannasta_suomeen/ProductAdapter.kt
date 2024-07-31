@@ -2,14 +2,12 @@ package com.rannasta_suomeen
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.data_classes.Product
@@ -63,24 +61,6 @@ class ProductAdapter(
                 itemView.setOnClickListener {
                     val popup = PopupProductAdd(item, totalCabinetRepository,imageRepository, activity, settings)
                     popup.show(it)
-                }
-                itemView.setOnLongClickListener {
-                    with(totalCabinetRepository) {
-                        val b = AlertDialog.Builder(activity)
-                        selectedCabinet?.let {
-                            b.setTitle("Sure you want to delete product ${item.name} from ${it.name}")
-                            b.setPositiveButton("Yes") { _dialogInterface: DialogInterface, _i: Int ->
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    removeItemFromCabinet(it.id, item.id)
-                                }
-                            }
-                            b.setNegativeButton("Cancel"){ dialogInterface: DialogInterface, _i: Int ->
-                                dialogInterface.cancel()
-                            }
-                        }
-                        b.show()
-                    }
-                    true
                 }
             }
         }

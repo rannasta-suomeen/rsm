@@ -1,90 +1,128 @@
 package com.rannasta_suomeen.data_classes
 
-import android.util.Log
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.storage.Settings
 
-@JsonIgnoreProperties(value = ["owner_id", "access_key"])
 data class CabinetCompact(
     val id: Int,
+    @JsonProperty("owner_id")
+    val ownerId: Int,
     val name: String,
-){
-    fun toStorable(products: List<CabinetProductCompact>): CabinetStorable{
-        return CabinetStorable(id, name, products.toMutableList())
-    }
-}
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class CabinetProductCompact(
-    val product_id: Int,
-    var amount_ml: Int?,
-    var usable: Boolean,
-){
-    fun toCabinetProduct(productMap: HashMap<Int, Product>): CabinetProduct?{
-        return productMap[product_id]?.let { CabinetProduct(it,amount_ml, usable) }
-    }
-}
-
-data class CabinetProduct(
-    val product: Product,
-    var amount_ml: Int?,
-    var usable: Boolean,
-)
-
-@JsonIgnoreProperties(value = ["owner_id"])
-data class CabinetStorable(
-    val id:Int,
-    val name: String,
-    var products: MutableList<CabinetProductCompact>
+    val members: List<CabinetMember>,
+    val products: MutableList<CabinetProductCompact>,
+    @JsonProperty("access_key")
+    val accessKey: String?,
 ){
     fun toCabinet(productMap: HashMap<Int, Product>): Cabinet?{
         val products = products.map{ it.toCabinetProduct(productMap) }
         return if (products.contains(null)) null
-        else Cabinet(id, name, products.mapNotNull { it })
+        else Cabinet(id, ownerId, name, members, products.mapNotNull { it },accessKey)
+    }
+
+    /**
+     * @throws IllegalArgumentException when you are not in said cabinet
+     */
+    fun getOwnUserId(): Int{
+        return members.find { it.userName == NetworkController.username }?.userId
+            ?: throw IllegalArgumentException("A cabinet you hold a reference to does not have yourself as a member")
     }
 }
+
+@JsonIgnoreProperties(value = ["cabinet_id", "name", "img", "href", "abv"])
+data class CabinetProductCompact(
+    val id: Int,
+    @JsonProperty("product_id")
+    val productId: Int,
+    @JsonProperty("owner_id")
+    val ownerId: Int,
+    @JsonProperty("amount_ml")
+    var amountMl: Int?,
+    var usable: Boolean,
+){
+    fun toCabinetProduct(productMap: HashMap<Int, Product>): CabinetProduct?{
+        return productMap[productId]?.let { CabinetProduct(id,it,productId,ownerId, amountMl, usable) }
+    }
+}
+
+data class CabinetProduct(
+    val id: Int,
+    val product: Product,
+    private val productId: Int,
+    val ownerId: Int,
+    var amountMl: Int?,
+    var usable: Boolean,
+){
+    fun toCompact(): CabinetProductCompact{
+        return CabinetProductCompact(id, productId, ownerId, amountMl, usable)
+    }
+}
+
+@JsonIgnoreProperties(value = ["cabinet_id"])
+data class CabinetMember(
+    @JsonProperty("user_id")
+    val userId: Int,
+    @JsonProperty("user_username")
+    val userName: String,
+)
 
 sealed class OwnedAmount{
     abstract fun show(settings: Settings): String
 }
-class None: OwnedAmount(){
+
+object None : OwnedAmount() {
     override fun show(settings: Settings): String {
         return "Not owned"
     }
 }
-class Infinite: OwnedAmount(){
+
+object Infinite : OwnedAmount() {
     override fun show(settings: Settings): String {
         return "Infinite"
     }
 }
 class Some(val x: Int): OwnedAmount(){
     override fun show(settings: Settings): String {
-        Log.d("Owned", "Amount_ml is: $x")
         return UnitType.ml.displayInDesiredUnit(x.toDouble(),settings.prefUnit)
     }
 }
 
 
-@JsonIgnoreProperties(value = ["owner_id"])
 data class Cabinet(
     val id: Int,
+    val ownerId: Int,
     val name: String,
+    val members: List<CabinetMember>,
     val products: List<CabinetProduct>,
+    val accessKey: String?,
 ){
+    fun toCompact(){
+        val productsCompact = products.map { it.toCompact() }
+        CabinetCompact(id, ownerId, name, members, productsCompact.toMutableList(), accessKey)
+    }
+
     fun owned(x: Product): OwnedAmount{
         val res = products.find {
             it.product == x
         }
         return if (res == null ){
-            None()
+            None
         }else{
-            when(res.amount_ml){
-                null -> Infinite()
-                else -> Some(res.amount_ml!!)
+            when(res.amountMl){
+                null -> Infinite
+                else -> Some(res.amountMl!!)
             }
         }
     }
     fun isOwned(x: Product): Boolean{
         return products.any { it.product == x }
+    }
+    /**
+     * @throws IllegalArgumentException when you are not in said cabinet
+     */
+    fun getOwnUserId(): Int{
+        return members.find { it.userName == NetworkController.username }?.userId
+            ?: throw IllegalArgumentException("A cabinet you hold a reference to does not have yourself as a member")
     }
 }

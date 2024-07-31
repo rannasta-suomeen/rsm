@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.rannasta_suomeen.ProductAdapter
-import com.rannasta_suomeen.ProductAdapterItemTouchHelper
+import com.rannasta_suomeen.CabinetProductAdapter
+import com.rannasta_suomeen.CabinetProductAdapterItemTouchHelper
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.storage.ImageRepository
@@ -29,7 +29,7 @@ import kotlin.math.max
 
 class CabinetFragment(private val activity: Activity, private val imageRepository: ImageRepository, private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository): Fragment(R.layout.fragment_cabinets), AdapterView.OnItemSelectedListener{
 
-    private lateinit var adapter: ProductAdapter
+    private lateinit var adapter: CabinetProductAdapter
     private var cabinetList = listOf<Cabinet>()
     private lateinit var spinnerAdapter: ArrayAdapter<String>
     private var selectedCabinet: Cabinet? = null
@@ -37,7 +37,7 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("Cabinets", "Created Again")
         super.onCreate(savedInstanceState)
-        adapter = ProductAdapter(activity, totalCabinetRepository, imageRepository, settings)
+        adapter = CabinetProductAdapter(activity, totalCabinetRepository, imageRepository, settings)
         spinnerAdapter = ArrayAdapter(requireContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item)
     }
 
@@ -55,7 +55,7 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = adapter
             recyclerView.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
-            val helper = ProductAdapterItemTouchHelper(adapter, MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimaryVariant, Color.GREEN),context)
+            val helper = CabinetProductAdapterItemTouchHelper(adapter, MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimaryVariant, Color.GREEN),context)
             helper.attachToRecyclerView(recyclerView)
 
             spinner.adapter = spinnerAdapter
@@ -125,7 +125,7 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
 
     private fun changeSelectedCabinet(){
         CoroutineScope(Dispatchers.Main).launch {
-            selectedCabinet?.products?.let { adapter.submitItems(it.map { it.product }) }
+            selectedCabinet?.products?.let { adapter.submitItems(it) }
         }
     }
 

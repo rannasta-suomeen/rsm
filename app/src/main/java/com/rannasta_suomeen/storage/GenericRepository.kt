@@ -2,6 +2,7 @@ package com.rannasta_suomeen.storage
 
 import android.content.Context
 import android.util.Log
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.rannasta_suomeen.NetworkController
@@ -117,10 +118,10 @@ class ProductToIngredientRepository(context: Context): GenericRepository<Ingredi
 }
 
 class CabinetRepository(context: Context){
-    private var state: MutableList<CabinetStorable> = mutableListOf()
-    val stateFlow: MutableSharedFlow<List<CabinetStorable>> = MutableSharedFlow(1)
-    private var serverState: List<CabinetStorable> = listOf()
-    private val serverFlow = MutableSharedFlow<List<CabinetStorable>>()
+    private var state: MutableList<CabinetCompact> = mutableListOf()
+    val stateFlow: MutableSharedFlow<List<CabinetCompact>> = MutableSharedFlow(1)
+    private var serverState: List<CabinetCompact> = listOf()
+    private val serverFlow = MutableSharedFlow<List<CabinetCompact>>()
 
     private var netActionQueue: MutableList<CabinetOperation> = mutableListOf()
     private val file = File(context.filesDir, CABINETSFILENAME)
@@ -144,9 +145,13 @@ class CabinetRepository(context: Context){
             stateMutex.withLock {
                 if (state.size == 0){
                     try {
-                        state = jackson.readerForArrayOf(CabinetStorable::class.java).readValue(file.readText(), Array<CabinetStorable>::class.java).toMutableList()
+                        state = jackson.readerForArrayOf(CabinetCompact::class.java).readValue(file.readText(), Array<CabinetCompact>::class.java).toMutableList()
                         stateFlow.emit(state)
-                    } catch (_: FileNotFoundException){}
+                    } catch (_: FileNotFoundException){
+                    } catch (e: JsonMappingException){
+                        Log.d("Json", "Failed to parse state cause:$e")
+                    }
+
                 }
             }
             try {
@@ -198,6 +203,10 @@ class CabinetRepository(context: Context){
             netQueueFile.writeText(jackson.writerFor(Array<CabinetOperation>::class.java).writeValueAsString(netActionQueue.toTypedArray()))
             runNetQueueAction(oper)
         } else {
+            val exp = res.exceptionOrNull()
+            if (exp is NetworkController.Error.MiscError){
+                netActionQueue.removeIf { it == oper }
+            }
             delay(100)
         }
     }
@@ -209,7 +218,7 @@ class CabinetRepository(context: Context){
         }
     }
 
-    private fun updateState(fn: (MutableList<CabinetStorable>) -> Unit){
+    private fun updateState(fn: (MutableList<CabinetCompact>) -> Unit){
         fn(state)
         CoroutineScope(Dispatchers.IO).launch {
             stateFlow.emit(state)
@@ -221,9 +230,10 @@ class CabinetRepository(context: Context){
         // TODO: Make this work without internet
         CoroutineScope(Dispatchers.IO).launch {
             tryNTimes(5, c, NetworkController::createCabinet).onSuccess {
-                stateMutex.withLock {
-                    state.add(CabinetStorable(it, c.name, mutableListOf()))
-                    stateFlow.emit(state.toList())
+                val newState = tryNTimes(5, Unit, NetworkController::getCabinets).onSuccess { cabState ->
+                    stateMutex.withLock {
+                        serverFlow.emit(cabState)
+                    }
                 }
             }
         }
@@ -262,19 +272,22 @@ class CabinetRepository(context: Context){
     private fun runNetQueueAction(c: CabinetOperation){
         when (c){
             is NewCabinet -> CoroutineScope(Dispatchers.IO).launch {
-                tryNTimes(5,c,NetworkController::createCabinet).onSuccess {
-                    stateMutex.withLock {
-                        state.add(CabinetStorable(it,c.name, mutableListOf()))
-                        stateFlow.emit(state.toList())
+                tryNTimes(5, c, NetworkController::createCabinet).onSuccess {
+                    tryNTimes(5, Unit, NetworkController::getCabinets).onSuccess { cabState ->
+                        stateMutex.withLock {
+                            serverFlow.emit(cabState)
+                        }
                     }
                 }
             }
-            is AddItemToCabinet -> updateState { it.find { it.id == c.id }?.products?.add(CabinetProductCompact(c.pid,c.amount, true)) }
+            is AddItemToCabinet -> updateState {
+                val t = it.find { it.id == c.id }
+                    t?.products?.add(CabinetProductCompact(c.id, c.pid, t.getOwnUserId(),c.amount, true)) }
             is DeleteCabinet -> updateState { it.removeIf { it.id == c.id } }
-            is MakeItemUnusable -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.usable = false} } }
-            is MakeItemUsable -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.usable = true} } }
-            is ModifyCabinetProductAmount -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.product_id == c.pid }?.let { it.amount_ml = c.amount} } }
-            is RemoveItemFromCabinet -> updateState { it.find { it.id == c.id }?.let { it.products.removeIf { it.product_id == c.pid } } }
+            is MakeItemUnusable -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.id == c.id }?.let { it.usable = false} } }
+            is MakeItemUsable -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.id == c.id }?.let { it.usable = true} } }
+            is ModifyCabinetProductAmount -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.id == c.id }?.let { it.amountMl = c.amount} } }
+            is RemoveItemFromCabinet -> updateState { it.find { it.id == c.id }?.let { it.products.removeIf { it.id == c.id } } }
         }
     }
 }
@@ -287,7 +300,7 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
     private var productMap:HashMap<Int, Product> = HashMap()
     private var productIngredientList = listOf<IngredientProductFilter>()
     private var productIngredientListPointer = listOf<IngredientProductFilterPointer>()
-    var cabinetList: List<CabinetStorable> = listOf()
+    var cabinetList: List<CabinetCompact> = listOf()
     private var lock = Mutex()
 
     var selectedCabinetFlow: MutableSharedFlow<Cabinet?> = MutableSharedFlow(1)
@@ -335,11 +348,17 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
         }
     }
 
+    /**
+     * Can only modify products you own
+     */
     fun addOrModifyToSelected(pid: Int, amount: Int?) {
         selectedCabinet?.let {
-            when(it.products.any { p-> p.product.id == pid }){
-                true -> modifyCabinetProductAmount(it.id, pid, amount)
-                false -> addItemToCabinet(it.id, pid, amount)
+            val userid = it.getOwnUserId()
+            val owned = it.products.find { p-> p.product.id == pid && userid == p.ownerId }
+            if (owned != null){
+                modifyCabinetProductAmount(it.id, owned.id, amount)
+            } else {
+                addItemToCabinet(it.id, pid, amount)
             }
         }
     }
@@ -367,7 +386,7 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
         cabinetRepository.makeItemUnUsable(MakeItemUnusable(id, pid))
     }
 
-    fun modifyCabinetProductAmount(id: Int, pid: Int, amount: Int?){
+    private fun modifyCabinetProductAmount(id: Int, pid: Int, amount: Int?){
         cabinetRepository.modifyCabinetProductAmount(ModifyCabinetProductAmount(id, pid, amount))
     }
 
