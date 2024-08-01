@@ -139,23 +139,16 @@ object NetworkController {
         }
     }
 
-    /** Makes a request and tries to get
+    /** Makes a request and tries to get all cabinets. Including shared ones
      * @return Result, either List of [CabinetCompact] or an [Error]
      */
     suspend fun getCabinets(_payload: Unit): Result<List<CabinetCompact>> {
-        val request = Request.Builder().url("$serverAddress/cabinet").get()
+        val request = Request.Builder().url("$serverAddress/cabinet/shared").get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
             val list = jackson.readerForArrayOf(CabinetCompact::class.java).readValue(s,Array<CabinetCompact>::class.java)
             list.toList()
         }
-    }
-
-    /** Make a request and gets all cabinets owned by a user
-     * @return [Result] of [List] of [CabinetStorable]
-     */
-    suspend fun getCabinetsTotal(_payload: Unit, dispatcher: CoroutineDispatcher = Dispatchers.IO): Result<List<CabinetCompact>>{
-        return tryNTimes(5, Unit, ::getCabinets)
     }
 
     /** Makes a request and tries to put a product into a cabinet
@@ -296,6 +289,63 @@ object NetworkController {
             val s = it.body?.string()
             val list = jackson.readerForArrayOf(GeneralIngredient::class.java).readValue(s,Array<GeneralIngredient>::class.java)
             list.toList()
+        }
+    }
+
+    /** Shares a cabinet and returns it's access key
+     * @param payload the id of the cabinet to share
+     * @return The string that is the cabinets new access code
+     */
+    suspend fun shareCabinet(payload: Int):Result<String>{
+        val request = Request.Builder()
+            .url("$serverAddress/cabinet/shared/$payload")
+            .put("".toRequestBody())
+        return makeTokenRequest(request){
+            val s = it.body?.string()
+            // Body should never be not a string
+            s?:""
+        }
+    }
+
+    /** Tries to join cabinet with a certain access key
+     * @param payload the string of the cabinet to join
+     * @return [Result] [Unit]
+     */
+    suspend fun joinCabinet(payload: String):Result<Unit>{
+        val request = Request.Builder()
+            .url("$serverAddress/cabinet/shared/join/$payload")
+            .get()
+        return makeTokenRequest(request){
+        }
+    }
+
+    /** Tries to quit a cabinet with a certain id
+     * @param payload the string of the cabinet to join
+     * @return [Result] [Unit]
+     */
+    suspend fun quitCabinet(payload: Int):Result<Unit>{
+        val request = Request.Builder()
+            .url("$serverAddress/cabinet/shared/quit/$payload")
+            .put("".toRequestBody())
+        return makeTokenRequest(request){
+        }
+    }
+
+    class CabinetMoveOperation(
+        val
+    )
+
+    // TODO: THIS IS INCOMPLETE
+
+    /** Tries to quit a cabinet with a certain id
+     * @param payload the string of the cabinet to join
+     * @return [Result] [Unit]
+     */
+    suspend fun moveItemsInCabinets(payload: Int):Result<Unit>{
+        val request = Request.Builder()
+            .url("$serverAddress/cabinet/shared/quit/$payload")
+            .put("".toRequestBody())
+        return makeTokenRequest(request){
         }
     }
 

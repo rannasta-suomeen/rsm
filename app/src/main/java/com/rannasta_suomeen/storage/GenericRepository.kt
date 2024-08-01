@@ -184,7 +184,7 @@ class CabinetRepository(context: Context){
     }
 
     private suspend fun forceUpdate(){
-        tryNTimes(5, Unit, NetworkController::getCabinetsTotal).onSuccess { serverFlow.emit(it)}
+        tryNTimes(5, Unit, NetworkController::getCabinets).onSuccess { serverFlow.emit(it)}
     }
 
     private suspend fun processNetOperation(oper: CabinetOperation){
