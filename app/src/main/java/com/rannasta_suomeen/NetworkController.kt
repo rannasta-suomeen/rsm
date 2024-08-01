@@ -69,7 +69,7 @@ object NetworkController {
                     200 -> {
                         // Server should always return a body with a successful login request
                         val token = it.body!!.string()
-                        jwtToken = token.strip()
+                        jwtToken = token.trim()
                         return Result.success(Unit)
                     }
                     401 -> {

@@ -3,6 +3,9 @@ package com.rannasta_suomeen.storage
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
+import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.UnitType
@@ -25,7 +28,12 @@ class Settings(activity: Activity) {
     var prefUnit: UnitType
         get() {
             val t = preferences.getString(UNIT, "cl")
-            return jackson.readValue(t, UnitType::class.java)
+            try {
+                return jackson.readValue(t, UnitType::class.java)
+            } catch (e: Exception){
+                Log.d("Storage", "Encountered $e")
+                return UnitType.cl
+            }
         }
         set(value) {
             val t = jackson.writeValueAsString(value)
