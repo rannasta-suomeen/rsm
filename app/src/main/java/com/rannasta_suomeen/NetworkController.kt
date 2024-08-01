@@ -332,7 +332,10 @@ object NetworkController {
     }
 
     class CabinetMoveOperation(
-        val
+        val cabineId: Int,
+        val targetId: Int,
+        // List of product actual id:s to move
+        val items: List<Int>,
     )
 
     // TODO: THIS IS INCOMPLETE
@@ -341,7 +344,7 @@ object NetworkController {
      * @param payload the string of the cabinet to join
      * @return [Result] [Unit]
      */
-    suspend fun moveItemsInCabinets(payload: Int):Result<Unit>{
+    suspend fun moveItemsInCabinets(payload: CabinetMoveOperation):Result<Unit>{
         val request = Request.Builder()
             .url("$serverAddress/cabinet/shared/quit/$payload")
             .put("".toRequestBody())
