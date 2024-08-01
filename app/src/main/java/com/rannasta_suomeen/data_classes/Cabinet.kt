@@ -1,5 +1,6 @@
 package com.rannasta_suomeen.data_classes
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.rannasta_suomeen.NetworkController
@@ -24,6 +25,7 @@ data class CabinetCompact(
     /**
      * @throws IllegalArgumentException when you are not in said cabinet
      */
+    @JsonIgnore
     fun getOwnUserId(): Int{
         return members.find { it.userName == NetworkController.username }?.userId
             ?: throw IllegalArgumentException("A cabinet you hold a reference to does not have yourself as a member")
@@ -56,6 +58,18 @@ data class CabinetProduct(
 ){
     fun toCompact(): CabinetProductCompact{
         return CabinetProductCompact(id, productId, ownerId, amountMl, usable)
+    }
+    fun estimatedFsd(): Double{
+        return when (amountMl == null){
+            true -> product.fsd()
+            false -> product.fsd()*amountMl!! / product.volumeMl()
+        }
+    }
+    fun estimatedPrice(): Double{
+        return when (amountMl == null){
+            true -> product.price
+            false -> product.price*amountMl!! / product.volumeMl()
+        }
     }
 }
 

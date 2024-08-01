@@ -19,6 +19,7 @@ import com.rannasta_suomeen.CabinetProductAdapter
 import com.rannasta_suomeen.CabinetProductAdapterItemTouchHelper
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Cabinet
+import com.rannasta_suomeen.popup_windows.PopupCabinetShare
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.TotalCabinetRepository
@@ -51,7 +52,7 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
             val spinner = findViewById<Spinner>(R.id.spinnerSelectCabinet)
             val buttonNewCabinet = findViewById<Button>(R.id.buttonNewCabinet)
             val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewCabinetProducts)
-            val fabAddToCabinet = findViewById<FloatingActionButton>(R.id.fabAddToCabinet)
+            val fabShare = findViewById<FloatingActionButton>(R.id.fabSharing)
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = adapter
             recyclerView.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
@@ -100,6 +101,15 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
                 }
                 b.show()
                 true
+            }
+
+            fabShare.setOnClickListener {
+                if (selectedCabinet != null){
+                    Log.d("Cabinets", "Selected cabinet is ${selectedCabinet!!.name}")
+                    PopupCabinetShare(activity, selectedCabinet!!).show(it)
+                } else {
+                    Toast.makeText(activity, "Cannot share a non existent cabinet", Toast.LENGTH_SHORT).show()
+                }
             }
 
             CoroutineScope(Dispatchers.IO).launch {
