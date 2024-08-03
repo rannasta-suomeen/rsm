@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.RannastaSuomeen" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="Theme.RannastaSuomeen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="backgroundColor">@color/gray</item>
-        <item name="colorOnBackground">@color/white</item>
-        <item name="colorPrimary">@color/semi_dark_blue</item>
-        <item name="colorPrimaryVariant">@color/dark_blue</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/light_blue</item>
-        <item name="colorSecondaryVariant">@color/blue</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?colorSecondary</item>
-        <!-- Customize your theme here. -->
-        <item name="colorError">@color/dark_red</item>
-        <item name="colorButtonNormal">@color/dark_green</item>
+        <item name="backgroundColor">@color/background_dark</item>
+        <item name="colorOnBackground">@color/font_black_dark</item>
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnPrimary">@color/font_main_dark</item>
+        <item name="colorOnSecondary">@color/font_secondary</item>
+        <item name="colorTertiary">@color/font_black_dark</item>
+        <item name="colorSecondary">@color/background_dark_ligher</item>
+        <item name="colorAccent">@color/font_button</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="colorError">@color/red</item>
+        <item name="colorButtonNormal">@color/green</item>
     </style>
     <style name="Theme.RannastaSuomeen.Switch" parent="Theme.RannastaSuomeen">
-        <item name="trackTint">?colorSecondary</item>
-        <item name="thumbTint">?colorSecondaryVariant</item>
+        <item name="trackTint">?colorPrimary</item>
+        <item name="thumbTint">?colorOnPrimary</item>
     </style>
 </resources>

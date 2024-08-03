@@ -24,6 +24,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:text="Saarenmaa 80%"
+        android:textColor="?colorOnPrimary"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -51,6 +52,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="Owned volume"
+        android:textColor="?colorOnBackground"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageViewInv" />
 
@@ -71,8 +73,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:backgroundTint="?colorError"
+        android:backgroundTint="?colorPrimary"
         android:text="@android:string/cancel"
+        android:textColor="?colorTertiary"
         app:layout_constraintEnd_toStartOf="@+id/buttonInvAdd"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextInvVolume" />
@@ -84,8 +87,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:backgroundTint="?colorButtonNormal"
+        android:backgroundTint="?colorPrimary"
         android:text="Add"
+        android:textColor="?colorTertiary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/buttonInvCancel"
         app:layout_constraintTop_toBottomOf="@+id/editTextInvVolume" />
@@ -96,6 +100,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/no_cabinet_selected"
+        android:textColor="?colorOnSecondary"
         app:layout_constraintBottom_toBottomOf="@+id/switchInvInfinite"
         app:layout_constraintStart_toEndOf="@+id/switchInvInfinite"
         app:layout_constraintTop_toTopOf="@+id/switchInvInfinite" />

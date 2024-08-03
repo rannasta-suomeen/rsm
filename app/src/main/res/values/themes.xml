@@ -2,23 +2,20 @@
     <!-- Base application theme. -->
     <style name="Theme.RannastaSuomeen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="backgroundColor">@color/white</item>
-        <item name="colorOnBackground">@color/black</item>
-        <item name="colorPrimary">@color/light_yellow</item>
-        <item name="colorPrimaryVariant">@color/sand</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/light_orange</item>
-        <item name="colorSecondaryVariant">@color/dark_orange</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorSecondary</item>
-        <!-- Customize your theme here. -->
+        <item name="backgroundColor">@color/background_light</item>
+        <item name="colorOnBackground">@color/font_black</item>
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnPrimary">@color/font_black</item>
+        <item name="colorOnSecondary">@color/font_secondary</item>
+        <item name="colorTertiary">@color/border_light</item>
+        <item name="colorSecondary">@color/background_secondary</item>
+        <item name="colorAccent">@color/font_button</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
         <item name="colorError">@color/red</item>
         <item name="colorButtonNormal">@color/green</item>
     </style>
     <style name="Theme.RannastaSuomeen.Switch" parent="Theme.RannastaSuomeen">
-        <item name="trackTint">?colorSecondary</item>
-        <item name="thumbTint">?colorSecondaryVariant</item>
+        <item name="trackTint">?colorPrimary</item>
+        <item name="thumbTint">?colorOnPrimary</item>
     </style>
 </resources>

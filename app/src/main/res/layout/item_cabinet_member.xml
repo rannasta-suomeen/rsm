@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="?colorSecondary">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -29,6 +30,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:text="JereHa"
+            android:textColor="?colorOnPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -39,6 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="1"
+            android:textColor="?colorOnBackground"
             app:layout_constraintStart_toEndOf="@+id/textViewMemberName"
             app:layout_constraintTop_toTopOf="@+id/textViewMemberName" />
 
@@ -48,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/shots"
+            android:textColor="?colorOnBackground"
             app:layout_constraintStart_toEndOf="@+id/textViewMemberAmount"
             app:layout_constraintTop_toTopOf="@+id/textViewMemberAmount" />
 
@@ -56,6 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:textColor="?colorOnBackground"
             android:text="@string/price"
             app:layout_constraintStart_toEndOf="@+id/textViewMemberFsd"
             app:layout_constraintTop_toTopOf="@+id/textViewMemberFsd" />

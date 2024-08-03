@@ -17,6 +17,7 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:text="Tropical depression"
+            android:textColor="?colorOnPrimary"
             android:textSize="34sp"
             app:layout_constraintEnd_toStartOf="@+id/imageView2"
             app:layout_constraintHorizontal_bias="0.0"
@@ -29,6 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Amount"
+            android:textColor="?colorOnBackground"
             app:layout_constraintEnd_toEndOf="@+id/editTextRecipeParts"
             app:layout_constraintStart_toStartOf="@+id/editTextRecipeParts"
             app:layout_constraintTop_toBottomOf="@+id/textViewRecipeTags" />
@@ -38,6 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Volume[cl]"
+            android:textColor="?colorOnBackground"
             app:layout_constraintEnd_toEndOf="@+id/editTextRecipeVolume"
             app:layout_constraintStart_toStartOf="@+id/editTextRecipeVolume"
             app:layout_constraintTop_toTopOf="@+id/textView2" />
@@ -49,6 +52,8 @@
             android:layout_marginStart="8dp"
             android:ems="3"
             android:hint="1.0"
+            android:textColorHint="?colorOnBackground"
+            android:textColor="?colorOnBackground"
             android:textAlignment="center"
             android:inputType="numberDecimal"
             android:singleLine="true"
@@ -64,6 +69,8 @@
             android:ems="3"
             android:textAlignment="center"
             android:hint="4"
+            android:textColorHint="?colorOnBackground"
+            android:textColor="?colorOnBackground"
             android:inputType="numberDecimal"
             android:singleLine="true"
             app:layout_constraintBottom_toBottomOf="@+id/buttonRemoveVolume"
@@ -77,10 +84,12 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:clickable="true"
+            android:backgroundTint="?colorPrimary"
             android:background="@drawable/shape_half_circle_left"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2"
-            app:srcCompat="@drawable/ic_baseline_arrow_drop_down_24" />
+            app:srcCompat="@drawable/ic_baseline_arrow_drop_down_24"
+            app:tint="?colorTertiary" />
 
         <ImageButton
             android:id="@+id/buttonAddAmount"
@@ -88,6 +97,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:clickable="true"
+            app:tint="?colorTertiary"
+            android:backgroundTint="?colorPrimary"
             android:background="@drawable/shape_half_circle_right"
             app:layout_constraintBottom_toBottomOf="@+id/editTextRecipeParts"
             app:layout_constraintStart_toEndOf="@+id/editTextRecipeParts"
@@ -101,6 +112,8 @@
             android:layout_marginEnd="8dp"
             android:background="@drawable/shape_half_circle_left"
             android:clickable="true"
+            app:tint="?colorTertiary"
+            android:backgroundTint="?colorPrimary"
             app:layout_constraintEnd_toStartOf="@+id/editTextRecipeVolume"
             app:layout_constraintTop_toTopOf="@+id/buttonAddAmount"
             app:srcCompat="@drawable/ic_baseline_arrow_drop_down_24" />
@@ -111,6 +124,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:clickable="true"
+            app:tint="?colorTertiary"
+            android:backgroundTint="?colorPrimary"
             android:background="@drawable/shape_half_circle_right"
             app:layout_constraintBottom_toBottomOf="@+id/editTextRecipeVolume"
             app:layout_constraintEnd_toEndOf="parent"
@@ -124,6 +139,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/abv"
+            android:textColor="?colorOnBackground"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider3" />
 
@@ -133,6 +149,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/shots"
+            android:textColor="?colorOnBackground"
             app:layout_constraintBottom_toBottomOf="@+id/textViewRecipeAbv"
             app:layout_constraintStart_toEndOf="@+id/textViewRecipeAbv"
             app:layout_constraintTop_toTopOf="@+id/textViewRecipeAbv" />
@@ -143,6 +160,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/aer"
+            android:textColor="?colorOnBackground"
             app:layout_constraintBottom_toBottomOf="@+id/textViewRecipeFsd"
             app:layout_constraintStart_toEndOf="@+id/textViewRecipeFsd"
             app:layout_constraintTop_toTopOf="@+id/textViewRecipeFsd" />
@@ -153,6 +171,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/price"
+            android:textColor="?colorOnBackground"
             app:layout_constraintBottom_toBottomOf="@+id/textViewRecipeAer"
             app:layout_constraintStart_toEndOf="@+id/textViewRecipeAer"
             app:layout_constraintTop_toTopOf="@+id/textViewRecipeAer"
@@ -179,6 +198,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:text="@string/cocktail"
+            android:textColor="?colorOnBackground"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView2" />
@@ -217,6 +237,7 @@
             android:layout_marginEnd="8dp"
             android:text="1. Add a shot of vodka\n2. Add a shot of vodka\n3. Add a shot of vodka\n4. Add a shot of vodka"
             android:textSize="16sp"
+            android:textColor="?colorOnBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recyclerViewDrinkParts" />
@@ -228,7 +249,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:backgroundTint="?colorSecondary"
+            android:backgroundTint="?colorPrimary"
+            android:textColor="?colorTertiary"
             android:text="Dokaa"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -242,6 +264,7 @@
             android:layout_marginEnd="8dp"
             android:text="#IBA#EXPERIMENTAL"
             android:textSize="20sp"
+            android:textColor="?colorOnBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/textViewRecipePrice"
