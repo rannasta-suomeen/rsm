@@ -34,7 +34,9 @@ data class GeneralIngredient(
     val alko_product_count: Int,
     val superalko_product_count: Int,
     val use_static_filter: Boolean,
-    val static_filter: Int?
+    val use_static_filter_c: Boolean,
+    val static_filter: Int?,
+    val static_filter_c: Int?,
 ){
 
     fun price(s: Settings): Double{

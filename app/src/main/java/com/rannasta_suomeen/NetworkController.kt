@@ -23,8 +23,8 @@ object NetworkController {
     private var password: String? = null
     private var userId: Int? = null
 
-    //private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
-    private const val serverAddress: String = "http://10.0.2.2:8000"
+    private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
+    //private const val serverAddress: String = "http://10.0.2.2:8000"
     private val client = OkHttpClient()
 
     init {
@@ -332,7 +332,7 @@ object NetworkController {
     }
 
     class CabinetMoveOperation(
-        val cabineId: Int,
+        val cabinetId: Int,
         val targetId: Int,
         // List of product actual id:s to move
         val items: List<Int>,

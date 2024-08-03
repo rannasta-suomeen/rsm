@@ -9,11 +9,16 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
+import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.data_classes.CabinetMember
 import com.rannasta_suomeen.displayDecimal
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupRsm(activity, R.layout.popup_cabinet_sharing, root = null) {
 
@@ -36,7 +41,6 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
             val itemView = p1?: LayoutInflater.from(p2!!.context).inflate(R.layout.item_cabinet_member,p2, false)
             val item = getItem(p0) as CabinetMember
             with(itemView){
-                findViewById<TextView>(R.id.textViewShareCabinetName).text = cabinet.name
                 findViewById<TextView>(R.id.textViewMemberName).text = item.userName
                 findViewById<TextView>(R.id.textViewMemberAmount).text = getMemberVolume(item).toString()
                 findViewById<TextView>(R.id.textViewMemberFsd).text = showMemberFsd(item, itemView)
@@ -66,15 +70,26 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
     }
     override fun bind(view: View) {
         with(view){
+            val accessKeyView = findViewById<TextView>(R.id.textViewCabinetCode)
+            findViewById<TextView>(R.id.textViewShareCabinetName).text = cabinet.name
             if (cabinet.accessKey != null) {
-                findViewById<TextView>(R.id.textViewCabinetCode).text = cabinet.accessKey
+                accessKeyView.text = cabinet.accessKey
             } else{
-                findViewById<TextView>(R.id.textViewCabinetCode).text = context.resources.getString(R.string.not_shared)
+                accessKeyView.text = context.resources.getString(R.string.not_shared)
             }
             findViewById<ListView>(R.id.listViewCabinetMembers).adapter = adapter
             val button = findViewById<Button>(R.id.buttonCabinetGenerate)
             button.setEnableDisable(cabinet.accessKey == null)
-            // TODO: Implement a generate button for access key
+            button.setOnClickListener {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val res = NetworkController.tryNTimes(5, cabinet.id, NetworkController::shareCabinet)
+                    if (res.isSuccess){
+                        CoroutineScope(Dispatchers.Main).launch {
+                            accessKeyView.text = res.getOrThrow()
+                        }
+                    }
+                }
+            }
             // TODO: Implement a way to join cabinets
         }
     }

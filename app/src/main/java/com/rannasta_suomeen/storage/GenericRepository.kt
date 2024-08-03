@@ -321,15 +321,18 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
             }
             t
         })
-        val owned = generalIngredientList.toList().map { it.second }.filter { it.use_static_filter && selectedCabinet?.products?.any { p-> p.product.subcategory_id == it.static_filter } == true }.toMutableList()
-        val ownedByFilter = productIngredientListPointer.filter {
+        val ownedByFilter = generalIngredientList.toList().map { it.second }.filter {
+            it.use_static_filter_c && selectedCabinet?.products?.any { p->p.product.category_id == it.static_filter_c } == true
+                    || it.use_static_filter && selectedCabinet?.products?.any { p-> p.product.subcategory_id == it.static_filter } == true
+        }.toMutableList()
+        val ownedById = productIngredientListPointer.filter {
             it.products.find { p->
                 selectedCabinet?.products?.map { it.product }?.find { it.id == p.id} != null
             } != null
         }.map { it.ingredient }
-        owned.addAll(ownedByFilter)
+        ownedByFilter.addAll(ownedById)
         ownedIngredientFlow.emit(
-            owned
+            ownedByFilter
         )
     }
 
