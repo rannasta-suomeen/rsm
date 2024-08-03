@@ -11,6 +11,9 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Cabinet
@@ -24,50 +27,53 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
 
     private val adapter = MemberAdapter(cabinet)
 
-    private class MemberAdapter(private var cabinet: Cabinet): BaseAdapter(){
-        override fun getCount(): Int {
+    private class MemberAdapter(private var cabinet: Cabinet): androidx.recyclerview.widget.RecyclerView.Adapter<MemberAdapter.MemberViewHolder>(){
+        private class MemberViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+            fun bind(item: CabinetMember, cabinet: Cabinet){
+                fun getMemberVolume(x: CabinetMember):Int{
+                    return cabinet.products.filter { it.ownerId == x.userId }.count()
+                }
+
+                fun showMemberFsd(x: CabinetMember, view: View):String{
+                    val sum = cabinet.products.filter { it.ownerId == x.userId }.map {
+                        it.estimatedFsd()
+                    }.sum()
+                    return displayDecimal(sum, R.string.shots, view)
+                }
+
+                fun showMemberValue(x: CabinetMember, view: View):String{
+                    val sum = cabinet.products.filter { it.ownerId == x.userId }.map {
+                        it.estimatedPrice()
+                    }.sum()
+                    return displayDecimal(sum, R.string.price, view)
+                }
+                with(itemView){
+                    findViewById<TextView>(R.id.textViewMemberName).text = item.userName
+                    findViewById<TextView>(R.id.textViewMemberAmount).text = getMemberVolume(item).toString()
+                    findViewById<TextView>(R.id.textViewMemberFsd).text = showMemberFsd(item, itemView)
+                    findViewById<TextView>(R.id.textViewMemberValue).text = showMemberValue(item, itemView)
+                    findViewById<ImageView>(R.id.imageViewMemberOwner).isVisible = cabinet.ownerId == item.userId
+                }
+
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemberViewHolder {
+            val layout = R.layout.item_cabinet_member
+            val itemView = LayoutInflater.from(parent.context).inflate(layout, parent, false)
+            return MemberViewHolder(itemView)
+        }
+
+        override fun onBindViewHolder(holder: MemberViewHolder, position: Int) {
+            val item = cabinet.members[position]
+            holder.bind(item, cabinet)
+        }
+
+        override fun getItemCount(): Int {
             return cabinet.members.size
         }
-
-        override fun getItem(p0: Int): Any {
-            return cabinet.members[p0]
-        }
-
-        override fun getItemId(p0: Int): Long {
-            return p0.toLong()
-        }
-
-        override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
-            val itemView = p1?: LayoutInflater.from(p2!!.context).inflate(R.layout.item_cabinet_member,p2, false)
-            val item = getItem(p0) as CabinetMember
-            with(itemView){
-                findViewById<TextView>(R.id.textViewMemberName).text = item.userName
-                findViewById<TextView>(R.id.textViewMemberAmount).text = getMemberVolume(item).toString()
-                findViewById<TextView>(R.id.textViewMemberFsd).text = showMemberFsd(item, itemView)
-                findViewById<TextView>(R.id.textViewMemberValue).text = showMemberValue(item, itemView)
-                findViewById<ImageView>(R.id.imageViewMemberOwner).isVisible = cabinet.ownerId == item.userId
-            }
-            return itemView
-        }
-
-        fun getMemberVolume(x: CabinetMember):Int{
-            return cabinet.products.filter { it.ownerId == x.userId }.count()
-        }
-
-        fun showMemberFsd(x: CabinetMember, view: View):String{
-            val sum = cabinet.products.filter { it.ownerId == x.userId }.map {
-                it.estimatedFsd()
-            }.sum()
-            return displayDecimal(sum, R.string.shots, view)
-        }
-
-        fun showMemberValue(x: CabinetMember, view: View):String{
-            val sum = cabinet.products.filter { it.ownerId == x.userId }.map {
-                it.estimatedPrice()
-            }.sum()
-            return displayDecimal(sum, R.string.price, view)
-        }
     }
+
     override fun bind(view: View) {
         with(view){
             val accessKeyView = findViewById<TextView>(R.id.textViewCabinetCode)
@@ -77,7 +83,9 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
             } else{
                 accessKeyView.text = context.resources.getString(R.string.not_shared)
             }
-            findViewById<ListView>(R.id.listViewCabinetMembers).adapter = adapter
+            val listView = findViewById<RecyclerView>(R.id.listViewCabinetMembers)
+            listView.adapter = adapter
+            listView.layoutManager = LinearLayoutManager(context)
             val button = findViewById<Button>(R.id.buttonCabinetGenerate)
             button.setEnableDisable(cabinet.accessKey == null)
             button.setOnClickListener {

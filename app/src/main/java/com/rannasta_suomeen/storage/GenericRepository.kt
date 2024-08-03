@@ -184,7 +184,10 @@ class CabinetRepository(context: Context){
     }
 
     private suspend fun forceUpdate(){
-        tryNTimes(5, Unit, NetworkController::getCabinets).onSuccess { serverFlow.emit(it)}
+        tryNTimes(5, Unit, NetworkController::getCabinets).onSuccess {
+            file.writeText(jackson.writeValueAsString(it))
+            serverFlow.emit(it)
+        }
     }
 
     private suspend fun processNetOperation(oper: CabinetOperation){
