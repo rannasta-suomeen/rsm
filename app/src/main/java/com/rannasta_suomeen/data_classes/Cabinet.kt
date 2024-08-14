@@ -81,24 +81,38 @@ data class CabinetMember(
     val userName: String,
 )
 
-sealed class OwnedAmount{
+sealed class OwnedAmount(protected val owner: ProductOwner?){
     abstract fun show(settings: Settings): String
 }
 
-object None : OwnedAmount() {
+class None : OwnedAmount(null) {
     override fun show(settings: Settings): String {
         return "Not owned"
     }
 }
 
-object Infinite : OwnedAmount() {
+class Infinite(owner: ProductOwner) : OwnedAmount(owner) {
     override fun show(settings: Settings): String {
-        return "Infinite"
+        return "Infinite" + owner?.show()
     }
 }
-class Some(val x: Int): OwnedAmount(){
+class Some(val x: Int, owner: ProductOwner): OwnedAmount(owner){
     override fun show(settings: Settings): String {
-        return UnitType.ml.displayInDesiredUnit(x.toDouble(),settings.prefUnit)
+        return UnitType.ml.displayInDesiredUnit(x.toDouble(),settings.prefUnit) + owner?.show()
+    }
+}
+
+sealed class ProductOwner(protected val cabinetMember: CabinetMember){
+    abstract fun show(): String
+    class Owned(cabinetMember: CabinetMember): ProductOwner(cabinetMember){
+        override fun show():String {
+            return ""
+        }
+    }
+    class Borrowed(cabinetMember: CabinetMember): ProductOwner(cabinetMember){
+        override fun show(): String {
+            return " *" + cabinetMember.userName
+        }
     }
 }
 
@@ -116,22 +130,32 @@ data class Cabinet(
         CabinetCompact(id, ownerId, name, members, productsCompact.toMutableList(), accessKey)
     }
 
-    fun owned(x: Product): OwnedAmount{
-        val res = products.find {
+    fun containedAmount(x: Product): OwnedAmount{
+        val res = products.filter {
             it.product == x
         }
-        return if (res == null ){
-            None
+        val prefered = res.find { it.ownerId == getOwnUserId() }?:res.sortedBy { it.amountMl }.reversed().getOrNull(0)
+        val owner = prefered?.let {ownedBy(it)}
+        return if (prefered == null ){
+            None()
         }else{
-            when(res.amountMl){
-                null -> Infinite
-                else -> Some(res.amountMl!!)
+            when(prefered.amountMl){
+                null -> Infinite(owner!!)
+                else -> Some(prefered.amountMl!!,owner!!)
             }
         }
     }
-    fun isOwned(x: Product): Boolean{
-        return products.any { it.product == x }
+    private fun ownedBy(x: CabinetProduct):ProductOwner?{
+        val member = members.find {x.ownerId == it.userId}
+        member?.let {
+            return when(it.userId == getOwnUserId()){
+                true -> ProductOwner.Owned(it)
+                false -> ProductOwner.Borrowed(it)
+            }
+        }
+        return null
     }
+
     /**
      * @throws IllegalArgumentException when you are not in said cabinet
      */

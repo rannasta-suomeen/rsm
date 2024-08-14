@@ -56,7 +56,7 @@ class ProductAdapter(
                 findViewById<TextView>(R.id.textViewProductSubcategory).text = from(item.subcategory_id).toString()
                 findViewById<ImageView>(R.id.imageViewProduct).setImageResource(R.drawable.ic_baseline_wine_bar_24)
                 findViewById<ImageView>(R.id.imageViewProduct).setImageBitmap(imageRepository.getFromMemoryOrMiss(item.img))
-                findViewById<TextView>(R.id.textViewProductOwned).text = totalCabinetRepository.selectedCabinet?.owned(item)?.show(settings)
+                findViewById<TextView>(R.id.textViewProductOwned).text = totalCabinetRepository.selectedCabinet?.containedAmount(item)?.show(settings)
 
                 itemView.setOnClickListener {
                     val popup = PopupProductAdd(item, totalCabinetRepository,imageRepository, activity, settings)

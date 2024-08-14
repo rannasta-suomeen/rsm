@@ -66,7 +66,7 @@ class PopupProductAdd(private val product: Product,
                     }
                 }
             }
-            findViewById<TextView>(R.id.textViewInvOwned).text = repo.selectedCabinet?.owned(product)
+            findViewById<TextView>(R.id.textViewInvOwned).text = repo.selectedCabinet?.containedAmount(product)
                 ?.show(settings)
         }
     }
