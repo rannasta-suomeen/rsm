@@ -9,9 +9,9 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView2"
-            app:cardBackgroundColor="?colorSecondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:cardBackgroundColor="?colorTertiary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
