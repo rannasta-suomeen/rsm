@@ -184,7 +184,8 @@
                     android:layout_marginStart="8dp"
                     android:backgroundTint="?colorPrimary"
                     android:textColor="?colorTertiary"
-                    android:text="category"/>
+                    style="?attr/buttonBarStyle"
+                    android:text="Category"/>
 
                 <Button
                     android:id="@+id/buttonRetailer"
@@ -195,6 +196,7 @@
                     android:layout_marginEnd="8dp"
                     android:textColor="?colorTertiary"
                     android:backgroundTint="?colorPrimary"
+                    style="?attr/buttonBarStyle"
                     android:text="Retailer" />
 
             </LinearLayout>
@@ -215,16 +217,19 @@
 
         <EditText
             android:id="@+id/editTextTextProductName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:ems="10"
-            android:textColorHint="?colorOnBackground"
-            android:textColor="?colorOnBackground"
             android:hint="Name"
             android:inputType="text"
             android:minHeight="48dp"
+            android:textColor="?colorOnBackground"
+            android:textColorHint="?colorOnBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

@@ -20,6 +20,7 @@ class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings
     private var owned: List<GeneralIngredient> = listOf()
 
     class DrinkPreviewViewHolder(itemView: View,val activity: Activity):RecyclerView.ViewHolder(itemView){
+        // TODO: sometimes drinks with multiline names fail to render the second line
         fun bind(i: DrinkTotal, owned:List<GeneralIngredient>, settings: Settings){
             val item = i.drink
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewName).text = item.name

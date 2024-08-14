@@ -53,10 +53,10 @@ data class DrinkInfo(
     fun displayTagList(): String{
         return tag_list.fold(""){r, t ->
             if (t != ""){
-                return@fold "$r#$t"
+                return@fold "$r#$t\n"
             }
             ""
-        }
+        }.trim()
     }
 
     fun price(settings: Settings): Double{

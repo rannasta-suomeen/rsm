@@ -11,15 +11,17 @@
 
         <TextView
             android:id="@+id/textViewRecipePartName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:text="Bols Blue curacao"
             android:textColor="?colorOnPrimary"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/textViewRecipePartVolume"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,36 +29,36 @@
             android:id="@+id/textViewRecipePartVolume"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/volume"
-            android:textSize="16sp"
             android:textColor="?colorOnBackground"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/textViewRecipePartName"
-            app:layout_constraintStart_toEndOf="@+id/textViewRecipePartName"
+            app:layout_constraintEnd_toStartOf="@+id/textViewRecipePartPrice"
             app:layout_constraintTop_toTopOf="@+id/textViewRecipePartName" />
 
         <TextView
             android:id="@+id/textViewRecipePartPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/price"
-            android:textSize="16sp"
             android:textColor="?colorOnBackground"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/textViewRecipePartVolume"
-            app:layout_constraintStart_toEndOf="@+id/textViewRecipePartVolume"
+            app:layout_constraintEnd_toStartOf="@id/textViewRecipePartAer"
             app:layout_constraintTop_toTopOf="@+id/textViewRecipePartVolume" />
 
         <TextView
             android:id="@+id/textViewRecipePartAer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/price"
-            android:textSize="16sp"
             android:textColor="?colorOnBackground"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/textViewRecipePartPrice"
-            app:layout_constraintStart_toEndOf="@+id/textViewRecipePartPrice"
+            app:layout_constraintEnd_toStartOf="@+id/imageViewRecipePartOwned"
             app:layout_constraintTop_toTopOf="@+id/textViewRecipePartPrice" />
 
         <ImageView

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="?colorSecondary">
@@ -8,6 +9,43 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/const_upper_line"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageViewProduct"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textViewProductName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                android:text="Bols Blue Curacao"
+                android:textColor="?colorOnPrimary"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/textViewRetailer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewRetailer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="SuperAlko"
+                android:textColor="?colorOnSecondary"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
             android:id="@+id/imageViewProduct"
@@ -21,21 +59,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_baseline_wine_bar_24" />
-
-        <TextView
-            android:id="@+id/textViewProductName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:text="Bols Blue Curacao"
-            android:textColor="?colorOnPrimary"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@+id/textViewRetailer"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/imageViewProduct"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textViewProductPrice"
@@ -53,13 +76,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:text="50 cl"
             android:textColor="?colorOnBackground"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageViewProduct"
-            app:layout_constraintTop_toBottomOf="@+id/textViewProductSubcategory"
+            app:layout_constraintTop_toBottomOf="@+id/textViewProductOwned"
             app:layout_constraintVertical_bias="0.0" />
 
         <TextView
@@ -75,18 +98,6 @@
             app:layout_constraintStart_toStartOf="@+id/textViewProductVolume"
             app:layout_constraintTop_toBottomOf="@+id/textViewProductVolume"
             app:layout_constraintVertical_bias="0.0" />
-
-        <TextView
-            android:id="@+id/textViewRetailer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:textColor="?colorOnSecondary"
-            android:text="Alko"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textViewProductName" />
 
         <TextView
             android:id="@+id/textViewProductFsd"
@@ -127,22 +138,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:text="cocktail_liquer"
             android:textColor="?colorOnBackground"
             android:textSize="14sp"
             app:layout_constraintStart_toEndOf="@+id/imageViewProduct"
-            app:layout_constraintTop_toBottomOf="@+id/textViewProductName" />
+            app:layout_constraintTop_toBottomOf="@+id/const_upper_line" />
 
         <TextView
             android:id="@+id/textViewProductOwned"
             android:layout_width="0dp"
-            android:textColor="?colorOnBackground"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/no_cabinet_selected"
+            android:textColor="?colorOnBackground"
             app:layout_constraintBottom_toBottomOf="@+id/textViewProductSubcategory"
-            app:layout_constraintEnd_toStartOf="@+id/textViewRetailer"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/textViewProductSubcategory"
             app:layout_constraintTop_toTopOf="@+id/textViewProductSubcategory" />
