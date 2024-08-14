@@ -4,16 +4,12 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.ListView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Cabinet
@@ -27,7 +23,7 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
 
     private val adapter = MemberAdapter(cabinet)
 
-    private class MemberAdapter(private var cabinet: Cabinet): androidx.recyclerview.widget.RecyclerView.Adapter<MemberAdapter.MemberViewHolder>(){
+    private class MemberAdapter(private var cabinet: Cabinet): RecyclerView.Adapter<MemberAdapter.MemberViewHolder>(){
         private class MemberViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
             fun bind(item: CabinetMember, cabinet: Cabinet){
                 fun getMemberVolume(x: CabinetMember):Int{

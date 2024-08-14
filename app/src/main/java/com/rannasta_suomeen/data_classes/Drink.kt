@@ -46,6 +46,11 @@ data class DrinkInfo(
     val favorite_count: Int
 
 ){
+
+    // TODO: Make this show abv in your cabinet
+    fun abv():Double{
+        return abv_average
+    }
     enum class SortTypes{
         Name, Type, Volume, Price, Fsd, Pps, Abv
     }
