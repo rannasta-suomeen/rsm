@@ -193,14 +193,17 @@ class CabinetRepository(context: Context){
     private suspend fun processNetOperation(oper: CabinetOperation){
         // TODO: Add timestamps and use them
        val res = when (oper){
-            is AddItemToCabinet -> tryNTimes(5,oper,NetworkController::insertCabinetProduct)
-            is DeleteCabinet  -> tryNTimes(5,oper,NetworkController::deleteCabinet)
-            is RemoveItemFromCabinet -> tryNTimes(5,oper,NetworkController::deleteCabinetProduct)
-            is MakeItemUnusable -> tryNTimes(5,oper,NetworkController::unusableCabinetProduct)
-            is MakeItemUsable -> tryNTimes(5,oper,NetworkController::usableCabinetProduct)
-            is NewCabinet -> tryNTimes(5,oper,NetworkController::createCabinet)
-            is ModifyCabinetProductAmount -> tryNTimes(5,oper,NetworkController::modifyCabinetProduct)
-        }
+           is AddItemToCabinet -> tryNTimes(5,oper,NetworkController::insertCabinetProduct)
+           is DeleteCabinet  -> tryNTimes(5,oper,NetworkController::deleteCabinet)
+           is RemoveItemFromCabinet -> tryNTimes(5,oper,NetworkController::deleteCabinetProduct)
+           is MakeItemUnusable -> tryNTimes(5,oper,NetworkController::unusableCabinetProduct)
+           is MakeItemUsable -> tryNTimes(5,oper,NetworkController::usableCabinetProduct)
+           is NewCabinet -> tryNTimes(5,oper,NetworkController::createCabinet)
+           is ModifyCabinetProductAmount -> tryNTimes(5,oper,NetworkController::modifyCabinetProduct)
+           is JoinCabinet -> tryNTimes(5,oper,NetworkController::joinCabinet)
+           is ExitCabinet -> tryNTimes(5,oper,NetworkController::quitCabinet)
+           is BulkMoveItems -> tryNTimes(5,oper,NetworkController::moveItemsIntoCabinet)
+       }
         if (res.isSuccess){
             netActionQueue.removeIf { it == oper }
             netQueueFile.writeText(jackson.writerFor(Array<CabinetOperation>::class.java).writeValueAsString(netActionQueue.toTypedArray()))
@@ -224,8 +227,10 @@ class CabinetRepository(context: Context){
     private fun updateState(fn: (MutableList<CabinetCompact>) -> Unit){
         fn(state)
         CoroutineScope(Dispatchers.IO).launch {
-            stateFlow.emit(state)
-            file.writeText(jackson.writeValueAsString(state))
+            stateMutex.withLock {
+                stateFlow.emit(state)
+                file.writeText(jackson.writeValueAsString(state))
+            }
         }
     }
 
@@ -233,7 +238,7 @@ class CabinetRepository(context: Context){
         // TODO: Make this work without internet
         CoroutineScope(Dispatchers.IO).launch {
             tryNTimes(5, c, NetworkController::createCabinet).onSuccess {
-                val newState = tryNTimes(5, Unit, NetworkController::getCabinets).onSuccess { cabState ->
+                tryNTimes(5, Unit, NetworkController::getCabinets).onSuccess { cabState ->
                     stateMutex.withLock {
                         serverFlow.emit(cabState)
                     }
@@ -272,6 +277,21 @@ class CabinetRepository(context: Context){
         runNetQueueAction(c)
     }
 
+    fun joinCabinet(c: JoinCabinet){
+        addActionToQueue(c)
+        runNetQueueAction(c)
+    }
+
+    fun exitCabinet(c: ExitCabinet){
+        addActionToQueue(c)
+        runNetQueueAction(c)
+    }
+
+    fun bulkMoveItems(c: BulkMoveItems){
+        addActionToQueue(c)
+        runNetQueueAction(c)
+    }
+
     private fun runNetQueueAction(c: CabinetOperation){
         when (c){
             is NewCabinet -> CoroutineScope(Dispatchers.IO).launch {
@@ -283,14 +303,36 @@ class CabinetRepository(context: Context){
                     }
                 }
             }
+            is JoinCabinet -> CoroutineScope(Dispatchers.IO).launch {
+                tryNTimes(5, Unit, NetworkController::getCabinets).onSuccess { cabState ->
+                    stateMutex.withLock {
+                        serverFlow.emit(cabState)
+                    }
+                }
+            }
             is AddItemToCabinet -> updateState {
                 val t = it.find { it.id == c.id }
-                    t?.products?.add(CabinetProductCompact(c.id, c.pid, t.getOwnUserId(),c.amount, true)) }
+                    t?.products?.add(CabinetProductCompact(c.id, c.pid, t.getOwnUserId(),c.amount, true))
+            }
             is DeleteCabinet -> updateState { it.removeIf { it.id == c.id } }
             is MakeItemUnusable -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.id == c.id }?.let { it.usable = false} } }
             is MakeItemUsable -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.id == c.id }?.let { it.usable = true} } }
             is ModifyCabinetProductAmount -> updateState { it.find { it.id == c.id }?.let { it.products.find { it.id == c.id }?.let { it.amountMl = c.amount} } }
             is RemoveItemFromCabinet -> updateState { it.find { it.id == c.id }?.let { it.products.removeIf { it.id == c.id } } }
+            is ExitCabinet -> updateState { it.removeIf { it.id == c.id } }
+            is BulkMoveItems -> updateState {
+                val originCabint = it.find { it.id == c.originId }
+                val targetCabinet = it.find { it.id == c.targetId }
+                originCabint?.let { origin ->
+                    targetCabinet?.let {target ->
+                        val targetList = originCabint.products.filter { c.items.contains(it.id) }
+                        targetList.forEach {
+                            origin.products.removeIf { targetList.contains(it) }
+                            target.products.addAll(targetList)
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -390,6 +432,18 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
 
     fun makeItemUnusable(id: Int, pid: Int){
         cabinetRepository.makeItemUnUsable(MakeItemUnusable(id, pid))
+    }
+
+    fun joinCabinet(code: String){
+        cabinetRepository.joinCabinet(CabinetOperation.JoinCabinet(code))
+    }
+
+    fun exitCabinet(id: Int){
+        cabinetRepository.exitCabinet(CabinetOperation.ExitCabinet(id))
+    }
+
+    fun bulkMoveItems(oid: Int, tid: Int, pids: List<Int>){
+        cabinetRepository.bulkMoveItems(CabinetOperation.BulkMoveItems(oid,tid,pids))
     }
 
     private fun modifyCabinetProductAmount(id: Int, pid: Int, amount: Int?){

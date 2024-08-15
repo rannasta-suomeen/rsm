@@ -79,6 +79,11 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
                 b.setNegativeButton("Cancel"){ dialogInterface: DialogInterface, i: Int ->
                     dialogInterface.cancel()
                 }
+                b.setNeutralButton("Join"){_,_->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        totalCabinetRepository.joinCabinet(editText.text.toString().trim())
+                    }
+                }
                 b.show()
             }
 
@@ -88,7 +93,13 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
                     b.setTitle("Sure you want to delete cabinet ${selectedCabinet?.name}")
                     b.setPositiveButton("Yes") { _dialogInterface: DialogInterface, _i: Int ->
                         CoroutineScope(Dispatchers.IO).launch {
-                            selectedCabinet?.let { it1 -> deleteCabinet(it1.id) }
+                            selectedCabinet?.let { it1 ->
+                                if (it1.ownerId == it1.getOwnUserId()){
+                                    deleteCabinet(it1.id)
+                                } else {
+                                    exitCabinet(it1.id)
+                                }
+                            }
                             totalCabinetRepository.changeSelectedCabinet(null)
                             CoroutineScope(Dispatchers.Main).launch {
                                 changeSelectedCabinet()

@@ -23,8 +23,8 @@ object NetworkController {
     private var password: String? = null
     private var userId: Int? = null
 
-    private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
-    //private const val serverAddress: String = "http://10.0.2.2:8000"
+    //private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
+    private const val serverAddress: String = "http://10.0.2.2:8000"
     private val client = OkHttpClient()
 
     init {
@@ -51,6 +51,9 @@ object NetworkController {
         class RemoveItemFromCabinet(val id:Int, val pid: Int): CabinetOperation()
         class MakeItemUsable(val id:Int, val pid: Int): CabinetOperation()
         class MakeItemUnusable(val id:Int, val pid: Int): CabinetOperation()
+        class JoinCabinet(val code: String): CabinetOperation()
+        class ExitCabinet(val id:Int):CabinetOperation()
+        class BulkMoveItems(val originId:Int, val targetId: Int, val items: List<Int>):CabinetOperation()
     }
 
     /** Logs the user in. First item of the pair is the username, second is the password.
@@ -311,45 +314,35 @@ object NetworkController {
      * @param payload the string of the cabinet to join
      * @return [Result] [Unit]
      */
-    suspend fun joinCabinet(payload: String):Result<Unit>{
+    suspend fun joinCabinet(payload: JoinCabinet):Result<Unit>{
         val request = Request.Builder()
-            .url("$serverAddress/cabinet/shared/join/$payload")
-            .get()
+            .url("$serverAddress/cabinet/shared/join/${payload.code}")
+            .put("".toRequestBody())
+        return makeTokenRequest(request){}
+    }
+
+    /** Tries to quit a cabinet with a certain id
+     * @param payload the id of the cabinet to quit
+     * @return [Result] [Unit]
+     */
+    suspend fun quitCabinet(payload: ExitCabinet):Result<Unit>{
+        val request = Request.Builder()
+            .url("$serverAddress/cabinet/shared/quit/${payload.id}")
+            .delete("".toRequestBody())
         return makeTokenRequest(request){
+
         }
     }
 
     /** Tries to quit a cabinet with a certain id
-     * @param payload the string of the cabinet to join
+     * @param payload [BulkMoveItems] object to tell what items to move
      * @return [Result] [Unit]
      */
-    suspend fun quitCabinet(payload: Int):Result<Unit>{
+    suspend fun moveItemsIntoCabinet(payload: BulkMoveItems):Result<Unit>{
         val request = Request.Builder()
-            .url("$serverAddress/cabinet/shared/quit/$payload")
-            .put("".toRequestBody())
-        return makeTokenRequest(request){
-        }
-    }
-
-    class CabinetMoveOperation(
-        val cabinetId: Int,
-        val targetId: Int,
-        // List of product actual id:s to move
-        val items: List<Int>,
-    )
-
-    // TODO: THIS IS INCOMPLETE
-
-    /** Tries to quit a cabinet with a certain id
-     * @param payload the string of the cabinet to join
-     * @return [Result] [Unit]
-     */
-    suspend fun moveItemsInCabinets(payload: CabinetMoveOperation):Result<Unit>{
-        val request = Request.Builder()
-            .url("$serverAddress/cabinet/shared/quit/$payload")
-            .put("".toRequestBody())
-        return makeTokenRequest(request){
-        }
+            .url("$serverAddress/cabinet/shared/quit/${payload.originId}/${payload.targetId}")
+            .post(jackson.writeValueAsString(payload.items).toRequestBody())
+        return makeTokenRequest(request){}
     }
 
     /** Makes a request and returns the result or error it caused.
@@ -378,7 +371,7 @@ object NetworkController {
                         Result.failure(Error.TokenError())
                     }
                     else -> {
-                        Log.d("Networking", "${it.code}")
+                        Log.d("Networking", "Returned ${it.code} from ${request.url}")
                         Result.failure(Error.MiscError(it.code, it.body?.string() ?: "No body"))
                     }
                 }
