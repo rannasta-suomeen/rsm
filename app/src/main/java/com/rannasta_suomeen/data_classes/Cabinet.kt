@@ -145,6 +145,14 @@ data class Cabinet(
             }
         }
     }
+    fun containedAmountCabinet(x: CabinetProduct): OwnedAmount{
+        val owner = x.let {ownedBy(it)}
+        return when (val amount = x.amountMl){
+            null -> Infinite(owner!!)
+            else -> Some(amount, owner!!)
+        }
+    }
+
     private fun ownedBy(x: CabinetProduct):ProductOwner?{
         val member = members.find {x.ownerId == it.userId}
         member?.let {

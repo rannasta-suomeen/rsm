@@ -58,7 +58,7 @@ class CabinetProductAdapter(
                 findViewById<TextView>(R.id.textViewProductSubcategory).text = from(item.product.subcategory_id).toString()
                 findViewById<ImageView>(R.id.imageViewProduct).setImageResource(R.drawable.ic_baseline_wine_bar_24)
                 findViewById<ImageView>(R.id.imageViewProduct).setImageBitmap(imageRepository.getFromMemoryOrMiss(item.product.img))
-                findViewById<TextView>(R.id.textViewProductOwned).text = totalCabinetRepository.selectedCabinet?.containedAmount(item.product)?.show(settings)
+                findViewById<TextView>(R.id.textViewProductOwned).text = totalCabinetRepository.selectedCabinet?.containedAmountCabinet(item)?.show(settings)
 
                 itemView.setOnClickListener {
                     val popup = PopupProductAdd(item.product, totalCabinetRepository,imageRepository, activity, settings)
@@ -70,8 +70,12 @@ class CabinetProductAdapter(
                         selectedCabinet?.let {
                             b.setTitle("Sure you want to delete product ${item.product.name} from ${it.name}")
                             b.setPositiveButton("Yes") { _dialogInterface: DialogInterface, _i: Int ->
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    removeItemFromCabinet(it.id, item.id)
+                                if (item.ownerId == it.getOwnUserId()){
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        removeItemFromCabinet(it.id, item.id)
+                                    }
+                                } else {
+                                    Toast.makeText(context, "Cannot remove product owned by someone else", Toast.LENGTH_SHORT).show()
                                 }
                             }
                             b.setNegativeButton("Cancel"){ dialogInterface: DialogInterface, _i: Int ->
