@@ -12,8 +12,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.color.MaterialColors
 import com.rannasta_suomeen.data_classes.CabinetProduct
-import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.data_classes.from
 import com.rannasta_suomeen.popup_windows.PopupProductAdd
 import com.rannasta_suomeen.storage.ImageRepository
@@ -23,7 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.math.roundToInt
 
 class CabinetProductAdapter(
     private val activity: Activity,
@@ -47,7 +46,8 @@ class CabinetProductAdapter(
         ):RecyclerView.ViewHolder(itemView){
         fun bind(item: CabinetProduct, settings: Settings){
             with(itemView){
-                findViewById<TextView>(R.id.textViewProductName).text = item.product.name
+                val nameView = findViewById<TextView>(R.id.textViewProductName)
+                nameView.text = item.product.name
                 findViewById<TextView>(R.id.textViewProductPrice).text = displayDecimal(item.product.price, R.string.price)
                 findViewById<TextView>(R.id.textViewProductVolume).text = item.product.volumeDesired(settings)
                 findViewById<TextView>(R.id.textViewProductAbv).text = displayDecimal(item.product.abv, R.string.abv)
@@ -59,6 +59,13 @@ class CabinetProductAdapter(
                 findViewById<ImageView>(R.id.imageViewProduct).setImageResource(R.drawable.ic_baseline_wine_bar_24)
                 findViewById<ImageView>(R.id.imageViewProduct).setImageBitmap(imageRepository.getFromMemoryOrMiss(item.product.img))
                 findViewById<TextView>(R.id.textViewProductOwned).text = totalCabinetRepository.selectedCabinet?.containedAmountCabinet(item)?.show(settings)
+                if (!item.usable){
+                    nameView.setTextColor(MaterialColors.getColor(context,
+                        com.google.android.material.R.attr.colorOnSecondary, context.getColor(R.color.green)))
+                } else {
+                    nameView.setTextColor(MaterialColors.getColor(context,
+                        com.google.android.material.R.attr.colorOnPrimary, context.getColor(R.color.green)))
+                }
 
                 itemView.setOnClickListener {
                     val popup = PopupProductAdd(item.product, totalCabinetRepository,imageRepository, activity, settings)
@@ -103,14 +110,23 @@ class CabinetProductAdapter(
 
     fun notifySwipe(viewHolder: ProductViewHolder, direction: Int){
         val item = items[viewHolder.adapterPosition]
-        val amount = when (direction){
-            ItemTouchHelper.RIGHT -> null
-            ItemTouchHelper.LEFT -> item.product.volumeMl().roundToInt()
-            else -> null
+        when (direction) {
+            ItemTouchHelper.RIGHT -> totalCabinetRepository.addOrModifyToSelected(item.product.id, null)
+            ItemTouchHelper.LEFT -> toggleUsable(item)
+            else -> Unit
         }
-        totalCabinetRepository.addOrModifyToSelected(item.product.id, amount)
-        val displayAmount = amount?.let{UnitType.ml.displayInDesiredUnit(it.toDouble(), settings.prefUnit)}?: "Inf"
-        Toast.makeText(activity.baseContext, "Added $displayAmount of ${item.product.name}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun toggleUsable(i: CabinetProduct){
+        totalCabinetRepository.selectedCabinet?.let {
+            if (i.ownerId != it.getOwnUserId()){
+                return
+            }
+            when (i.usable){
+                true -> totalCabinetRepository.makeItemUnusable(it.id,i.id)
+                false -> totalCabinetRepository.makeItemUsable(it.id,i.id)
+            }
+        }
     }
 
     private fun submitImageFound(url: String){

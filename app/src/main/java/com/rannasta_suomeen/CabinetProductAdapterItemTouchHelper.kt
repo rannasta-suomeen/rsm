@@ -38,7 +38,7 @@ class CabinetProductAdapterItemTouchHelper(recyclerView: CabinetProductAdapter, 
             dY: Float,
             actionState: Int,
             isCurrentlyActive: Boolean
-        ) {
+        ) { // TODO: Make this look reasonable again, without dumb visual bugs
             if (actionState == ACTION_STATE_SWIPE && isCurrentlyActive){
                 val iW = viewHolder.itemView
                 val paint = Paint()
@@ -56,8 +56,8 @@ class CabinetProductAdapterItemTouchHelper(recyclerView: CabinetProductAdapter, 
                     }
                     false -> {
                         Triple(
-                            RectF(iW.right.toFloat(),iW.top.toFloat(),iW.right.toFloat() +dX, iW.bottom.toFloat()),
-                            VectorDrawableCompat.create(context.resources, R.drawable.ic_baseline_wine_bar_24, null),
+                            RectF(iW.right.toFloat(),iW.top.toFloat(),iW.right.toFloat() + dX, iW.bottom.toFloat()),
+                            VectorDrawableCompat.create(context.resources, R.drawable.ic_baseline_remove_24, null),
                             iW.width.toFloat()-iconHeight*3/2
                         )
                     }

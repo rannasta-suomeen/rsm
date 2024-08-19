@@ -146,7 +146,7 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
 
     private fun changeSelectedCabinet(){
         CoroutineScope(Dispatchers.Main).launch {
-            selectedCabinet?.products?.let { adapter.submitItems(it) }
+            selectedCabinet?.products?.let { adapter.submitItems(it.sortedBy { it.product.name }) }
         }
     }
 
