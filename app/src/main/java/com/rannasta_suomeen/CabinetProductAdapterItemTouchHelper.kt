@@ -55,7 +55,7 @@ class CabinetProductAdapterItemTouchHelper(recyclerView: CabinetProductAdapter, 
                     }
                     false -> {
                         Triple(
-                            RectF(iW.right.toFloat() + dX,iW.top.toFloat(),iW.right.toFloat(), iW.bottom.toFloat()),
+                            RectF(iW.right.toFloat(),iW.top.toFloat(),iW.right.toFloat() +dX, iW.bottom.toFloat()),
                             VectorDrawableCompat.create(context.resources, R.drawable.ic_baseline_wine_bar_24, null),
                             iW.width.toFloat()-iconHeight*3/2
                         )

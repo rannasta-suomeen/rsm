@@ -56,7 +56,7 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = adapter
             recyclerView.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
-            val helper = CabinetProductAdapterItemTouchHelper(adapter, MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimaryVariant, Color.GREEN),context)
+            val helper = CabinetProductAdapterItemTouchHelper(adapter, MaterialColors.getColor(context, com.google.android.material.R.attr.colorTertiary, Color.GREEN),context)
             helper.attachToRecyclerView(recyclerView)
 
             spinner.adapter = spinnerAdapter
