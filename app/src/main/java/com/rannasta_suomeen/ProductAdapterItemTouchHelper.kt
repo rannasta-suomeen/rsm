@@ -38,7 +38,7 @@ class ProductAdapterItemTouchHelper(recyclerView: ProductAdapter,color: Int, con
             actionState: Int,
             isCurrentlyActive: Boolean
         ) {
-            if (actionState == ACTION_STATE_SWIPE){
+            if (actionState == ACTION_STATE_SWIPE && isCurrentlyActive){
                 val iW = viewHolder.itemView
                 val paint = Paint()
                 paint.color = color
@@ -55,7 +55,7 @@ class ProductAdapterItemTouchHelper(recyclerView: ProductAdapter,color: Int, con
                     }
                     false -> {
                         Triple(
-                            RectF(iW.right.toFloat() + dX,iW.top.toFloat(),iW.right.toFloat(), iW.bottom.toFloat()),
+                            RectF(iW.right.toFloat(),iW.top.toFloat(),iW.right.toFloat() + dX, iW.bottom.toFloat()),
                             VectorDrawableCompat.create(context.resources, R.drawable.ic_baseline_wine_bar_24, null),
                             iW.width.toFloat()-iconHeight*3/2
                         )

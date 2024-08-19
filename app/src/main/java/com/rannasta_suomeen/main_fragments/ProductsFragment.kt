@@ -61,7 +61,7 @@ class ProductsFragment(private val activity: Activity, private val imageReposito
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val helper = ProductAdapterItemTouchHelper(productAdapter, MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorPrimaryVariant, Color.GREEN), requireContext())
+        val helper = ProductAdapterItemTouchHelper(productAdapter, MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorTertiary, Color.GREEN), requireContext())
         val recyclerViewDrinks = view.findViewById<RecyclerView>(R.id.recyclerViewPreviewDrinks)
         helper.attachToRecyclerView(recyclerViewDrinks)
         recyclerViewDrinks.layoutManager = LinearLayoutManager(this.context)
