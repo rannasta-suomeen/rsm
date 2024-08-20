@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.rannasta_suomeen.CabinetProductAdapter
-import com.rannasta_suomeen.CabinetProductAdapterItemTouchHelper
+import com.rannasta_suomeen.adapters.CabinetProductAdapter
+import com.rannasta_suomeen.adapters.CabinetProductAdapterItemTouchHelper
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.popup_windows.PopupCabinetShare

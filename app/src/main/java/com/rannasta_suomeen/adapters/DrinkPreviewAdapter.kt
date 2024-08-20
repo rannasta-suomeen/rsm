@@ -1,4 +1,4 @@
-package com.rannasta_suomeen
+package com.rannasta_suomeen.adapters
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.DrinkTotal
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.UnitType
@@ -24,12 +25,20 @@ class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings
         fun bind(i: DrinkTotal, owned:List<GeneralIngredient>, settings: Settings){
             val item = i.drink
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewName).text = item.name
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(item.standard_servings, R.string.shots)
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewPrice).text = displayDecimal(item.price(settings), R.string.price)
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAbv).text = displayDecimal(item.abv_average, R.string.abv)
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(item.standard_servings,
+                R.string.shots
+            )
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewPrice).text = displayDecimal(item.price(settings),
+                R.string.price
+            )
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAbv).text = displayDecimal(item.abv_average,
+                R.string.abv
+            )
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewVolume).text = UnitType.ml.displayInDesiredUnit(i.drink.total_volume, settings.prefUnit)
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewTags).text = item.displayTagList()
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAer).text = displayDecimal(item.pricePerServing(settings), R.string.aer)
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAer).text = displayDecimal(item.pricePerServing(settings),
+                R.string.aer
+            )
             itemView.findViewById<TextView>(R.id.textViewDrinkMissingAlcohol).text = i.missingIngredientsAlcoholic(owned).toString()
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewMissingGrocery).text = i.missingIngredientsNonAlcoholic(owned).toString()
             itemView.setOnClickListener {

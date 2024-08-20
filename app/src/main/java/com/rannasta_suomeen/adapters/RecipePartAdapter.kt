@@ -1,4 +1,4 @@
-package com.rannasta_suomeen
+package com.rannasta_suomeen.adapters
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.IngredientsForDrinkPointer
 import com.rannasta_suomeen.storage.Settings
@@ -23,8 +24,12 @@ class RecipePartAdapter(private var owned: List<GeneralIngredient>,private val s
                 findViewById<TextView>(R.id.textViewRecipePartName).text = item.name
                 findViewById<TextView>(R.id.textViewRecipePartVolume).text = item.unit.displayInDesiredUnit((item.amount * amount), settings.prefUnit)
                 // TODO: make this show price per desired unit
-                findViewById<TextView>(R.id.textViewRecipePartPrice).text = displayDecimal(amount * item.price(settings),R.string.price)
-                findViewById<TextView>(R.id.textViewRecipePartAer).text = displayDecimal(item.ingredient.price(settings),R.string.ppl)
+                findViewById<TextView>(R.id.textViewRecipePartPrice).text = displayDecimal(amount * item.price(settings),
+                    R.string.price
+                )
+                findViewById<TextView>(R.id.textViewRecipePartAer).text = displayDecimal(item.ingredient.price(settings),
+                    R.string.ppl
+                )
                 val img = findViewById<ImageView>(R.id.imageViewRecipePartOwned)
                 when (owned.contains(item.ingredient)){
                     true -> {
