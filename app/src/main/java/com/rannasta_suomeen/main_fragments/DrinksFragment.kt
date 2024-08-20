@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.rannasta_suomeen.DrinkPreviewAdapter
+import com.rannasta_suomeen.adapters.DrinkPreviewAdapter
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.DrinkInfo
 import com.rannasta_suomeen.data_classes.DrinkTotal

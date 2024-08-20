@@ -23,8 +23,8 @@ object NetworkController {
     private var password: String? = null
     private var userId: Int? = null
 
-    //private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
-    private const val serverAddress: String = "http://10.0.2.2:8000"
+    private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
+    //private const val serverAddress: String = "http://10.0.2.2:8000"
     private val client = OkHttpClient()
 
     init {
@@ -340,7 +340,7 @@ object NetworkController {
      */
     suspend fun moveItemsIntoCabinet(payload: BulkMoveItems):Result<Unit>{
         val request = Request.Builder()
-            .url("$serverAddress/cabinet/shared/quit/${payload.originId}/${payload.targetId}")
+            .url("$serverAddress/cabinet/shared/move/${payload.originId}/${payload.targetId}")
             .post(jackson.writeValueAsString(payload.items).toRequestBody())
         return makeTokenRequest(request){}
     }

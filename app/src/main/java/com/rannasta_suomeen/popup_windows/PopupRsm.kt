@@ -10,7 +10,7 @@ import android.widget.PopupWindow
 abstract class PopupRsm(activity: Activity, layout: Int, root: ViewGroup?) {
 
     val view = activity.layoutInflater.inflate(layout, root)
-    private val window: PopupWindow = PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+    protected val window: PopupWindow = PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
     private fun create(){
         window.isFocusable = true

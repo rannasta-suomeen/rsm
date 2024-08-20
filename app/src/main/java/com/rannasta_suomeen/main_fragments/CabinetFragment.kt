@@ -15,11 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.rannasta_suomeen.CabinetProductAdapter
-import com.rannasta_suomeen.CabinetProductAdapterItemTouchHelper
+import com.rannasta_suomeen.adapters.CabinetProductAdapter
+import com.rannasta_suomeen.adapters.CabinetProductAdapterItemTouchHelper
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.popup_windows.PopupCabinetShare
+import com.rannasta_suomeen.popup_windows.PopupExportProducts
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.TotalCabinetRepository
@@ -53,6 +54,7 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
             val buttonNewCabinet = findViewById<Button>(R.id.buttonNewCabinet)
             val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewCabinetProducts)
             val fabShare = findViewById<FloatingActionButton>(R.id.fabSharing)
+            val fabMove = findViewById<FloatingActionButton>(R.id.fabMove)
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = adapter
             recyclerView.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
@@ -123,6 +125,15 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
                 }
             }
 
+            fabMove.setOnClickListener{
+                if (selectedCabinet != null){
+                    Log.d("Cabinets", "Selected cabinet is ${selectedCabinet!!.name}")
+                    PopupExportProducts(activity, totalCabinetRepository).show(it)
+                } else {
+                    Toast.makeText(activity, "Cannot move a non existent cabinet", Toast.LENGTH_SHORT).show()
+                }
+            }
+
             CoroutineScope(Dispatchers.IO).launch {
                 launch {
                     totalCabinetRepository.cabinetFlow.collect{
@@ -146,7 +157,7 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
 
     private fun changeSelectedCabinet(){
         CoroutineScope(Dispatchers.Main).launch {
-            selectedCabinet?.products?.let { adapter.submitItems(it) }
+            selectedCabinet?.products?.let { adapter.submitItems(it.sortedBy { it.product.name }) }
         }
     }
 

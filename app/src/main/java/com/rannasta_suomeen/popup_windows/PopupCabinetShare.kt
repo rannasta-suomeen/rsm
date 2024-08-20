@@ -94,7 +94,6 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
                     }
                 }
             }
-            // TODO: Implement a way to join cabinets
         }
     }
 

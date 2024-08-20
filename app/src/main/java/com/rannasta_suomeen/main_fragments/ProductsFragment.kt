@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
-import com.rannasta_suomeen.ProductAdapter
-import com.rannasta_suomeen.ProductAdapterItemTouchHelper
+import com.rannasta_suomeen.adapters.ProductAdapter
+import com.rannasta_suomeen.adapters.ProductAdapterItemTouchHelper
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Product
 import com.rannasta_suomeen.data_classes.Product.SortTypes

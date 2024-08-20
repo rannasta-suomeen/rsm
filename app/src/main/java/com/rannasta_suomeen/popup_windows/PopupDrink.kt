@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.R
-import com.rannasta_suomeen.RecipePartAdapter
+import com.rannasta_suomeen.adapters.RecipePartAdapter
 import com.rannasta_suomeen.data_classes.DrinkTotal
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.storage.DRINK_VOLUME_UNIT

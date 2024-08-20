@@ -1,4 +1,4 @@
-package com.rannasta_suomeen
+package com.rannasta_suomeen.adapters
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Product
 import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.data_classes.from
@@ -46,13 +47,23 @@ class ProductAdapter(
         fun bind(item: Product, settings: Settings){
             with(itemView){
                 findViewById<TextView>(R.id.textViewProductName).text = item.name
-                findViewById<TextView>(R.id.textViewProductPrice).text = displayDecimal(item.price, R.string.price)
+                findViewById<TextView>(R.id.textViewProductPrice).text = displayDecimal(item.price,
+                    R.string.price
+                )
                 findViewById<TextView>(R.id.textViewProductVolume).text = item.volumeDesired(settings)
-                findViewById<TextView>(R.id.textViewProductAbv).text = displayDecimal(item.abv, R.string.abv)
+                findViewById<TextView>(R.id.textViewProductAbv).text = displayDecimal(item.abv,
+                    R.string.abv
+                )
                 findViewById<TextView>(R.id.textViewRetailer).text = item.retailer.toString()
-                findViewById<TextView>(R.id.textViewProductFsd).text = displayDecimal(item.fsd(), R.string.shots)
-                findViewById<TextView>(R.id.textViewProductPpl).text = displayDecimal(item.unit_price, R.string.ppl)
-                findViewById<TextView>(R.id.textViewProductPps).text = displayDecimal(item.pps(), R.string.aer)
+                findViewById<TextView>(R.id.textViewProductFsd).text = displayDecimal(item.fsd(),
+                    R.string.shots
+                )
+                findViewById<TextView>(R.id.textViewProductPpl).text = displayDecimal(item.unit_price,
+                    R.string.ppl
+                )
+                findViewById<TextView>(R.id.textViewProductPps).text = displayDecimal(item.pps(),
+                    R.string.aer
+                )
                 findViewById<TextView>(R.id.textViewProductSubcategory).text = from(item.subcategory_id).toString()
                 findViewById<ImageView>(R.id.imageViewProduct).setImageResource(R.drawable.ic_baseline_wine_bar_24)
                 findViewById<ImageView>(R.id.imageViewProduct).setImageBitmap(imageRepository.getFromMemoryOrMiss(item.img))
