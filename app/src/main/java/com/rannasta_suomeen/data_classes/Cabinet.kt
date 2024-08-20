@@ -146,10 +146,10 @@ data class Cabinet(
         }
     }
     fun containedAmountCabinet(x: CabinetProduct): OwnedAmount{
-        val owner = x.let {ownedBy(it)}
+        val owner = ownedBy(x)?:ProductOwner.Owned(CabinetMember(getOwnUserId(),NetworkController.username?:""))
         return when (val amount = x.amountMl){
-            null -> Infinite(owner!!)
-            else -> Some(amount, owner!!)
+            null -> Infinite(owner)
+            else -> Some(amount, owner)
         }
     }
 

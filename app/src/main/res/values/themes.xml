@@ -18,4 +18,8 @@
         <item name="trackTint">?colorPrimary</item>
         <item name="thumbTint">?colorOnPrimary</item>
     </style>
+    <style name="Theme.RannastaSuomeen.Button" parent="Theme.RannastaSuomeen">
+        <item name="backgroundTint">?colorPrimary</item>
+        <item name="android:textColor">?colorTertiary</item>
+    </style>
 </resources>
