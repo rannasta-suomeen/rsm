@@ -10,8 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.rannasta_suomeen.adapters.DrinkPreviewAdapter
 import com.rannasta_suomeen.R
+import com.rannasta_suomeen.adapters.DrinkPreviewAdapter
 import com.rannasta_suomeen.data_classes.DrinkInfo
 import com.rannasta_suomeen.data_classes.DrinkTotal
 import com.rannasta_suomeen.data_classes.GeneralIngredient
@@ -35,7 +35,7 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
     private var sortByAsc = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        filterMenu = PopupDrinkFilter(activity, ::updateSelection,drinkListFull,settings,ownedIngredients)
+        filterMenu = PopupDrinkFilter(activity, ::updateSelection,drinkListFull,settings)
         drinkPreviewAdapter = DrinkPreviewAdapter(activity, settings)
         super.onCreate(savedInstanceState)
         updateSelection()
@@ -74,7 +74,7 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
             launch {
                 totalDrinkRepository.dataFlow.collect{
                     drinkListFull = it
-                    filterMenu = PopupDrinkFilter(activity, ::updateSelection,drinkListFull,settings,ownedIngredients)
+                    filterMenu = PopupDrinkFilter(activity, ::updateSelection,drinkListFull,settings)
                     drinkListFull
                     activity.runOnUiThread { updateSelection() }
                 }
@@ -93,7 +93,7 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
     }
 
     private fun updateSelection(){
-        drinkPreviewAdapter.submitItems(sortDrinkPreview(filterMenu.filter(drinkListFull), sortType, sortByAsc, settings), ownedIngredients)
+        drinkPreviewAdapter.submitItems(sortDrinkPreview(filterMenu.filter(drinkListFull, ownedIngredients), sortType, sortByAsc, settings), ownedIngredients)
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {

@@ -177,7 +177,7 @@ class PopupFilter(
     }
 }
 
-class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, private val drinksList: List<DrinkTotal>,private val appSettings: Settings,private val ownedIngredients: List<GeneralIngredient>): PopupFilterBase(activity, R.layout.popup_drink_filer){
+class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, private val drinksList: List<DrinkTotal>,private val appSettings: Settings): PopupFilterBase(activity, R.layout.popup_drink_filer){
     private class FilterSettings(
         var searchedName: String,
         var allowedTags: List<String>,
@@ -343,7 +343,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
             window.dismiss()
         }
     }
-    fun filter(drinklist: List<DrinkTotal>): List<DrinkTotal>{
+    fun filter(drinklist: List<DrinkTotal>, ownedIngredients: List<GeneralIngredient>): List<DrinkTotal>{
         val mutList = drinklist.toMutableList()
 
         fun<T> quickRemove(cond: T?, predicate: (DrinkTotal) -> Boolean){
