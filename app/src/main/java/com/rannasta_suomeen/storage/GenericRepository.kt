@@ -212,6 +212,7 @@ class CabinetRepository(context: Context){
             val exp = res.exceptionOrNull()
             if (exp is NetworkController.Error.MiscError){
                 netActionQueue.removeIf { it == oper }
+                netQueueFile.writeText(jackson.writerFor(Array<CabinetOperation>::class.java).writeValueAsString(netActionQueue.toTypedArray()))
             }
             delay(100)
         }
@@ -308,6 +309,7 @@ class CabinetRepository(context: Context){
                     }
                 }
             }
+            // TODO: With no internet this creates a product with wrong id.
             is AddItemToCabinet -> updateState {
                 val t = it.find { it.id == cabinetOperation.id }
                     t?.products?.add(CabinetProductCompact(cabinetOperation.id, cabinetOperation.pid, t.getOwnUserId(),cabinetOperation.amount, true))

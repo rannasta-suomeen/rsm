@@ -404,19 +404,19 @@ object NetworkController {
                 when (res.exceptionOrNull()) {
                     is Error.NetworkError -> {
                         if (n == 0) {
-                        return Result.failure(Error.RetryError(res.exceptionOrNull()!!))
+                        return Result.failure(res.exceptionOrNull()!!)
                     }
                         tryNTimes(n - 1, payload, function)
                     }
                     is Error.MiscError -> {
                         if (n == 0) {
-                            return Result.failure(Error.RetryError(res.exceptionOrNull()!!))
+                            return Result.failure(res.exceptionOrNull()!!)
                         }
                         tryNTimes(n - 1, payload, function)
                     }
                     is Error.NoCredentialsError -> {
                         if (n == 0) {
-                            return Result.failure(Error.RetryError(res.exceptionOrNull()!!))
+                            return Result.failure(res.exceptionOrNull()!!)
                         }
                         tryNTimes(n - 1, payload, function)
                     }
