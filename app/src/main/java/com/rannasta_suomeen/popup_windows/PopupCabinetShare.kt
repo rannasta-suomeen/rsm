@@ -26,8 +26,8 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
     private class MemberAdapter(private var cabinet: Cabinet): RecyclerView.Adapter<MemberAdapter.MemberViewHolder>(){
         private class MemberViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
             fun bind(item: CabinetMember, cabinet: Cabinet){
-                fun getMemberVolume(x: CabinetMember):Int{
-                    return cabinet.products.filter { it.ownerId == x.userId }.count()
+                fun getMemberOwned(x: CabinetMember):Int{
+                    return cabinet.products.count { it.ownerId == x.userId }
                 }
 
                 fun showMemberFsd(x: CabinetMember, view: View):String{
@@ -45,7 +45,7 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
                 }
                 with(itemView){
                     findViewById<TextView>(R.id.textViewMemberName).text = item.userName
-                    findViewById<TextView>(R.id.textViewMemberAmount).text = getMemberVolume(item).toString()
+                    findViewById<TextView>(R.id.textViewMemberAmount).text = itemView.resources.getString(R.string.kpl,getMemberOwned(item).toString())
                     findViewById<TextView>(R.id.textViewMemberFsd).text = showMemberFsd(item, itemView)
                     findViewById<TextView>(R.id.textViewMemberValue).text = showMemberValue(item, itemView)
                     findViewById<ImageView>(R.id.imageViewMemberOwner).isVisible = cabinet.ownerId == item.userId
