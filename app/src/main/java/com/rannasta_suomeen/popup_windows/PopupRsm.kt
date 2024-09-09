@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 
-// TODO: Refactor all popups to use this
 abstract class PopupRsm(activity: Activity, layout: Int, root: ViewGroup?) {
 
     val view = activity.layoutInflater.inflate(layout, root)

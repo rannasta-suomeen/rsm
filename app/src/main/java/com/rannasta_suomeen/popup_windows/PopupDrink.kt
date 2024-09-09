@@ -1,12 +1,9 @@
 package com.rannasta_suomeen.popup_windows
 
 import android.app.Activity
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -21,24 +18,19 @@ import com.rannasta_suomeen.storage.Settings
 import java.text.DecimalFormat
 import kotlin.math.max
 
-class PopupDrink(val drink: DrinkTotal, activity: Activity, owned: List<GeneralIngredient>,private val settings: Settings) {
+class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val owned: List<GeneralIngredient>,private val settings: Settings):PopupRsm(activity, R.layout.popup_drink_recipe, root = null) {
 
     private var amount = 1.0
-    private var window: PopupWindow
     private var volume = DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, settings.prefUnit) * amount
     private val df = DecimalFormat("#.#")
 
-    init {
+    override fun bind(view: View) {
         val adapter = RecipePartAdapter(owned, settings)
-        val view = activity.layoutInflater.inflate(R.layout.popup_drink_recipe, null)
 
         fun displayDecimal(x: Double, stringId: Int): String{
             val number = String.format("%.1f", x)
             return view.resources.getString(stringId, number)
         }
-
-        window = PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        window.isFocusable = true
         with(view) {
 
             findViewById<TextView>(R.id.textViewRecipeAbv).text = displayDecimal(drink.drink.abv_average, R.string.abv)
@@ -129,9 +121,5 @@ class PopupDrink(val drink: DrinkTotal, activity: Activity, owned: List<GeneralI
 
     private fun calculatePrice(): Double{
         return drink.drink.price(settings) * amount
-    }
-
-    fun show(parent: View){
-        window.showAtLocation(parent, Gravity.NO_GRAVITY, 0,0)
     }
 }

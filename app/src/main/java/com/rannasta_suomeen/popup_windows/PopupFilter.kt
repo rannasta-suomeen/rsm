@@ -2,12 +2,9 @@ package com.rannasta_suomeen.popup_windows
 
 
 import android.app.Activity
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AlertDialog
@@ -21,8 +18,7 @@ abstract class PopupFilterBase(
     protected val activity: Activity,
     @LayoutRes
     private val layout: Int,
-) {
-    protected var window: PopupWindow
+):PopupRsm(activity, layout, root = null) {
 
     protected inline fun <reified T : Any> multiOptionDialog(
         items: List<T>,
@@ -46,26 +42,6 @@ abstract class PopupFilterBase(
         dialog.setNegativeButton("Cancel") { _, _ -> }
         return dialog.create()
     }
-
-    init {
-        val view = activity.layoutInflater.inflate(layout, null)
-        window = PopupWindow(
-            view,
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        window.isFocusable = true
-    }
-
-    fun show(parent: View) {
-        bind(window.contentView)
-        window.showAtLocation(parent, Gravity.TOP, 0, 0)
-    }
-
-    /**
-     * Binds the layout to logic
-     */
-    abstract fun bind(view: View)
 }
 
 class PopupFilter(
@@ -343,8 +319,8 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
             window.dismiss()
         }
     }
-    fun filter(drinklist: List<DrinkTotal>, ownedIngredients: List<GeneralIngredient>): List<DrinkTotal>{
-        val mutList = drinklist.toMutableList()
+    fun filter(drinkList: List<DrinkTotal>, ownedIngredients: List<GeneralIngredient>): List<DrinkTotal>{
+        val mutList = drinkList.toMutableList()
 
         fun<T> quickRemove(cond: T?, predicate: (DrinkTotal) -> Boolean){
             if (cond != null){

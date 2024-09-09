@@ -1,9 +1,7 @@
 package com.rannasta_suomeen.popup_windows
 
 import android.app.Activity
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import com.rannasta_suomeen.R
@@ -21,14 +19,9 @@ class PopupProductAdd(private val product: Product,
                       private val repo: TotalCabinetRepository,
                       private val imgRepo :ImageRepository,
                       activity: Activity,
-                      private val settings: Settings) {
+                      private val settings: Settings):PopupRsm(activity, R.layout.popup_add_to_cabinet, root = null) {
 
-    private var window: PopupWindow
-    init {
-        val view = activity.layoutInflater.inflate(R.layout.popup_add_to_cabinet, null)
-
-        window = PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        window.isFocusable = true
+    override fun bind(view: View) {
         with(view) {
             CoroutineScope(Dispatchers.IO).launch {
                 val img = imgRepo.getImage(product.img)
@@ -48,7 +41,6 @@ class PopupProductAdd(private val product: Product,
             }
 
             val switch = findViewById<SwitchCompat>(R.id.switchInvInfinite)
-
 
             findViewById<Button>(R.id.buttonInvAdd).setOnClickListener {
                 val t = parseVolume(edv.toString())
@@ -94,9 +86,5 @@ class PopupProductAdd(private val product: Product,
             true -> Result.success(convertedVolume!!.roundToInt())
             false -> Result.failure(java.lang.NumberFormatException("$text cannot be converted to volume"))
         }
-    }
-
-    fun show(parent: View){
-        window.showAtLocation(parent, Gravity.NO_GRAVITY, 0,0)
     }
 }
