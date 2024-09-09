@@ -98,7 +98,7 @@ class Infinite(owner: ProductOwner) : OwnedAmount(owner) {
 }
 class Some(val x: Int, owner: ProductOwner): OwnedAmount(owner){
     override fun show(settings: Settings): String {
-        return UnitType.ml.displayInDesiredUnit(x.toDouble(),settings.prefUnit) + owner?.show()
+        return UnitType.Ml.displayInDesiredUnit(x.toDouble(), settings.prefUnit) + owner?.show()
     }
 }
 

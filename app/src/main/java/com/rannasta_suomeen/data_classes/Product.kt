@@ -1,5 +1,6 @@
 package com.rannasta_suomeen.data_classes
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.rannasta_suomeen.storage.Settings
 
 /** Kotlin equivalent of the RSM product */
@@ -11,11 +12,14 @@ data class Product(
     val img: String,
     /// Volume of the product in L
     val volume: Double,
-    val category_id: Int,
-    val subcategory_id: Int,
+    @JsonProperty("category_id")
+    val categoryId: Int,
+    @JsonProperty("subcategory_id")
+    val subcategoryId: Int,
     val abv: Double,
     val aer: Double,
-    val unit_price: Double,
+    @JsonProperty("unit_price")
+    val unitPrice: Double,
     val checksum: String,
     val retailer: Retailer
 ){
@@ -40,7 +44,7 @@ data class Product(
     }
 
     fun volumeDesired(settings: Settings): String{
-        return UnitType.cl.displayInDesiredUnit(volumeCl(), settings.prefUnit)
+        return UnitType.Cl.displayInDesiredUnit(volumeCl(), settings.prefUnit)
     }
 
     companion object{
@@ -55,7 +59,7 @@ fun sort(list: List<Product>, type: Product.SortTypes, asc: Boolean): List<Produ
         Product.SortTypes.Volume -> list.sortedBy { it.volume }
         Product.SortTypes.Abv -> list.sortedBy {it.abv}
         Product.SortTypes.Pps -> list.sortedBy { it.pps() }
-        Product.SortTypes.UnitPrice -> list.sortedBy { it.unit_price }
+        Product.SortTypes.UnitPrice -> list.sortedBy { it.unitPrice }
         Product.SortTypes.Fsd -> list.sortedBy { it.fsd() }
     }
     if (!asc){sortedAsc = sortedAsc.reversed()}
@@ -63,5 +67,9 @@ fun sort(list: List<Product>, type: Product.SortTypes, asc: Boolean): List<Produ
 }
 
 enum class Retailer {
-    alko, superalko
+    @JsonProperty("alko")
+    Alko,
+
+    @JsonProperty("superalko")
+    Superalko
 }

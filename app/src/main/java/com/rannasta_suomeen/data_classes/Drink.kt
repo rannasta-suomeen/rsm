@@ -1,63 +1,85 @@
 package com.rannasta_suomeen.data_classes
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.rannasta_suomeen.storage.Settings
 
 /**
  This is the equivalent of the RS-Struct Recipe
  */
 
-@Suppress("SpellCheckingInspection")
 data class DrinkInfo(
     val id: Int,
     val type: DrinkType,
-    val recipe_id: Int,
+    @JsonProperty("recipe_id")
+    val recipeId: Int,
 
-    val author_id: Int,
+    @JsonProperty("author_id")
+    val authorId: Int,
     val name: String,
     val info: String,
 
-    val tag_list: List<String>,
+    @JsonProperty("tag_list")
+    val tagList: List<String>,
 
-    val alko_price_per_serving: Double,
-    val superalko_price_per_serving: Double,
+    @JsonProperty("alko_price_per_serving")
+    val alkoPps: Double,
+    @JsonProperty("superalko_price_per_serving")
+    val superalkoPps: Double,
 
-    val alko_aer: Double,
-    val superalko_aer: Double,
+    @JsonProperty("alko_aer")
+    val alkoAer: Double,
+    @JsonProperty("superalko_aer")
+    val superalkoAer: Double,
 
-    /** Volume of the drink in ml*/
-    val total_volume : Double,
-    val standard_servings: Double,
+    /// Volume of the drink in ml
+    @JsonProperty("total_volume")
+    val volume: Double,
+    @JsonProperty("standard_servings")
+    val standardServings: Double,
 
-    val abv_average: Double,
-    val abv_max: Double,
-    val abv_min: Double,
+    @JsonProperty("abv_average")
+    val abvAvg: Double,
+    @JsonProperty("abv_max")
+    val abvMax: Double,
+    @JsonProperty("abv_min")
+    val abvMin: Double,
 
-    val available_alko: Boolean,
-    val alko_price_max: Double,
-    val alko_price_min: Double,
-    val alko_price_average: Double,
+    @JsonProperty("available_alko")
+    val availableAlko: Boolean,
+    @JsonProperty("alko_price_max")
+    val alkoPriceMax: Double,
+    @JsonProperty("alko_price_min")
+    val alkoPriceMin: Double,
+    @JsonProperty("alko_price_average")
+    val alkoPriceAverage: Double,
 
-    val available_superalko: Boolean,
-    val superalko_price_max: Double,
-    val superalko_price_min: Double,
-    val superalko_price_average: Double,
+    @JsonProperty("available_superalko")
+    val availableSuperalko: Boolean,
+    @JsonProperty("superalko_price_max")
+    val superalkoPriceMax: Double,
+    @JsonProperty("superalko_price_min")
+    val superalkoPriceMin: Double,
+    @JsonProperty("superalko_price_average")
+    val superalkoPriceAverage: Double,
 
-    val incredient_count: Int,
-    val favorite_count: Int
+    @JsonProperty("incredient_count")
+    val ingredientCount: Int,
+    @JsonProperty("favorite_count")
+    val favoriteCount: Int
 
 ){
 
     // TODO: Make this show abv in your cabinet
     fun abv():Double{
-        return abv_average
+        return abvAvg
     }
     enum class SortTypes{
         Name, Type, Volume, Price, Fsd, Pps, Abv
     }
 
     fun displayTagList(): String{
-        return tag_list.fold(""){r, t ->
-            if (t != ""){
+        return tagList.fold("") { r, t ->
+            if (t != "") {
                 return@fold "$r#$t\n"
             }
             ""
@@ -67,22 +89,22 @@ data class DrinkInfo(
     fun price(settings: Settings): Double{
         return when (settings.prefAlko){
             true -> {
-                when (available_alko) {
-                    true -> alko_price_average
-                    false -> superalko_price_average
+                when (availableAlko) {
+                    true -> alkoPriceAverage
+                    false -> superalkoPriceAverage
                 }
             }
-            false ->{
-                when (available_superalko){
-                    true -> superalko_price_average
-                    false -> alko_price_average
+            false -> {
+                when (availableSuperalko) {
+                    true -> superalkoPriceAverage
+                    false -> alkoPriceAverage
                 }
             }
         }
     }
 
     fun pricePerServing(settings: Settings): Double{
-        return price(settings)/standard_servings
+        return price(settings) / standardServings
     }
 
 }
@@ -93,15 +115,19 @@ data class DrinkInfo(
 data class DrinkTotal(val drink: DrinkInfo, val ingredients: IngredientsForDrinkPointer){
 
     fun missingIngredientsAlcoholic(owned: List<GeneralIngredient>): Int{
-        return ingredients.recipeParts.map{ it.ingredient }.filter { it.type == IngredientType.light_alcohol_product || it.type == IngredientType.strong_alcohol_product }.count {
-            !owned.contains(it)
-        }
+        return ingredients.recipeParts.map { it.ingredient }
+            .filter { it.type == IngredientType.LightAlcoholProduct || it.type == IngredientType.StrongAlcoholProduct }
+            .count {
+                !owned.contains(it)
+            }
     }
 
     fun missingIngredientsNonAlcoholic(owned: List<GeneralIngredient>): Int{
-        return ingredients.recipeParts.map{ it.ingredient }.filter { it.type != IngredientType.light_alcohol_product && it.type != IngredientType.strong_alcohol_product }.count {
-            !owned.contains(it)
-        }
+        return ingredients.recipeParts.map { it.ingredient }
+            .filter { it.type != IngredientType.LightAlcoholProduct && it.type != IngredientType.StrongAlcoholProduct }
+            .count {
+                !owned.contains(it)
+            }
     }
 }
 
@@ -109,11 +135,11 @@ fun sortDrinkPreview(list: List<DrinkTotal>, type: DrinkInfo.SortTypes, asc: Boo
     var sortedAsc = when (type){
         DrinkInfo.SortTypes.Name -> list.sortedBy { it.drink.name }
         DrinkInfo.SortTypes.Type -> list.sortedBy { it.drink.type }
-        DrinkInfo.SortTypes.Volume -> list.sortedBy { it.drink.total_volume }
+        DrinkInfo.SortTypes.Volume -> list.sortedBy { it.drink.volume }
         DrinkInfo.SortTypes.Price -> list.sortedBy { it.drink.price(settings) }
-        DrinkInfo.SortTypes.Fsd -> list.sortedBy { it.drink.standard_servings }
+        DrinkInfo.SortTypes.Fsd -> list.sortedBy { it.drink.standardServings }
         DrinkInfo.SortTypes.Pps -> list.sortedBy { it.drink.pricePerServing(settings) }
-        DrinkInfo.SortTypes.Abv -> list.sortedBy { it.drink.abv_average }
+        DrinkInfo.SortTypes.Abv -> list.sortedBy { it.drink.abvAvg }
     }
 
     if (!asc){sortedAsc = sortedAsc.reversed()}
@@ -121,7 +147,17 @@ fun sortDrinkPreview(list: List<DrinkTotal>, type: DrinkInfo.SortTypes, asc: Boo
 }
 
 enum class DrinkType {
-    cocktail, shot, punch, generated
+    @JsonProperty("cocktail")
+    Cocktail,
+
+    @JsonProperty("shot")
+    Shot,
+
+    @JsonProperty("punch")
+    Punch,
+
+    @JsonProperty("generated")
+    Generated
 }
 
 

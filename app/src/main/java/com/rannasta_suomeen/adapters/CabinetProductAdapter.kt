@@ -57,16 +57,20 @@ class CabinetProductAdapter(
                     R.string.abv
                 )
                 findViewById<TextView>(R.id.textViewRetailer).text = item.product.retailer.toString()
-                findViewById<TextView>(R.id.textViewProductFsd).text = displayDecimal(item.product.fsd(),
+                findViewById<TextView>(R.id.textViewProductFsd).text = displayDecimal(
+                    item.product.fsd(),
                     R.string.shots
                 )
-                findViewById<TextView>(R.id.textViewProductPpl).text = displayDecimal(item.product.unit_price,
+                findViewById<TextView>(R.id.textViewProductPpl).text = displayDecimal(
+                    item.product.unitPrice,
                     R.string.ppl
                 )
-                findViewById<TextView>(R.id.textViewProductPps).text = displayDecimal(item.product.pps(),
+                findViewById<TextView>(R.id.textViewProductPps).text = displayDecimal(
+                    item.product.pps(),
                     R.string.aer
                 )
-                findViewById<TextView>(R.id.textViewProductSubcategory).text = from(item.product.subcategory_id).toString()
+                findViewById<TextView>(R.id.textViewProductSubcategory).text =
+                    from(item.product.subcategoryId).toString()
                 findViewById<ImageView>(R.id.imageViewProduct).setImageResource(R.drawable.ic_baseline_wine_bar_24)
                 findViewById<ImageView>(R.id.imageViewProduct).setImageBitmap(imageRepository.getFromMemoryOrMiss(item.product.img))
                 findViewById<TextView>(R.id.textViewProductOwned).text = totalCabinetRepository.selectedCabinet?.containedAmountCabinet(item)?.show(settings)

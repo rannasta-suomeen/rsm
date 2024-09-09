@@ -21,7 +21,7 @@ import kotlin.math.max
 class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val owned: List<GeneralIngredient>,private val settings: Settings):PopupRsm(activity, R.layout.popup_drink_recipe, root = null) {
 
     private var amount = 1.0
-    private var volume = DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, settings.prefUnit) * amount
+    private var volume = DRINK_VOLUME_UNIT.convert(drink.drink.volume, settings.prefUnit) * amount
     private val df = DecimalFormat("#.#")
 
     override fun bind(view: View) {
@@ -33,11 +33,13 @@ class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val o
         }
         with(view) {
 
-            findViewById<TextView>(R.id.textViewRecipeAbv).text = displayDecimal(drink.drink.abv_average, R.string.abv)
-            findViewById<TextView>(R.id.textViewRecipeAer).text = displayDecimal(drink.drink.pricePerServing(settings), R.string.aer)
+            findViewById<TextView>(R.id.textViewRecipeAbv).text =
+                displayDecimal(drink.drink.abvAvg, R.string.abv)
+            findViewById<TextView>(R.id.textViewRecipeAer).text =
+                displayDecimal(drink.drink.pricePerServing(settings), R.string.aer)
             findViewById<TextView>(R.id.textViewRecipeTags).text = drink.drink.displayTagList()
             val fsdView = findViewById<TextView>(R.id.textViewRecipeFsd)
-            fsdView.text = displayDecimal(drink.drink.standard_servings, R.string.shots)
+            fsdView.text = displayDecimal(drink.drink.standardServings, R.string.shots)
             val priceView = findViewById<TextView>(R.id.textViewRecipePrice)
             priceView.text = displayDecimal(drink.drink.price(settings), R.string.price)
             findViewById<TextView>(R.id.textViewRecipeDescription).text = drink.drink.info
@@ -60,10 +62,10 @@ class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val o
             // Edit texts that change the data
             fun updateByAmount(){
                 volCounter.text.clear()
-                volume = DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, settings.prefUnit) * amount
+                volume = DRINK_VOLUME_UNIT.convert(drink.drink.volume, settings.prefUnit) * amount
                 volCounter.text.append(df.format(volume))
                 priceView.text = displayDecimal(calculatePrice(), R.string.price)
-                fsdView.text = displayDecimal(drink.drink.standard_servings*amount, R.string.shots)
+                fsdView.text = displayDecimal(drink.drink.standardServings * amount, R.string.shots)
                 adapter.submitAmount(amount)
             }
 
@@ -75,11 +77,11 @@ class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val o
             }
 
             fun updateByVolume(){
-                amount = volume/DRINK_VOLUME_UNIT.convert(drink.drink.total_volume, settings.prefUnit)
+                amount = volume / DRINK_VOLUME_UNIT.convert(drink.drink.volume, settings.prefUnit)
                 amountCounter.text.clear()
                 amountCounter.text.append(df.format(amount))
                 priceView.text = displayDecimal(calculatePrice(), R.string.price)
-                fsdView.text = displayDecimal(drink.drink.standard_servings*amount, R.string.shots)
+                fsdView.text = displayDecimal(drink.drink.standardServings * amount, R.string.shots)
                 adapter.submitAmount(amount)
             }
 

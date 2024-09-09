@@ -1,28 +1,48 @@
 package com.rannasta_suomeen.data_classes
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.*
 
-enum class Category{
-    strong_alcohol, wine, liquer, beer, cider, long_drink_cocktail, drink_mix;
+enum class Category {
+    @JsonProperty("strong_alcohol")
+    StrongAlcohol,
 
-    fun toId(): Int{
-        return when (this){
-            strong_alcohol -> 2
-            wine -> 3
-            liquer -> 4
-            beer -> 5
-            cider -> 6
-            long_drink_cocktail -> 7
-            drink_mix -> 8
+    @JsonProperty("wine")
+    Wine,
+
+    @JsonProperty("liquer")
+    Liquor,
+
+    @JsonProperty("beer")
+    Beer,
+
+    @JsonProperty("cider")
+    Cider,
+
+    @JsonProperty("long_drink_cocktail")
+    LongDrinkCocktail,
+
+    @JsonProperty("drink_mix")
+    DrinkMix;
+
+    fun toId(): Int {
+        return when (this) {
+            StrongAlcohol -> 2
+            Wine -> 3
+            Liquor -> 4
+            Beer -> 5
+            Cider -> 6
+            LongDrinkCocktail -> 7
+            DrinkMix -> 8
         }
     }
 }
 
 object CategoryJson{
 
-    private val CATEGORY_FIELD_NAME = "category"
+    private const val CATEGORY_FIELD_NAME = "category"
 
     object CategorySerializer : JsonSerializer<Category>(){
         override fun serialize(
@@ -51,61 +71,117 @@ object CategoryJson{
 }
 
 fun from_id(id: Int): Category{
-    return when (id){
-        2 -> Category.strong_alcohol
-        3 -> Category.wine
-        4 -> Category.liquer
-        5 -> Category.beer
-        6 -> Category.cider
-        7 -> Category.long_drink_cocktail
-        8 -> Category.drink_mix
+    return when (id) {
+        2 -> Category.StrongAlcohol
+        3 -> Category.Wine
+        4 -> Category.Liquor
+        5 -> Category.Beer
+        6 -> Category.Cider
+        7 -> Category.LongDrinkCocktail
+        8 -> Category.DrinkMix
         else -> throw IllegalArgumentException("Cannot build category from $id")
     }
 }
 
-enum class Subcategory(val category: Category){
+enum class Subcategory(val category: Category) {
 
-    Vodka(Category.strong_alcohol),
-    whiskey(Category.strong_alcohol),
-    rum(Category.strong_alcohol),
-    gin(Category.strong_alcohol),
-    tequila(Category.strong_alcohol),
-    cognac(Category.strong_alcohol),
-    brandy(Category.strong_alcohol),
-    bitter(Category.strong_alcohol),
-    other_strong_alcohol(Category.strong_alcohol),
+    Vodka(Category.StrongAlcohol),
 
-    red_wine(Category.wine),
-    white_wine(Category.wine),
-    rose_wine(Category.wine),
-    sparkling_wine(Category.wine),
-    champagne(Category.wine),
-    strong_wine(Category.wine),
-    vermouth(Category.wine),
-    mulled_wine(Category.wine),
+    @JsonProperty("Whiskey")
+    Whiskey(Category.StrongAlcohol),
 
-    liquer(Category.liquer),
-    ground_liquer(Category.liquer),
-    berry_fruit_liqueur(Category.liquer),
-    cocktail_liqueur(Category.liquer),
-    cream_liquer(Category.liquer),
+    @JsonProperty("rum")
+    Rum(Category.StrongAlcohol),
 
-    lager(Category.beer),
-    ale(Category.beer),
-    wheat(Category.beer),
-    dark(Category.beer),
-    other(Category.beer),
-    cocktail(Category.long_drink_cocktail),
+    @JsonProperty("gin")
+    Gin(Category.StrongAlcohol),
 
-    cider(Category.cider),
-    natural_cider(Category.cider),
+    @JsonProperty("tequila")
+    Tequila(Category.StrongAlcohol),
 
-    long_drink(Category.long_drink_cocktail);
+    @JsonProperty("cognac")
+    Cognac(Category.StrongAlcohol),
+
+    @JsonProperty("brandy")
+    Brandy(Category.StrongAlcohol),
+
+    @JsonProperty("bitter")
+    Bitter(Category.StrongAlcohol),
+
+    @JsonProperty("other_strong_alcohol")
+    OtherStrongAlcohol(Category.StrongAlcohol),
+
+    @JsonProperty("red_wine")
+    RedWine(Category.Wine),
+
+    @JsonProperty("white_wine")
+    WhiteWine(Category.Wine),
+
+    @JsonProperty("rose_wine")
+    RoseWine(Category.Wine),
+
+    @JsonProperty("sparkling_wine")
+    SparklingWine(Category.Wine),
+
+    @JsonProperty("champagne")
+    Champagne(Category.Wine),
+
+    @JsonProperty("strong_wine")
+    StrongWine(Category.Wine),
+
+    @JsonProperty("vermouth")
+    Vermouth(Category.Wine),
+
+    @JsonProperty("mulled_wine")
+    MulledWine(Category.Wine),
+
+    @JsonProperty("liquer")
+    Liquor(Category.Liquor),
+
+    @JsonProperty("ground_liquer")
+    GroundLiquor(Category.Liquor),
+
+    @JsonProperty("berry_fruit_liqueur")
+    BerryFruitLiqueur(Category.Liquor),
+
+    @JsonProperty("cocktail_liqueur")
+    CocktailLiqueur(Category.Liquor),
+
+    @JsonProperty("cream_liquer")
+    CreamLiquor(Category.Liquor),
+
+    @JsonProperty("lager")
+    Lager(Category.Beer),
+
+    @JsonProperty("ale")
+    Ale(Category.Beer),
+
+    @JsonProperty("wheat")
+    Wheat(Category.Beer),
+
+    @JsonProperty("dark")
+    Dark(Category.Beer),
+
+    @JsonProperty("other")
+    Other(Category.Beer),
+
+    @JsonProperty("cocktail")
+    Cocktail(Category.LongDrinkCocktail),
+
+    @JsonProperty("cider")
+    Cider(Category.Cider),
+
+    @JsonProperty("natural_cider")
+    NaturalCider(Category.Cider),
+
+    @JsonProperty("long_drink")
+    LongDrink(Category.LongDrinkCocktail);
+
 
     override fun toString(): String {
-        val t = when (this){
-            other -> "Other beer"
-            dark -> "Dark beer"
+        val t = when (this) {
+            Other -> "Other beer"
+            Dark -> "Dark beer"
             else -> super.toString().replaceFirstChar { it.uppercaseChar() }.replace("_", " ")
         }
         return t
@@ -113,38 +189,39 @@ enum class Subcategory(val category: Category){
 }
 
 fun from(id: Int): Subcategory{
-    return when(id){
-        1 -> Subcategory.tequila
-        2 -> Subcategory.other_strong_alcohol
-        3 -> Subcategory.bitter
-        4 -> Subcategory.brandy
-        5 -> Subcategory.cognac
-        6 -> Subcategory.gin
-        7 -> Subcategory.rum
-        8 -> Subcategory.whiskey
+    return when (id) {
+        1 -> Subcategory.Tequila
+        2 -> Subcategory.OtherStrongAlcohol
+        3 -> Subcategory.Bitter
+        4 -> Subcategory.Brandy
+        5 -> Subcategory.Cognac
+        6 -> Subcategory.Gin
+        7 -> Subcategory.Rum
+        8 -> Subcategory.Whiskey
         9 -> Subcategory.Vodka
-        10 -> Subcategory.mulled_wine
-        11 -> Subcategory.vermouth
-        12 -> Subcategory.strong_wine
-        13 -> Subcategory.champagne
-        14 -> Subcategory.sparkling_wine
-        15 -> Subcategory.white_wine
-        16 -> Subcategory.red_wine
-        17 -> Subcategory.rose_wine
-        18 -> Subcategory.berry_fruit_liqueur
-        19 -> Subcategory.cream_liquer
-        20 -> Subcategory.cocktail_liqueur
-        21 -> Subcategory.ground_liquer
-        22 -> Subcategory.liquer
-        23 -> Subcategory.other
-        24 -> Subcategory.dark
-        25 -> Subcategory.wheat
-        26 -> Subcategory.ale
-        27 -> Subcategory.lager
-        28 -> Subcategory.natural_cider
-        29 -> Subcategory.cider
-        30 -> Subcategory.cocktail
-        31 -> Subcategory.long_drink
+        10 -> Subcategory.MulledWine
+        11 -> Subcategory.Vermouth
+        12 -> Subcategory.StrongWine
+        13 -> Subcategory.Champagne
+        14 -> Subcategory.SparklingWine
+        15 -> Subcategory.WhiteWine
+        16 -> Subcategory.RedWine
+        17 -> Subcategory.RoseWine
+        18 -> Subcategory.BerryFruitLiqueur
+        19 -> Subcategory.CreamLiquor
+        20 -> Subcategory.CocktailLiqueur
+        21 -> Subcategory.GroundLiquor
+        22 -> Subcategory.Liquor
+        23 -> Subcategory.Other
+        24 -> Subcategory.Dark
+        25 -> Subcategory.Wheat
+        26 -> Subcategory.Ale
+        27 -> Subcategory.Lager
+        28 -> Subcategory.NaturalCider
+        29 -> Subcategory.Cider
+        30 -> Subcategory.Cocktail
+        31 -> Subcategory.LongDrink
+
         else -> throw IllegalArgumentException("Cant build category from $id")
     }
 }

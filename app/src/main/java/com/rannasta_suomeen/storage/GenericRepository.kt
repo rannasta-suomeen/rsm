@@ -367,8 +367,8 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
             t
         })
         val ownedByFilter = generalIngredientList.toList().map { it.second }.filter {
-            it.use_static_filter_c && selectedCabinet?.products?.any { p->p.product.category_id == it.static_filter_c && p.usable} == true
-                    || it.use_static_filter && selectedCabinet?.products?.any { p-> p.product.subcategory_id == it.static_filter && p.usable} == true
+            it.use_static_filter_c && selectedCabinet?.products?.any { p -> p.product.categoryId == it.static_filter_c && p.usable } == true
+                    || it.use_static_filter && selectedCabinet?.products?.any { p -> p.product.subcategoryId == it.static_filter && p.usable } == true
         }.toMutableList()
         val ownedById = productIngredientListPointer.filter {
             it.products.find { p->
@@ -505,7 +505,7 @@ class TotalDrinkRepository(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             suspend fun emitCurrent() {
                 dataFlow.emit(recipeList.mapNotNull { ings ->
-                    drinkList.find { it.recipe_id == ings.recipe_id }?.let {
+                    drinkList.find { it.recipeId == ings.recipeId }?.let {
                         ings.toPointer(ingredientList)
                             ?.let { it1 -> DrinkTotal(it, it1) }
                     }

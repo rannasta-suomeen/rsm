@@ -33,7 +33,7 @@ class PopupProductAdd(private val product: Product,
             findViewById<TextView>(R.id.textViewInvName).text = product.name
             val edv = findViewById<EditText>(R.id.editTextInvVolume).text
             edv.clear()
-            val showable = UnitType.cl.displayInDesiredUnit(product.volumeCl(), settings.prefUnit)
+            val showable = UnitType.Cl.displayInDesiredUnit(product.volumeCl(), settings.prefUnit)
             edv.append(showable)
 
             findViewById<Button>(R.id.buttonInvCancel).setOnClickListener {
@@ -67,19 +67,19 @@ class PopupProductAdd(private val product: Product,
         val text = input.filter { !it.isWhitespace() }
         val numbers = text.takeWhile { it.isDigit() || listOf('.', ',').contains(it) }.toDoubleOrNull()
         val unit = text.dropWhile { it.isDigit() || listOf('.', ',').contains(it) }
-        val unitActual = when (unit.lowercase()){
-            "cl" -> UnitType.cl
-            "ml" -> UnitType.ml
-            "oz" -> UnitType.oz
-            "" -> UnitType.kpl
-            "b" -> UnitType.kpl
+        val unitActual = when (unit.lowercase()) {
+            "cl" -> UnitType.Cl
+            "ml" -> UnitType.Ml
+            "oz" -> UnitType.Oz
+            "" -> UnitType.Kpl
+            "b" -> UnitType.Kpl
             else -> null
         }
 
-        val convertedVolume = when(unitActual){
+        val convertedVolume = when (unitActual) {
             null -> 0.0
-            UnitType.kpl -> numbers?.let { it * product.volume*1000 } ?: 0.0
-            else -> numbers?.let {unitActual.convert(it, UnitType.ml)}
+            UnitType.Kpl -> numbers?.let { it * product.volume * 1000 } ?: 0.0
+            else -> numbers?.let { unitActual.convert(it, UnitType.Ml) }
         }
 
         return when(numbers != null && unitActual != null){

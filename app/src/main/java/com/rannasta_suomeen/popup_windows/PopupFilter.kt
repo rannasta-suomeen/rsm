@@ -62,7 +62,16 @@ class PopupFilter(
         var selectedSubcategory: Array<Subcategory> = Subcategory.values()
     }
 
-    private var settings: Settings = Settings(null,null, null,null,null,null, null, listOf(Retailer.alko, Retailer.superalko))
+    private var settings: Settings = Settings(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        listOf(Retailer.Alko, Retailer.Superalko)
+    )
 
     override fun bind(view:View) {
         /**
@@ -149,7 +158,8 @@ class PopupFilter(
         quickRemove(settings.volMin){it.volumeCl()<settings.volMin!!}
         quickRemove(settings.volMax){it.volumeCl()>settings.volMax!!}
 
-        return mutList.filter { settings.selectedSubcategory.contains(from(it.subcategory_id)) }.filter { settings.retailers.contains(it.retailer) }
+        return mutList.filter { settings.selectedSubcategory.contains(from(it.subcategoryId)) }
+            .filter { settings.retailers.contains(it.retailer) }
     }
 }
 
@@ -172,18 +182,20 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
             disAllowedTags.removeAll{allowedTags.contains(it)}
             fun checkTags(drink: DrinkTotal):Boolean{
                 for (i in disAllowedTags){
-                    if(when (i){
-                        // TODO: Make this work without hardcoded strings
-                        "Cocktail" -> drink.drink.type == DrinkType.cocktail
-                        "Shot" -> drink.drink.type == DrinkType.shot
-                        "Punch" -> drink.drink.type == DrinkType.punch
-                        "Missing Alcohol" -> drink.missingIngredientsAlcoholic(ownedIngredients) != 0
-                        "Missing Groceries" -> drink.missingIngredientsNonAlcoholic(ownedIngredients) != 0
-                        "Tagless" -> drink.drink.tag_list.isEmpty()
-                        else -> {
-                            drink.drink.tag_list.contains(i)
-                        }
-                    }){
+                    if(when (i) {
+                            // TODO: Make this work without hardcoded strings
+                            "Cocktail" -> drink.drink.type == DrinkType.Cocktail
+                            "Shot" -> drink.drink.type == DrinkType.Shot
+                            "Punch" -> drink.drink.type == DrinkType.Punch
+                            "Missing Alcohol" -> drink.missingIngredientsAlcoholic(ownedIngredients) != 0
+                            "Missing Groceries" -> drink.missingIngredientsNonAlcoholic(
+                                ownedIngredients
+                            ) != 0
+                            "Tagless" -> drink.drink.tagList.isEmpty()
+                            else -> {
+                                drink.drink.tagList.contains(i)
+                            }
+                        }){
                         return false
                     }
                 }
@@ -196,7 +208,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
     }
     private fun findAllTags(): List<String>{
         val tagMap = mutableSetOf<String>()
-        drinksList.forEach {tagMap.addAll(it.drink.tag_list) }
+        drinksList.forEach { tagMap.addAll(it.drink.tagList) }
         return tagMap.toList()
     }
 
@@ -319,30 +331,33 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
             window.dismiss()
         }
     }
-    fun filter(drinkList: List<DrinkTotal>, ownedIngredients: List<GeneralIngredient>): List<DrinkTotal>{
+    fun filter(drinkList: List<DrinkTotal>, ownedIngredients: List<GeneralIngredient>): List<DrinkTotal> {
         val mutList = drinkList.toMutableList()
 
-        fun<T> quickRemove(cond: T?, predicate: (DrinkTotal) -> Boolean){
-            if (cond != null){
+        fun <T> quickRemove(cond: T?, predicate: (DrinkTotal) -> Boolean) {
+            if (cond != null) {
                 mutList.removeAll(predicate)
             }
         }
 
-        quickRemove(settings.searchedName){!it.drink.name.contains(settings.searchedName,true)}
-        quickRemove(settings.abvMin){it.drink.abv_average<settings.abvMin!!}
-        quickRemove(settings.abvMax){it.drink.abv_average>settings.abvMax!!}
+        quickRemove(settings.searchedName) { !it.drink.name.contains(settings.searchedName, true) }
+        quickRemove(settings.abvMin) { it.drink.abvAvg < settings.abvMin!! }
+        quickRemove(settings.abvMax) { it.drink.abvAvg > settings.abvMax!! }
 
-        quickRemove(settings.priceMin){it.drink.price(appSettings)<settings.priceMin!!}
-        quickRemove(settings.priceMax){it.drink.price(appSettings)>settings.priceMax!!}
+        quickRemove(settings.priceMin) { it.drink.price(appSettings) < settings.priceMin!! }
+        quickRemove(settings.priceMax) { it.drink.price(appSettings) > settings.priceMax!! }
 
         // TODO parse volume with unit
-        quickRemove(settings.volMin){it.drink.total_volume*10<settings.volMin!!}
-        quickRemove(settings.volMax){it.drink.total_volume*10>settings.volMax!!}
+        quickRemove(settings.volMin) { it.drink.volume * 10 < settings.volMin!! }
+        quickRemove(settings.volMax) { it.drink.volume * 10 > settings.volMax!! }
 
-        quickRemove(settings.volMin){it.drink.pricePerServing(appSettings)<settings.volMin!!}
-        quickRemove(settings.volMax){it.drink.pricePerServing(appSettings)>settings.volMax!!}
+        quickRemove(settings.volMin) { it.drink.pricePerServing(appSettings) < settings.volMin!! }
+        quickRemove(settings.volMax) { it.drink.pricePerServing(appSettings) > settings.volMax!! }
         settings.filterTag(mutList, ownedIngredients, tags)
-        mutList.removeAll{!it.ingredients.recipeParts.map {it.ingredient}.all { settings.whiteListedIngredients.contains(it) }}
+        mutList.removeAll {
+            !it.ingredients.recipeParts.map { it.ingredient }
+                .all { settings.whiteListedIngredients.contains(it) }
+        }
 
         return mutList.toList()
     }

@@ -55,16 +55,20 @@ class ProductAdapter(
                     R.string.abv
                 )
                 findViewById<TextView>(R.id.textViewRetailer).text = item.retailer.toString()
-                findViewById<TextView>(R.id.textViewProductFsd).text = displayDecimal(item.fsd(),
+                findViewById<TextView>(R.id.textViewProductFsd).text = displayDecimal(
+                    item.fsd(),
                     R.string.shots
                 )
-                findViewById<TextView>(R.id.textViewProductPpl).text = displayDecimal(item.unit_price,
+                findViewById<TextView>(R.id.textViewProductPpl).text = displayDecimal(
+                    item.unitPrice,
                     R.string.ppl
                 )
-                findViewById<TextView>(R.id.textViewProductPps).text = displayDecimal(item.pps(),
+                findViewById<TextView>(R.id.textViewProductPps).text = displayDecimal(
+                    item.pps(),
                     R.string.aer
                 )
-                findViewById<TextView>(R.id.textViewProductSubcategory).text = from(item.subcategory_id).toString()
+                findViewById<TextView>(R.id.textViewProductSubcategory).text =
+                    from(item.subcategoryId).toString()
                 findViewById<ImageView>(R.id.imageViewProduct).setImageResource(R.drawable.ic_baseline_wine_bar_24)
                 findViewById<ImageView>(R.id.imageViewProduct).setImageBitmap(imageRepository.getFromMemoryOrMiss(item.img))
                 findViewById<TextView>(R.id.textViewProductOwned).text = totalCabinetRepository.selectedCabinet?.containedAmount(item)?.show(settings)
@@ -96,7 +100,9 @@ class ProductAdapter(
             else -> null
         }
         totalCabinetRepository.addOrModifyToSelected(item.id, amount)
-        val displayAmount = amount?.let{UnitType.ml.displayInDesiredUnit(it.toDouble(), settings.prefUnit)}?: "Inf"
+        val displayAmount =
+            amount?.let { UnitType.Ml.displayInDesiredUnit(it.toDouble(), settings.prefUnit) }
+                ?: "Inf"
         Toast.makeText(activity.baseContext, "Added $displayAmount of ${item.name}", Toast.LENGTH_SHORT).show()
     }
 

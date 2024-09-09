@@ -25,17 +25,22 @@ class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings
         fun bind(i: DrinkTotal, owned:List<GeneralIngredient>, settings: Settings){
             val item = i.drink
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewName).text = item.name
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(item.standard_servings,
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(
+                item.standardServings,
                 R.string.shots
             )
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewPrice).text = displayDecimal(item.price(settings),
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewPrice).text = displayDecimal(
+                item.price(settings),
                 R.string.price
             )
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAbv).text = displayDecimal(item.abv_average,
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAbv).text = displayDecimal(
+                item.abvAvg,
                 R.string.abv
             )
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewVolume).text = UnitType.ml.displayInDesiredUnit(i.drink.total_volume, settings.prefUnit)
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewTags).text = item.displayTagList()
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewVolume).text =
+                UnitType.Ml.displayInDesiredUnit(i.drink.volume, settings.prefUnit)
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewTags).text =
+                item.displayTagList()
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAer).text = displayDecimal(item.pricePerServing(settings),
                 R.string.aer
             )

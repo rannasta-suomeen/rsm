@@ -8,7 +8,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.UnitType
 
-val DRINK_VOLUME_UNIT = UnitType.ml
+val DRINK_VOLUME_UNIT = UnitType.Ml
 
 class Settings(activity: Activity) {
     private val jackson = jacksonObjectMapper()
@@ -26,11 +26,11 @@ class Settings(activity: Activity) {
     var prefUnit: UnitType
         get() {
             val t = preferences.getString(UNIT, "cl")
-            try {
-                return jackson.readValue(t, UnitType::class.java)
-            } catch (e: Exception){
+            return try {
+                jackson.readValue(t, UnitType::class.java)
+            } catch (e: Exception) {
                 Log.d("Storage", "Encountered $e")
-                return UnitType.cl
+                UnitType.Cl
             }
         }
         set(value) {

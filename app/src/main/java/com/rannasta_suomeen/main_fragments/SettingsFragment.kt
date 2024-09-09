@@ -22,7 +22,7 @@ class SettingsFragment(private val settings: Settings): Fragment(R.layout.fragme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        spinnerAdapter.addAll(UnitType.kpl.listVolumeOptions().map { it.second })
+        spinnerAdapter.addAll(UnitType.Kpl.listVolumeOptions().map { it.second })
         setUpUi(view)
     }
 
@@ -31,7 +31,7 @@ class SettingsFragment(private val settings: Settings): Fragment(R.layout.fragme
             val spinner = findViewById<Spinner>(R.id.spinnerSelectUnit)
             spinner.adapter = spinnerAdapter
             spinner.onItemSelectedListener = this@SettingsFragment
-            val l = UnitType.kpl.listVolumeOptions()
+            val l = UnitType.Kpl.listVolumeOptions()
             spinner.setSelection(l.indexOf(l.find{ it.first == settings.prefUnit}))
             val switch = findViewById<SwitchCompat>(R.id.switchPreferAlko)
             switch.isChecked = settings.prefAlko
@@ -42,7 +42,7 @@ class SettingsFragment(private val settings: Settings): Fragment(R.layout.fragme
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-        settings.prefUnit = UnitType.kpl.listVolumeOptions()[p2].first
+        settings.prefUnit = UnitType.Kpl.listVolumeOptions()[p2].first
     }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {

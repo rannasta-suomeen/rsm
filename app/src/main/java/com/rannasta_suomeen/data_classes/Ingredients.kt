@@ -1,5 +1,6 @@
 package com.rannasta_suomeen.data_classes
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.rannasta_suomeen.storage.Settings
@@ -57,47 +58,59 @@ data class GeneralIngredient(
     }
 }
 
-enum class IngredientType{
-    light_alcohol_product,
-    strong_alcohol_product,
-    common,
-    mixer,
-    grocery,
+enum class IngredientType {
+    @JsonProperty("light_alcohol_product")
+    LightAlcoholProduct,
+
+    @JsonProperty("strong_alcohol_product")
+    StrongAlcoholProduct,
+
+    @JsonProperty("common")
+    Common,
+
+    @JsonProperty("mixer")
+    Mixer,
+
+    @JsonProperty("grocery")
+    Grocery,
 }
 
 /**
  * Kotlin equivalent of the rs class IngredientsForDrink
  */
 data class IngredientsForDrink(
-    val recipe_id: Int,
-    val recipe_parts: Array<RecipePartNoId>
+    @JsonProperty("recipe_id")
+    val recipeId: Int,
+    @JsonProperty("recipe_parts")
+    val recipeParts: Array<RecipePartNoId>
 ){
     /**
      * Kotlin equivalent of the rs class RecipePartNoId
      */
     data class RecipePartNoId(
-        val ingredient_id: Int,
+        @JsonProperty("ingredient_id")
+        val ingredientId: Int,
         val amount: Int,
         val name: String,
         val unit: UnitType,
     ){
         fun toPointer(generalIngredients: List<GeneralIngredient>): IngredientsForDrinkPointer.RecipePartPointer?{
-            val ingredient = generalIngredients.find { it.id == ingredient_id }
+            val ingredient = generalIngredients.find { it.id == ingredientId }
             return ingredient?.let { IngredientsForDrinkPointer.RecipePartPointer(it, amount, name, unit) }
         }
     }
     fun toPointer(generalIngredients: List<GeneralIngredient>): IngredientsForDrinkPointer?{
-        val list = recipe_parts.map { it.toPointer(generalIngredients) }
+        val list = recipeParts.map { it.toPointer(generalIngredients) }
         return if (list.contains(null)){
             null
         } else {
-            IngredientsForDrinkPointer(recipe_id, list.map { it!! }.toTypedArray())
+            IngredientsForDrinkPointer(recipeId, list.map { it!! }.toTypedArray())
         }
     }
 }
 
 data class IngredientsForDrinkPointer(
-    val recipe_id: Int,
+    val recipeId: Int,
     val recipeParts: Array<RecipePartPointer>
 ){
     data class RecipePartPointer(
@@ -107,50 +120,60 @@ data class IngredientsForDrinkPointer(
         val unit: UnitType
     ){
         fun price(s: Settings): Double{
-            return when (unit){
-                UnitType.kpl -> amount*ingredient.price(s)
-                else -> ingredient.price(s)*unit.convert(amount,UnitType.cl)/100
+            return when (unit) {
+                UnitType.Kpl -> amount * ingredient.price(s)
+                else -> ingredient.price(s) * unit.convert(amount, UnitType.Cl) / 100
             }
 
         }
     }
 }
 
-// TODO: Rename using normal names and json @Annotations
-enum class UnitType{
-    cl,
-    ml,
-    oz,
-    kpl,
-    tl,
-    dash;
+enum class UnitType {
+    @JsonProperty("cl")
+    Cl,
 
-    fun convert(amount: Int, newUnit: UnitType): Double{
+    @JsonProperty("ml")
+    Ml,
+
+    @JsonProperty("oz")
+    Oz,
+
+    @JsonProperty("kpl")
+    Kpl,
+
+    @JsonProperty("tl")
+    Tl,
+
+    @JsonProperty("dash")
+    Dash;
+
+    fun convert(amount: Int, newUnit: UnitType): Double {
         val ml = this.convertToMl(amount.toDouble())
         return newUnit.convertFromMl(ml)
     }
 
-    fun convert(amount: Double, newUnit: UnitType): Double{
+    fun convert(amount: Double, newUnit: UnitType): Double {
         val ml = this.convertToMl(amount)
         return newUnit.convertFromMl(ml)
     }
 
     fun displayInDesiredUnit(amount: Double, desiredUnit: UnitType): String{
-        if (this == kpl) {
+        if (this == Kpl) {
             return "$amount kpl"
         }
         val converted = this.convert(amount, desiredUnit)
-        val unit = when (desiredUnit){
-            cl -> "cl"
-            ml -> "ml"
-            oz -> "oz"
-            kpl -> throw IllegalArgumentException("Unreachable")
-            tl -> "tl"
-            dash -> throw IllegalArgumentException("Unreachable")
+        val unit = when (desiredUnit) {
+            Cl -> "cl"
+            Ml -> "ml"
+            Oz -> "oz"
+            Kpl -> throw IllegalArgumentException("Unreachable")
+            Tl -> "tl"
+            Dash -> throw IllegalArgumentException("Unreachable")
         }
 
         // ml does not need to display decimals
-        return if (desiredUnit == ml){
+        return if (desiredUnit == Ml) {
             String.format("%d $unit", converted.roundToInt())
         } else {
             String.format("%.1f $unit", converted)
@@ -158,40 +181,42 @@ enum class UnitType{
     }
 
     private fun convertToMl(amount: Double): Double{
-        return when (this){
-            cl -> amount*10
-            ml -> amount
-            oz -> 29.57352956*amount
-            kpl -> throw IllegalArgumentException("Cant convert Kpl to ml")
-            tl -> 15*amount
-            dash -> 0.625 * amount
+        return when (this) {
+            Cl -> amount * 10
+            Ml -> amount
+            Oz -> 29.57352956 * amount
+            Kpl -> throw IllegalArgumentException("Cant convert Kpl to ml")
+            Tl -> 15 * amount
+            Dash -> 0.625 * amount
         }
     }
 
     private fun convertFromMl(amount: Double): Double{
-        return when (this){
-            cl -> amount / 10
-            ml -> amount
-            oz -> 0.03381402270*amount
-            kpl -> throw IllegalArgumentException("Cant convert ml to kpl")
-            tl -> 0.06666666666*amount
-            dash -> 1.6*amount
+        return when (this) {
+            Cl -> amount / 10
+            Ml -> amount
+            Oz -> 0.03381402270 * amount
+            Kpl -> throw IllegalArgumentException("Cant convert ml to kpl")
+            Tl -> 0.06666666666 * amount
+            Dash -> 1.6 * amount
         }
     }
 
     fun listVolumeOptions(): List<Pair<UnitType, String>>{
-        return listOf(Pair(cl, "cl"), Pair(ml, "ml"), Pair(oz, "oz"), Pair(tl, "tl"))
+        return listOf(Pair(Cl, "cl"), Pair(Ml, "ml"), Pair(Oz, "oz"), Pair(Tl, "tl"))
     }
 }
 
 class IngredientProductFilter(
-    val ingredient_id: Int,
-    val product_ids: Array<Int>,
+    @JsonProperty("ingredient_id")
+    val ingredientId: Int,
+    @JsonProperty("product_ids")
+    val productIds: Array<Int>,
 ){
-    fun toPointer(ingredientList: HashMap<Int, GeneralIngredient>,productList: HashMap<Int, Product>): IngredientProductFilterPointer?{
-        val ingredient = ingredientList[ingredient_id]
-        val products = product_ids.map{ productList[it] }
-        if (ingredient != null && !products.contains(null)){
+    fun toPointer(ingredientList: HashMap<Int, GeneralIngredient>,productList: HashMap<Int, Product>): IngredientProductFilterPointer? {
+        val ingredient = ingredientList[ingredientId]
+        val products = productIds.map { productList[it] }
+        if (ingredient != null && !products.contains(null)) {
             return IngredientProductFilterPointer(ingredient, products.map { it!! })
         }
         return null
