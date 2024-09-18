@@ -160,7 +160,7 @@ enum class UnitType {
 
     fun displayInDesiredUnit(amount: Double, desiredUnit: UnitType): String{
         if (this == Kpl) {
-            return "$amount kpl"
+            return String.format("%.1f kpl", amount)
         }
         val converted = this.convert(amount, desiredUnit)
         val unit = when (desiredUnit) {
