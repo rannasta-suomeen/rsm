@@ -23,13 +23,14 @@ import com.rannasta_suomeen.popup_windows.PopupCabinetShare
 import com.rannasta_suomeen.popup_windows.PopupExportProducts
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.Settings
+import com.rannasta_suomeen.storage.ShoppingCart
 import com.rannasta_suomeen.storage.TotalCabinetRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
-class CabinetFragment(private val activity: Activity, private val imageRepository: ImageRepository, private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository): Fragment(R.layout.fragment_cabinets), AdapterView.OnItemSelectedListener{
+class CabinetFragment(private val activity: Activity, private val imageRepository: ImageRepository, private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository, private val shoppingCart: ShoppingCart): Fragment(R.layout.fragment_cabinets), AdapterView.OnItemSelectedListener{
 
     private lateinit var adapter: CabinetProductAdapter
     private var cabinetList = listOf<Cabinet>()

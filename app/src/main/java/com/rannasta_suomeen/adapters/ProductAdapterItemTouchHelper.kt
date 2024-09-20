@@ -11,7 +11,7 @@ class ProductCallBack(private val recyclerView: ProductAdapter, color: Int, cont
     RsmCallback(
         color,
         context,
-        R.drawable.ic_baseline_loop_24,
+        R.drawable.ic_baseline_storefront_24,
         R.drawable.ic_baseline_wine_bar_24
     ) {
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {

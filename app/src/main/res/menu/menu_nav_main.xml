@@ -12,6 +12,9 @@
             android:title="@string/charts"
             android:id="@+id/menuMainCharts"
             />
+        <item
+            android:title="@string/shopping_cart"
+            android:id="@+id/menuMainCart"/>
     </group>
     <group android:enabled="true">
         <item

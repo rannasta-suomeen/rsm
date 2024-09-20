@@ -12,11 +12,13 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Product
+import com.rannasta_suomeen.data_classes.ShoppingCartItem
 import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.data_classes.from
 import com.rannasta_suomeen.popup_windows.PopupProductAdd
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.Settings
+import com.rannasta_suomeen.storage.ShoppingCart
 import com.rannasta_suomeen.storage.TotalCabinetRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +28,7 @@ import kotlin.math.roundToInt
 
 class ProductAdapter(
     private val activity: Activity,
-    private val totalCabinetRepository: TotalCabinetRepository, private val imageRepository: ImageRepository, private val settings: Settings): RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
+    private val totalCabinetRepository: TotalCabinetRepository, private val imageRepository: ImageRepository, private val settings: Settings, private val shoppingCart: ShoppingCart): RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
     private var items: List<Product> = listOf()
 
@@ -94,16 +96,20 @@ class ProductAdapter(
 
     fun notifySwipe(viewHolder: ProductViewHolder, direction: Int){
         val item = items[viewHolder.adapterPosition]
-        val amount = when (direction){
-            ItemTouchHelper.RIGHT -> null
-            ItemTouchHelper.LEFT -> item.volumeMl().roundToInt()
+        when (direction){
+            ItemTouchHelper.RIGHT -> {
+                shoppingCart.addItem(ShoppingCartItem(item,1.0))
+            }
+            ItemTouchHelper.LEFT -> {
+                val amount = item.volumeMl().roundToInt()
+                totalCabinetRepository.addOrModifyToSelected(item.id, amount)
+                val displayAmount =
+                    amount.let { UnitType.Ml.displayInDesiredUnit(it.toDouble(), settings.prefUnit) }
+                Toast.makeText(activity.baseContext, "Added $displayAmount of ${item.name}", Toast.LENGTH_SHORT).show()
+            }
             else -> null
         }
-        totalCabinetRepository.addOrModifyToSelected(item.id, amount)
-        val displayAmount =
-            amount?.let { UnitType.Ml.displayInDesiredUnit(it.toDouble(), settings.prefUnit) }
-                ?: "Inf"
-        Toast.makeText(activity.baseContext, "Added $displayAmount of ${item.name}", Toast.LENGTH_SHORT).show()
+
     }
 
     private fun submitImageFound(url: String){

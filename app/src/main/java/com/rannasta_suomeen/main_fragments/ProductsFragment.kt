@@ -22,12 +22,13 @@ import com.rannasta_suomeen.popup_windows.PopupFilter
 import com.rannasta_suomeen.productRepository
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.Settings
+import com.rannasta_suomeen.storage.ShoppingCart
 import com.rannasta_suomeen.storage.TotalCabinetRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ProductsFragment(private val activity: Activity, private val imageRepository: ImageRepository,private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository) : Fragment(R.layout.fragment_products), AdapterView.OnItemSelectedListener {
+class ProductsFragment(private val activity: Activity, private val imageRepository: ImageRepository,private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository, private val shoppingCart: ShoppingCart) : Fragment(R.layout.fragment_products), AdapterView.OnItemSelectedListener {
 
     private lateinit var productAdapter: ProductAdapter
     private var productListFull = listOf<Product>().sortedBy {it.name}
@@ -39,7 +40,7 @@ class ProductsFragment(private val activity: Activity, private val imageReposito
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        productAdapter = ProductAdapter(activity, totalCabinetRepository, imageRepository, settings)
+        productAdapter = ProductAdapter(activity, totalCabinetRepository, imageRepository, settings, shoppingCart)
         filterMenu = PopupFilter(activity, ::updateSelection)
 
         CoroutineScope(Dispatchers.IO).launch {

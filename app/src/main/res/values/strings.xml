@@ -26,6 +26,8 @@
     <string name="no_cabinet_selected">No cabinet selected</string>
     <string name="new_s">New</string>
     <string name="move_products">Move products</string>
+    <string name="shopping_cart">Shopping cart</string>
+    <string name="buy">Buy</string>
     <string-array name="drinks_possible_sort">
         <item>Name</item>
         <item>Abv</item>

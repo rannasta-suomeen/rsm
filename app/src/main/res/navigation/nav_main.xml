@@ -55,5 +55,9 @@
         android:id="@+id/fragmentCharts"
         android:name="com.rannasta_suomeen.main_fragments.ChartsFragment">
     </fragment>
+    <fragment
+        android:id="@+id/fragmentCart"
+        android:name="com.rannasta_suomeen.main_fragments.ShoppingCartFragment">
+    </fragment>
 
 </navigation>

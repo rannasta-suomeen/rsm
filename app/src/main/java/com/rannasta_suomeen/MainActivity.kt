@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var imageRepository: ImageRepository
     private lateinit var totalCabinetRepository: TotalCabinetRepository
     private lateinit var settings: Settings
+    private lateinit var shoppingCart: ShoppingCart
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val target = when(item.itemId){
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.menuMainDrinks -> R.id.fragmentDrinks
             R.id.menuMainSettings -> R.id.fragmentSettings
             R.id.menuMainStorage -> R.id.fragmentCabinets
+            R.id.menuMainCart -> R.id.fragmentCart
             else -> throw IllegalArgumentException("Attempted to navigate to ${item.itemId} witch is not possible")
         }
         navController.navigate(target)
@@ -57,7 +59,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         totalCabinetRepository = TotalCabinetRepository(applicationContext, settings)
         encryptedStorage = EncryptedStorage(applicationContext)
         imageRepository = ImageRepository(applicationContext)
-        supportFragmentManager.fragmentFactory = FragmentFactory(this, imageRepository, settings, totalCabinetRepository)
+        shoppingCart = ShoppingCart(applicationContext)
+        supportFragmentManager.fragmentFactory = FragmentFactory(this, imageRepository, settings, totalCabinetRepository, shoppingCart)
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.layout_activity_main)
