@@ -19,6 +19,7 @@ import com.rannasta_suomeen.data_classes.from
 import com.rannasta_suomeen.popup_windows.PopupProductAdd
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.Settings
+import com.rannasta_suomeen.storage.ShoppingCart
 import com.rannasta_suomeen.storage.TotalCabinetRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,7 @@ import java.util.*
 
 class CabinetProductAdapter(
     private val activity: Activity,
-    private val totalCabinetRepository: TotalCabinetRepository, private val imageRepository: ImageRepository, private val settings: Settings): RecyclerView.Adapter<CabinetProductAdapter.ProductViewHolder>() {
+    private val totalCabinetRepository: TotalCabinetRepository, private val imageRepository: ImageRepository, private val settings: Settings,private val shoppingCart: ShoppingCart): RecyclerView.Adapter<CabinetProductAdapter.ProductViewHolder>() {
 
     private var items: List<CabinetProduct> = listOf()
 
@@ -44,6 +45,7 @@ class CabinetProductAdapter(
         private val imageRepository: ImageRepository,
         private val totalCabinetRepository: TotalCabinetRepository,
         private var activity: Activity,
+        private val shoppingCart: ShoppingCart,
         ):RecyclerView.ViewHolder(itemView){
         fun bind(item: CabinetProduct, settings: Settings){
             with(itemView){
@@ -83,7 +85,7 @@ class CabinetProductAdapter(
                 }
 
                 itemView.setOnClickListener {
-                    val popup = PopupProductAdd(item.product, totalCabinetRepository,imageRepository, activity, settings)
+                    val popup = PopupProductAdd(item.product, totalCabinetRepository,imageRepository, activity, settings, shoppingCart)
                     popup.show(it)
                 }
                 itemView.setOnLongClickListener {
@@ -154,7 +156,7 @@ class CabinetProductAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val layout = R.layout.item_product
         val itemView = LayoutInflater.from(parent.context).inflate(layout, parent,false)
-        return ProductViewHolder(itemView, imageRepository, totalCabinetRepository, activity)
+        return ProductViewHolder(itemView, imageRepository, totalCabinetRepository, activity, shoppingCart)
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {

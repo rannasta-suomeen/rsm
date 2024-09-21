@@ -40,7 +40,7 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("Cabinets", "Created Again")
         super.onCreate(savedInstanceState)
-        adapter = CabinetProductAdapter(activity, totalCabinetRepository, imageRepository, settings)
+        adapter = CabinetProductAdapter(activity, totalCabinetRepository, imageRepository, settings, shoppingCart)
         spinnerAdapter = ArrayAdapter(requireContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item)
     }
 

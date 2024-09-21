@@ -41,6 +41,7 @@ class ShoppingCartAdapter(
         private val imageRepository: ImageRepository,
         private val totalCabinetRepository: TotalCabinetRepository,
         private val activity: Activity,
+        private val shoppingCart: ShoppingCart,
         ):RecyclerView.ViewHolder(itemView){
         fun bind(item: ShoppingCartItem, settings: Settings, callback: (ShoppingCartItem) -> Unit, deleteCallBack: (ShoppingCartItem) -> Unit){
             with(itemView){
@@ -61,7 +62,7 @@ class ShoppingCartAdapter(
                     true
                 }
                 setOnClickListener {
-                    val popup = PopupProductAdd(item.product,totalCabinetRepository, imageRepository, activity, settings)
+                    val popup = PopupProductAdd(item.product,totalCabinetRepository, imageRepository, activity, settings, shoppingCart)
                     popup.show(this)
                 }
             }
@@ -94,7 +95,7 @@ class ShoppingCartAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val layout = R.layout.item_product_shopping
         val itemView = LayoutInflater.from(parent.context).inflate(layout, parent,false)
-        return ProductViewHolder(itemView, imageRepository,totalCabinetRepository, activity)
+        return ProductViewHolder(itemView, imageRepository,totalCabinetRepository, activity, shoppingCart)
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {

@@ -45,6 +45,7 @@ class ProductAdapter(
         private val imageRepository: ImageRepository,
         private val totalCabinetRepository: TotalCabinetRepository,
         private var activity: Activity,
+        private val shoppingCart: ShoppingCart
         ):RecyclerView.ViewHolder(itemView){
         fun bind(item: Product, settings: Settings){
             with(itemView){
@@ -76,7 +77,7 @@ class ProductAdapter(
                 findViewById<TextView>(R.id.textViewProductOwned).text = totalCabinetRepository.selectedCabinet?.containedAmount(item)?.show(settings)
 
                 itemView.setOnClickListener {
-                    val popup = PopupProductAdd(item, totalCabinetRepository,imageRepository, activity, settings)
+                    val popup = PopupProductAdd(item, totalCabinetRepository,imageRepository, activity, settings, shoppingCart)
                     popup.show(it)
                 }
             }
@@ -122,7 +123,7 @@ class ProductAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val layout = R.layout.item_product
         val itemView = LayoutInflater.from(parent.context).inflate(layout, parent,false)
-        return ProductViewHolder(itemView, imageRepository, totalCabinetRepository, activity)
+        return ProductViewHolder(itemView, imageRepository, totalCabinetRepository, activity, shoppingCart)
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {

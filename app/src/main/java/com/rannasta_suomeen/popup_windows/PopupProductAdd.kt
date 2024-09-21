@@ -6,9 +6,11 @@ import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Product
+import com.rannasta_suomeen.data_classes.ShoppingCartItem
 import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.Settings
+import com.rannasta_suomeen.storage.ShoppingCart
 import com.rannasta_suomeen.storage.TotalCabinetRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +21,8 @@ class PopupProductAdd(private val product: Product,
                       private val repo: TotalCabinetRepository,
                       private val imgRepo :ImageRepository,
                       activity: Activity,
-                      private val settings: Settings):PopupRsm(activity, R.layout.popup_add_to_cabinet, root = null) {
+                      private val settings: Settings,
+                      private val shoppingCart: ShoppingCart, ):PopupRsm(activity, R.layout.popup_add_to_cabinet, root = null) {
 
     override fun bind(view: View) {
         with(view) {
@@ -58,9 +61,25 @@ class PopupProductAdd(private val product: Product,
                     }
                 }
             }
+
+            findViewById<Button>(R.id.buttonAddToCart).setOnClickListener {
+                val t = parseVolume(edv.toString())
+                when(t.isSuccess){
+                    true -> {
+                        addToShoppingCart(product,t.getOrThrow()/product.volumeMl())
+                        window.dismiss()
+                    }
+                    false -> Toast.makeText(context, "$edv is not a valid volume", Toast.LENGTH_SHORT).show()
+                }
+            }
+
             findViewById<TextView>(R.id.textViewInvOwned).text = repo.selectedCabinet?.containedAmount(product)
                 ?.show(settings)
         }
+    }
+
+    private fun addToShoppingCart(product: Product, amount: Double){
+        shoppingCart.addItem(ShoppingCartItem(product, amount))
     }
 
     private fun parseVolume(input: String): Result<Int>{
