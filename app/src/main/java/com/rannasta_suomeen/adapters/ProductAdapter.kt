@@ -99,7 +99,7 @@ class ProductAdapter(
         val item = items[viewHolder.adapterPosition]
         when (direction){
             ItemTouchHelper.RIGHT -> {
-                shoppingCart.addItem(ShoppingCartItem(item,1.0))
+                shoppingCart.addItem(ShoppingCartItem(item,1))
             }
             ItemTouchHelper.LEFT -> {
                 val amount = item.volumeMl().roundToInt()
@@ -108,9 +108,7 @@ class ProductAdapter(
                     amount.let { UnitType.Ml.displayInDesiredUnit(it.toDouble(), settings.prefUnit) }
                 Toast.makeText(activity.baseContext, "Added $displayAmount of ${item.name}", Toast.LENGTH_SHORT).show()
             }
-            else -> null
         }
-
     }
 
     private fun submitImageFound(url: String){

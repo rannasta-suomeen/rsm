@@ -117,7 +117,7 @@ class ProductToIngredientRepository(context: Context): GenericRepository<Ingredi
     override val type = Array<IngredientProductFilter>::class.java
 }
 
-class CabinetRepository(context: Context){
+internal class CabinetRepository(context: Context){
     private var state: MutableList<CabinetCompact> = mutableListOf()
     val stateFlow: MutableSharedFlow<List<CabinetCompact>> = MutableSharedFlow(1)
     private var serverState: List<CabinetCompact> = listOf()
@@ -366,19 +366,21 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
             }
             t
         })
+        selectedCabinet?.products?.let { ownedIngredientFlow.emit(productsToIngredients(it)) }
+    }
+
+    fun productsToIngredients(products: List<CabinetProduct>):List<GeneralIngredient>{
         val ownedByFilter = generalIngredientList.toList().map { it.second }.filter {
-            it.use_static_filter_c && selectedCabinet?.products?.any { p -> p.product.categoryId == it.static_filter_c && p.usable } == true
-                    || it.use_static_filter && selectedCabinet?.products?.any { p -> p.product.subcategoryId == it.static_filter && p.usable } == true
+            it.use_static_filter_c && products.any { p -> p.product.categoryId == it.static_filter_c && p.usable }
+                    || it.use_static_filter && products.any { p -> p.product.subcategoryId == it.static_filter && p.usable }
         }.toMutableList()
         val ownedById = productIngredientListPointer.filter {
             it.products.find { p->
-                selectedCabinet?.products?.find{ it.product.id == p.id && it.usable} != null
+                products.find{ it.product.id == p.id && it.usable} != null
             } != null
         }.map { it.ingredient }
         ownedByFilter.addAll(ownedById)
-        ownedIngredientFlow.emit(
-            ownedByFilter
-        )
+        return ownedByFilter.toList()
     }
 
     fun createCabinet(name: String) {

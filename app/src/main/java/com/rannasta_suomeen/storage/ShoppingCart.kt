@@ -76,6 +76,22 @@ class ShoppingCart(context: Context) {
         return getItems().sumOf { it.volume(desiredUnit)}
     }
 
+    fun amountOfShots():Double{
+        return getItems().sumOf { it.amountOfShots() }
+    }
+
+    fun amountOfItems():Int{
+        return getItems().sumOf { it.amount }
+    }
+
+    fun pps():Double{
+        return amountOfShots()/totalPrice()
+    }
+
+    fun ppl():Double{
+        return totalPrice()/totalVolume(UnitType.L)
+    }
+
     fun removeItemAt(index: Int){
         scope.launch {
         rwLock.writeLock().lock()

@@ -47,7 +47,7 @@ class ShoppingCartAdapter(
             with(itemView){
                 findViewById<TextView>(R.id.textViewProductName).text = item.product.name
                 findViewById<TextView>(R.id.textViewRetailer).text = item.product.retailer.toString()
-                findViewById<TextView>(R.id.textViewshoppingKpl).text = displayDecimal(item.amount,R.string.kpl)
+                findViewById<TextView>(R.id.textViewshoppingKpl).text = resources.getString(R.string.kpl_int, item.amount)
                 findViewById<TextView>(R.id.textViewShoppingVolume).text = settings.prefUnit.displayInDesiredUnit(item.volume(settings.prefUnit),settings.prefUnit)
                 findViewById<TextView>(R.id.textViewShoppingPrice).text = displayDecimal(item.price(),R.string.price)
                 findViewById<TextView>(R.id.textViewShoppingPps).text = displayDecimal(item.product.pps(),R.string.aer)

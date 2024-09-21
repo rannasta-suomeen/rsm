@@ -51,6 +51,7 @@ data class CabinetProductCompact(
 data class CabinetProduct(
     val id: Int,
     val product: Product,
+    // TODO: Remove this useless field
     private val productId: Int,
     val ownerId: Int,
     var amountMl: Int?,

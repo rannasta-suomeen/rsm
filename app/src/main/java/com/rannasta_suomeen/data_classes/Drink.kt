@@ -129,6 +129,16 @@ data class DrinkTotal(val drink: DrinkInfo, val ingredients: IngredientsForDrink
                 !owned.contains(it)
             }
     }
+
+    fun canMakeAlcoholic(owned: List<GeneralIngredient>): Boolean{
+        return missingIngredientsAlcoholic(owned) == 0
+    }
+    fun canMakeNonAlcoholic(owned: List<GeneralIngredient>): Boolean{
+        return missingIngredientsNonAlcoholic(owned) == 0
+    }
+    fun canMakeStrict(owned: List<GeneralIngredient>):Boolean{
+        return canMakeAlcoholic(owned) && canMakeNonAlcoholic(owned)
+    }
 }
 
 fun sortDrinkPreview(list: List<DrinkTotal>, type: DrinkInfo.SortTypes, asc: Boolean, settings: Settings): List<DrinkTotal>{

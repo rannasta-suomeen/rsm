@@ -66,7 +66,7 @@ class PopupProductAdd(private val product: Product,
                 val t = parseVolume(edv.toString())
                 when(t.isSuccess){
                     true -> {
-                        addToShoppingCart(product,t.getOrThrow()/product.volumeMl())
+                        addToShoppingCart(product,t.getOrThrow()/product.volumeMl().ceil())
                         window.dismiss()
                     }
                     false -> Toast.makeText(context, "$edv is not a valid volume", Toast.LENGTH_SHORT).show()
@@ -78,7 +78,16 @@ class PopupProductAdd(private val product: Product,
         }
     }
 
-    private fun addToShoppingCart(product: Product, amount: Double){
+    private fun Double.ceil():Int{
+        val t = this.roundToInt()
+        return if (t >= this){
+            t
+        } else {
+            t+1
+        }
+    }
+
+    private fun addToShoppingCart(product: Product, amount: Int){
         shoppingCart.addItem(ShoppingCartItem(product, amount))
     }
 

@@ -11,6 +11,7 @@
     <string name="aer">%1$s €/fsd</string>
     <string name="ppl">%1$s €/l</string>
     <string name="kpl">%1s kpl</string>
+    <string name="kpl_int">%1d kpl</string>
     <string name="abv">%1$s%%</string>
     <string name="shots">%1$s fsd</string>
     <string name="cocktail">Cocktail</string>
@@ -28,6 +29,8 @@
     <string name="move_products">Move products</string>
     <string name="shopping_cart">Shopping cart</string>
     <string name="buy">Buy</string>
+    <string name="close">Close</string>
+    <string name="n_new_drinks">"%1$d new drinks"</string>
     <string-array name="drinks_possible_sort">
         <item>Name</item>
         <item>Abv</item>

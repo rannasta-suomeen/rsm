@@ -27,8 +27,7 @@ internal class NetworkControllerTest {
     @Test
 
     fun getCabinetsTotal() = runTest {
-        val dispatcher = StandardTestDispatcher(testScheduler)
-        val res = NetworkController.getCabinetsTotal(Unit, dispatcher)
+        val res = NetworkController.getCabinets(Unit)
             assertEquals(res.isSuccess, true)
     }
     @OptIn(ExperimentalCoroutinesApi::class)
