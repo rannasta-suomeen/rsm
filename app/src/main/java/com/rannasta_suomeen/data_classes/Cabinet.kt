@@ -44,19 +44,18 @@ data class CabinetProductCompact(
     var usable: Boolean,
 ){
     fun toCabinetProduct(productMap: HashMap<Int, Product>): CabinetProduct?{
-        return productMap[productId]?.let { CabinetProduct(id,it,productId,ownerId, amountMl, usable) }
+        return productMap[productId]?.let { CabinetProduct(id,it,ownerId, amountMl, usable) }
     }
 }
 
 data class CabinetProduct(
     val id: Int,
     val product: Product,
-    // TODO: Remove this useless field
-    private val productId: Int,
     val ownerId: Int,
     var amountMl: Int?,
     var usable: Boolean,
 ){
+    var productId = product.id
     fun toCompact(): CabinetProductCompact{
         return CabinetProductCompact(id, productId, ownerId, amountMl, usable)
     }

@@ -53,7 +53,7 @@ class PopupShoppingCartInfo(activity: Activity,private val shoppingCart: Shoppin
     }
 
     private fun newDrinksFromEither(v: View): String{
-        return v.resources.getString(R.string.n_new_drinks,newDrinksWithThis(shoppingCart.getItems().map { CabinetProduct(0,it.product,it.product.id,0,null,true) }).size)
+        return v.resources.getString(R.string.n_new_drinks,newDrinksWithThis(shoppingCart.getItems().map { CabinetProduct(0,it.product,0,null,true) }).size)
     }
 
     private fun newDrinksWithThis(newProducts: List<CabinetProduct>):List<DrinkTotal>{
