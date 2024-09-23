@@ -11,6 +11,6 @@ data class ShoppingCartItem(
         return UnitType.Cl.convert(this.product.volumeCl()*this.amount,desiredUnit)
     }
     fun amountOfShots():Double{
-        return volume(UnitType.Cl)*product.abv/1.6
+        return volume(UnitType.Cl)*product.abv/160
     }
 }

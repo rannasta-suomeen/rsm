@@ -8,6 +8,7 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.CabinetProduct
 import com.rannasta_suomeen.data_classes.DrinkTotal
 import com.rannasta_suomeen.data_classes.GeneralIngredient
+import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.displayDecimal
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.ShoppingCart
@@ -23,8 +24,8 @@ class PopupShoppingCartInfo(activity: Activity,private val shoppingCart: Shoppin
     override fun bind(view: View) {
         with(view){
             findViewById<TextView>(R.id.textViewShoppingCartPrice).text = displayDecimal(shoppingCart.totalPrice(),R.string.price)
-            findViewById<TextView>(R.id.textViewShoppingCartVolume).text = displayDecimal(shoppingCart.totalVolume(settings.prefUnit),R.string.price)
-            findViewById<TextView>(R.id.textViewShoppingPps).text = displayDecimal(shoppingCart.pps(),R.string.aer)
+            findViewById<TextView>(R.id.textViewShoppingCartVolume).text = UnitType.Ml.displayInDesiredUnit(shoppingCart.totalVolume(UnitType.Ml), settings.prefUnit)
+            findViewById<TextView>(R.id.textViewShoppingCartPps).text = displayDecimal(shoppingCart.pps(),R.string.aer)
             findViewById<TextView>(R.id.textViewShoppingCartItems).text = resources.getString(R.string.kpl_int,shoppingCart.amountOfItems())
             findViewById<TextView>(R.id.textViewShoppingCartShots).text = displayDecimal(shoppingCart.amountOfShots(),R.string.shots)
             val newDrinksText = findViewById<TextView>(R.id.textViewShoppingCartNewDrinks)

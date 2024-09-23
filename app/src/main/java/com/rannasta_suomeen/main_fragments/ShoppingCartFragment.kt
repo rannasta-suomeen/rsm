@@ -24,8 +24,9 @@ class ShoppingCartFragment(private val activity: Activity,private val shoppingCa
             val shoppingCartView = findViewById<RecyclerView>(R.id.recyclerViewShoppingCart)
             shoppingCartView.adapter = shoppingCartAdapter
             shoppingCartView.layoutManager = LinearLayoutManager(context)
-            findViewById<ImageButton>(R.id.imageButtonCartInfo).setOnClickListener {
-                PopupShoppingCartInfo(activity,shoppingCart, settings, totalCabinetRepository, totalDrinkRepository)
+            val buttomInfo = findViewById<ImageButton>(R.id.imageButtonCartInfo)
+            buttomInfo.setOnClickListener {
+                PopupShoppingCartInfo(activity,shoppingCart, settings, totalCabinetRepository, totalDrinkRepository).show(buttomInfo)
             }
         }
         super.onViewCreated(view, savedInstanceState)

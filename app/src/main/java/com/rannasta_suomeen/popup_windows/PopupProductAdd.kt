@@ -40,8 +40,7 @@ class PopupProductAdd(private val product: Product,
             findViewById<TextView>(R.id.textViewInvName).text = product.name
             val edv = findViewById<EditText>(R.id.editTextInvVolume).text
             edv.clear()
-            val showable = UnitType.Cl.displayInDesiredUnit(product.volumeCl(), settings.prefUnit)
-            edv.append(showable)
+            edv.append("1")
 
             findViewById<Button>(R.id.buttonInvCancel).setOnClickListener {
                 window.dismiss()

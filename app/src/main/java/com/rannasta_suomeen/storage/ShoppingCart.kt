@@ -85,7 +85,7 @@ class ShoppingCart(context: Context) {
     }
 
     fun pps():Double{
-        return amountOfShots()/totalPrice()
+        return totalPrice()/amountOfShots()
     }
 
     fun ppl():Double{
