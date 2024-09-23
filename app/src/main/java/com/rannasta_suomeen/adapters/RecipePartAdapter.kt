@@ -11,7 +11,7 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.IngredientsForDrinkPointer
 import com.rannasta_suomeen.storage.Settings
-import java.util.*
+import java.util.Locale
 
 class RecipePartAdapter(private var owned: List<GeneralIngredient>,private val settings: Settings): RecyclerView.Adapter<RecipePartAdapter.ProductViewHolder>() {
 

@@ -30,6 +30,7 @@ class Settings(activity: Activity) {
                 jackson.readValue(t, UnitType::class.java)
             } catch (e: Exception) {
                 Log.d("Storage", "Encountered $e")
+                prefUnit = UnitType.Cl
                 UnitType.Cl
             }
         }

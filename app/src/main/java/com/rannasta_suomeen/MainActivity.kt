@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.Gravity
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -20,10 +21,16 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.navigation.NavigationView
 import com.rannasta_suomeen.main_fragments.FragmentFactory
-import com.rannasta_suomeen.storage.*
+import com.rannasta_suomeen.storage.EncryptedStorage
+import com.rannasta_suomeen.storage.ImageRepository
+import com.rannasta_suomeen.storage.IngredientRepository
+import com.rannasta_suomeen.storage.ProductRepository
+import com.rannasta_suomeen.storage.Settings
+import com.rannasta_suomeen.storage.ShoppingCart
+import com.rannasta_suomeen.storage.TotalCabinetRepository
+import com.rannasta_suomeen.storage.TotalDrinkRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -88,11 +95,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         navView.bringToFront()
         navView.setNavigationItemSelectedListener(this)
-        setupToken()
+        setupToken(toolbar)
     }
 
-    private fun setupToken(){
-        val res = CoroutineScope(Dispatchers.IO).async {
+    private fun setupToken(root: View){
+        CoroutineScope(Dispatchers.IO).launch {
             val userName = encryptedStorage.userName
             val password = encryptedStorage.password
             if (userName != null && password != null) {
@@ -104,20 +111,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                     if (t is NetworkController.Error.CredentialsError){
                         runOnUiThread {
-                            login()
+                            login(root)
                         }
                     }
                 }
             } else{
                 runOnUiThread {
-                    login()
+                    login(root)
                 }
             }
         }
     }
 
     @SuppressLint("InflateParams")
-    private fun login(){
+    private fun login(root: View){
         val popUpView = layoutInflater.inflate(R.layout.popup_login, null)
         val popupWindow = PopupWindow(popUpView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         popupWindow.isFocusable = true
@@ -155,6 +162,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        popupWindow.showAtLocation(this.findViewById(R.id.toolbarMain), Gravity.TOP,0,0)
+        root.post {
+            popupWindow.showAtLocation(root, Gravity.TOP,0,0)
+        }
     }
 }

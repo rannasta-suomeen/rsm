@@ -2,7 +2,12 @@ package com.rannasta_suomeen.popup_windows
 
 import android.app.Activity
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors

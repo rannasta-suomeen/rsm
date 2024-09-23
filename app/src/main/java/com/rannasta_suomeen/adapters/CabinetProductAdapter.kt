@@ -24,7 +24,7 @@ import com.rannasta_suomeen.storage.TotalCabinetRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Locale
 
 class CabinetProductAdapter(
     private val activity: Activity,

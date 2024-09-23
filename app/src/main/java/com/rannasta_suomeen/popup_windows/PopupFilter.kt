@@ -9,7 +9,13 @@ import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AlertDialog
 import com.rannasta_suomeen.R
-import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.data_classes.DrinkTotal
+import com.rannasta_suomeen.data_classes.DrinkType
+import com.rannasta_suomeen.data_classes.GeneralIngredient
+import com.rannasta_suomeen.data_classes.Product
+import com.rannasta_suomeen.data_classes.Retailer
+import com.rannasta_suomeen.data_classes.Subcategory
+import com.rannasta_suomeen.data_classes.from
 import com.rannasta_suomeen.storage.Settings
 
 private val BASE_TAGS = listOf(R.string.cocktail,R.string.shot, R.string.punch, R.string.unmakeble, R.string.unmakebleGrocery, R.string.tagless)
