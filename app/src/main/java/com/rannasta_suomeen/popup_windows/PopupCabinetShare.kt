@@ -37,14 +37,14 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
                     val sum = cabinet.products.filter { it.ownerId == x.userId }.map {
                         it.estimatedFsd()
                     }.sum()
-                    return displayDecimal(sum, R.string.shots, view)
+                    return view.displayDecimal(sum, R.string.shots)
                 }
 
                 fun showMemberValue(x: CabinetMember, view: View):String{
                     val sum = cabinet.products.filter { it.ownerId == x.userId }.map {
                         it.estimatedPrice()
                     }.sum()
-                    return displayDecimal(sum, R.string.price, view)
+                    return view.displayDecimal(sum, R.string.price)
                 }
                 with(itemView){
                     findViewById<TextView>(R.id.textViewMemberName).text = item.userName
@@ -103,7 +103,7 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
             findViewById<TextView>(R.id.textViewCabinetCoverageMax).text = allDrinks.size.toString()
             val percent = (100*makeableDrinks.size)/allDrinks.size
             findViewById<ProgressBar>(R.id.progressBarCabinetCoverage).progress = percent
-            findViewById<TextView>(R.id.textViewCabinetCoveragePercent).text = percent.toString() + "%"
+            findViewById<TextView>(R.id.textViewCabinetCoveragePercent).text = resources.getString(R.string.percentage, percent)
         }
     }
 

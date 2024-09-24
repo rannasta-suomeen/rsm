@@ -31,6 +31,7 @@
     <string name="buy">Buy</string>
     <string name="close">Close</string>
     <string name="n_new_drinks">"%1$d new drinks"</string>
+    <string name="percentage">"%1$d%%"</string>
     <string-array name="drinks_possible_sort">
         <item>Name</item>
         <item>Abv</item>
