@@ -10,8 +10,8 @@
     <string name="volumeUnit">Volume[%1$s]</string>
     <string name="aer">%1$s €/fsd</string>
     <string name="ppl">%1$s €/l</string>
-    <string name="kpl">%1s kpl</string>
-    <string name="kpl_int">%1d kpl</string>
+    <string name="kpl">%1$s kpl</string>
+    <string name="kpl_int">%1$d kpl</string>
     <string name="abv">%1$s%%</string>
     <string name="shots">%1$s fsd</string>
     <string name="cocktail">Cocktail</string>

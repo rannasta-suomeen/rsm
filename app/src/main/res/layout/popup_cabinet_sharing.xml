@@ -10,6 +10,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/textViewCabinetCoverageMax"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textViewCabinetCoverage" />
+
+        <TextView
+            android:id="@+id/textViewCabinetCoverage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="TextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView15" />
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView4"
             android:layout_width="0dp"
@@ -92,6 +111,50 @@
             tools:itemCount="3"
             tools:listitem="@layout/item_cabinet_member"
             />
+
+        <ProgressBar
+            android:id="@+id/progressBarCabinetCoverage"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:progress="25"
+            android:progressTint="?attr/colorPrimary"
+            app:layout_constraintEnd_toStartOf="@+id/textViewCabinetCoverageMax"
+            app:layout_constraintStart_toEndOf="@+id/textViewCabinetCoverage"
+            app:layout_constraintTop_toTopOf="@+id/textViewCabinetCoverage" />
+
+        <View
+            android:id="@+id/divider4"
+            android:layout_width="409dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewCabinetCode" />
+
+        <TextView
+            android:id="@+id/textView15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Coverage"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider4" />
+
+        <TextView
+            android:id="@+id/textViewCabinetCoveragePercent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="28%"
+            app:layout_constraintBottom_toBottomOf="@+id/textView15"
+            app:layout_constraintStart_toEndOf="@+id/textView15"
+            app:layout_constraintTop_toTopOf="@+id/textView15" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +16,8 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.data_classes.CabinetMember
 import com.rannasta_suomeen.displayDecimal
+import com.rannasta_suomeen.totalCabinetRepository
+import com.rannasta_suomeen.totalDrinkRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -94,6 +97,13 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
                     }
                 }
             }
+            val makeableDrinks = totalDrinkRepository.makeableWith(totalCabinetRepository.productsToIngredients(cabinet.products))
+            val allDrinks = totalDrinkRepository.totalDrinkList
+            findViewById<TextView>(R.id.textViewCabinetCoverage).text = makeableDrinks.size.toString()
+            findViewById<TextView>(R.id.textViewCabinetCoverageMax).text = allDrinks.size.toString()
+            val percent = (100*makeableDrinks.size)/allDrinks.size
+            findViewById<ProgressBar>(R.id.progressBarCabinetCoverage).progress = percent
+            findViewById<TextView>(R.id.textViewCabinetCoveragePercent).text = percent.toString() + "%"
         }
     }
 

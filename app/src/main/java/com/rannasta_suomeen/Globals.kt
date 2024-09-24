@@ -3,11 +3,14 @@ package com.rannasta_suomeen
 import android.view.View
 import com.rannasta_suomeen.storage.IngredientRepository
 import com.rannasta_suomeen.storage.ProductRepository
+import com.rannasta_suomeen.storage.TotalCabinetRepository
 import com.rannasta_suomeen.storage.TotalDrinkRepository
 
 lateinit var totalDrinkRepository: TotalDrinkRepository
 lateinit var productRepository: ProductRepository
 lateinit var ingredientRepository: IngredientRepository
+lateinit var totalCabinetRepository: TotalCabinetRepository
+
 
 @Deprecated("Use View.displayDecimal instead")
 fun displayDecimal(x: Double, stringId: Int, view: View): String{

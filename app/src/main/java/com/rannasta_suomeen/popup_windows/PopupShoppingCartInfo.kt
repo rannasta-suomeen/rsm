@@ -54,14 +54,12 @@ class PopupShoppingCartInfo(activity: Activity,private val shoppingCart: Shoppin
     }
 
     private fun newDrinksFromEither(v: View): String{
-        return v.resources.getString(R.string.n_new_drinks,newDrinksWithThis(shoppingCart.getItems().map { CabinetProduct(0,it.product,0,null,true) }).size)
+        return v.resources.getString(
+            R.string.n_new_drinks,
+            newDrinksWithThis(shoppingCart.getItems().map { CabinetProduct(0,it.product,0,null,true) }).size)
     }
 
     private fun newDrinksWithThis(newProducts: List<CabinetProduct>):List<DrinkTotal>{
-        val previousMakeable = drinks.filter { it.canMakeAlcoholic(owned) }
-        val newList = owned.toMutableList()
-        newList.addAll(totalCabinetRepository.productsToIngredients(newProducts))
-        val makeableWithCart = drinks.filter { it.canMakeAlcoholic(newList)}
-        return makeableWithCart.filter { !previousMakeable.contains(it) }
+        return totalDrinkRepository.makeableWithNew(owned, totalCabinetRepository.productsToIngredients(newProducts))
     }
 }

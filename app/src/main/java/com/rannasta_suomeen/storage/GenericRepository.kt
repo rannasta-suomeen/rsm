@@ -500,18 +500,21 @@ class TotalDrinkRepository(context: Context) {
     private var ingredientList: List<GeneralIngredient> = listOf()
     private var recipeList: List<IngredientsForDrink> = listOf()
     private var drinkList: List<DrinkInfo> = listOf()
+    var totalDrinkList: List<DrinkTotal> = listOf()
 
     val dataFlow: MutableSharedFlow<List<DrinkTotal>> = MutableSharedFlow(1)
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
             suspend fun emitCurrent() {
-                dataFlow.emit(recipeList.mapNotNull { ings ->
+                val list = recipeList.mapNotNull { ings ->
                     drinkList.find { it.recipeId == ings.recipeId }?.let {
                         ings.toPointer(ingredientList)
                             ?.let { it1 -> DrinkTotal(it, it1) }
                     }
-                })
+                }
+                totalDrinkList = list
+                dataFlow.emit(list)
             }
             launch {
                 drinkRepository.dataFlow.collect {
@@ -532,5 +535,20 @@ class TotalDrinkRepository(context: Context) {
                 }
             }
         }
+    }
+
+    /**
+     * Returns list of drinks that can be made with current alcoholic ingredients
+     */
+    fun makeableWith(owned: List<GeneralIngredient>): List<DrinkTotal>{
+        return totalDrinkList.filter { it.canMakeAlcoholic(owned) }
+    }
+
+    fun makeableWithNew(owned: List<GeneralIngredient>, new: List<GeneralIngredient>): List<DrinkTotal>{
+        val previousMakeable = makeableWith(owned)
+        val newList = owned.toMutableList()
+        newList.addAll(new)
+        val makeableWithCart = totalDrinkList.filter { it.canMakeAlcoholic(newList)}
+        return makeableWithCart.filter { !previousMakeable.contains(it) }
     }
 }

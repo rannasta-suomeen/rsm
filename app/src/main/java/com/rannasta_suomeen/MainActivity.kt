@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var navController : NavController
     private lateinit var  encryptedStorage: EncryptedStorage
     private lateinit var imageRepository: ImageRepository
-    private lateinit var totalCabinetRepository: TotalCabinetRepository
     private lateinit var settings: Settings
     private lateinit var shoppingCart: ShoppingCart
 
