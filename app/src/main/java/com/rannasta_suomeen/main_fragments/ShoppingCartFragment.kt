@@ -10,11 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.ShoppingCartAdapter
 import com.rannasta_suomeen.popup_windows.PopupShoppingCartInfo
-import com.rannasta_suomeen.storage.ImageRepository
-import com.rannasta_suomeen.storage.Settings
-import com.rannasta_suomeen.storage.ShoppingCart
-import com.rannasta_suomeen.storage.TotalCabinetRepository
-import com.rannasta_suomeen.storage.TotalDrinkRepository
+import com.rannasta_suomeen.storage.*
 
 class ShoppingCartFragment(private val activity: Activity,private val shoppingCart: ShoppingCart,imageRepository: ImageRepository,private val totalCabinetRepository: TotalCabinetRepository,private val totalDrinkRepository: TotalDrinkRepository,private val settings: Settings) : Fragment(R.layout.fragment_shopping_cart){
     private val shoppingCartAdapter = ShoppingCartAdapter(activity,imageRepository, totalCabinetRepository, settings, shoppingCart)

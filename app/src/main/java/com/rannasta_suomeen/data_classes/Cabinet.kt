@@ -13,13 +13,19 @@ data class CabinetCompact(
     val name: String,
     val members: List<CabinetMember>,
     val products: MutableList<CabinetProductCompact>,
+    val mixers: MutableList<CabinetMixerCompact>,
     @JsonProperty("access_key")
     val accessKey: String?,
+    val checksum: String,
 ){
-    fun toCabinet(productMap: HashMap<Int, Product>): Cabinet?{
+    fun toCabinet(productMap: HashMap<Int, Product>, ingredientMap: HashMap<Int, GeneralIngredient>): Cabinet?{
         val products = products.map{ it.toCabinetProduct(productMap) }
         return if (products.contains(null)) null
-        else Cabinet(id, ownerId, name, members, products.mapNotNull { it },accessKey)
+        else {
+            val mixers = mixers.map { it.toCabinetMixer(ingredientMap) }
+            return if(mixers.contains(null)) null
+            else Cabinet(id, ownerId, name, members, products.mapNotNull { it },mixers.mapNotNull { it },accessKey, checksum)
+        }
     }
 
     /**
@@ -32,7 +38,6 @@ data class CabinetCompact(
     }
 }
 
-@JsonIgnoreProperties(value = ["cabinet_id", "name", "img", "href", "abv"])
 data class CabinetProductCompact(
     val id: Int,
     @JsonProperty("product_id")
@@ -45,6 +50,21 @@ data class CabinetProductCompact(
 ){
     fun toCabinetProduct(productMap: HashMap<Int, Product>): CabinetProduct?{
         return productMap[productId]?.let { CabinetProduct(id,it,ownerId, amountMl, usable) }
+    }
+}
+
+data class CabinetMixerCompact(
+    val id: Int,
+    @JsonProperty("ingredient_id")
+    val ingredientId: Int,
+    @JsonProperty("owner_id")
+    val ownerId: Int,
+    val amount: Int?,
+    val unit: UnitType,
+    val usable: Boolean,
+){
+    fun toCabinetMixer(ingredientMap: HashMap<Int, GeneralIngredient>): CabinetMixer?{
+        return ingredientMap[ingredientId]?.let { CabinetMixer(id,it,ownerId, amount, unit, usable) }
     }
 }
 
@@ -116,6 +136,14 @@ sealed class ProductOwner(protected val cabinetMember: CabinetMember){
     }
 }
 
+data class CabinetMixer(
+    val id: Int,
+    val ingredient: GeneralIngredient,
+    val ownerId: Int,
+    val amount: Int?,
+    val unit: UnitType,
+    val usable: Boolean,
+)
 
 data class Cabinet(
     val id: Int,
@@ -123,12 +151,10 @@ data class Cabinet(
     val name: String,
     val members: List<CabinetMember>,
     val products: List<CabinetProduct>,
+    val mixers: List<CabinetMixer>,
     val accessKey: String?,
+    val checksum: String,
 ){
-    fun toCompact(){
-        val productsCompact = products.map { it.toCompact() }
-        CabinetCompact(id, ownerId, name, members, productsCompact.toMutableList(), accessKey)
-    }
 
     fun containedAmount(x: Product): OwnedAmount{
         val res = products.filter {

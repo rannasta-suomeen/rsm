@@ -21,7 +21,6 @@ object NetworkController {
     private val jackson = jacksonObjectMapper()
     var username: String? = null
     private var password: String? = null
-    private var userId: Int? = null
 
     private const val serverAddress: String = "https://api.rannasta-suomeen.fi"
     //private const val serverAddress: String = "http://10.0.2.2:8000"
@@ -146,7 +145,7 @@ object NetworkController {
      * @return Result, either List of [CabinetCompact] or an [Error]
      */
     suspend fun getCabinets(_payload: Unit): Result<List<CabinetCompact>> {
-        val request = Request.Builder().url("$serverAddress/cabinet/shared").get()
+        val request = Request.Builder().url("$serverAddress/cabinet").get()
         return makeTokenRequest(request) {
             val s = it.body?.string()
             val list = jackson.readerForArrayOf(CabinetCompact::class.java).readValue(s,Array<CabinetCompact>::class.java)

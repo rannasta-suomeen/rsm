@@ -13,7 +13,7 @@ import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.popup_windows.PopupDrink
 import com.rannasta_suomeen.storage.Settings
-import java.util.Locale
+import java.util.*
 
 class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings): RecyclerView.Adapter<DrinkPreviewAdapter.DrinkPreviewViewHolder>() {
 

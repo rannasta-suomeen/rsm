@@ -38,6 +38,7 @@ data class GeneralIngredient(
     val use_static_filter_c: Boolean,
     val static_filter: Int?,
     val static_filter_c: Int?,
+    val unit: UnitType,
 ){
 
     fun price(s: Settings): Double{

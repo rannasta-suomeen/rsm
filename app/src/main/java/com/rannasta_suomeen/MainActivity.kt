@@ -21,14 +21,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.navigation.NavigationView
 import com.rannasta_suomeen.main_fragments.FragmentFactory
-import com.rannasta_suomeen.storage.EncryptedStorage
-import com.rannasta_suomeen.storage.ImageRepository
-import com.rannasta_suomeen.storage.IngredientRepository
-import com.rannasta_suomeen.storage.ProductRepository
-import com.rannasta_suomeen.storage.Settings
-import com.rannasta_suomeen.storage.ShoppingCart
-import com.rannasta_suomeen.storage.TotalCabinetRepository
-import com.rannasta_suomeen.storage.TotalDrinkRepository
+import com.rannasta_suomeen.storage.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

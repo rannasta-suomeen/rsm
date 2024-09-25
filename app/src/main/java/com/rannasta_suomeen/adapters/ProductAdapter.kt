@@ -23,7 +23,7 @@ import com.rannasta_suomeen.storage.TotalCabinetRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Locale
+import java.util.*
 import kotlin.math.roundToInt
 
 class ProductAdapter(

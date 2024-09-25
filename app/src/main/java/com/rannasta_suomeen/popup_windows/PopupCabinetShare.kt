@@ -11,13 +11,9 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.rannasta_suomeen.NetworkController
-import com.rannasta_suomeen.R
+import com.rannasta_suomeen.*
 import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.data_classes.CabinetMember
-import com.rannasta_suomeen.displayDecimal
-import com.rannasta_suomeen.totalCabinetRepository
-import com.rannasta_suomeen.totalDrinkRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

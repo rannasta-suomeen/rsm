@@ -359,7 +359,7 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
         productIngredientListPointer = productIngredientList.mapNotNull { it.toPointer(generalIngredientList, productMap) }
 
         cabinetFlow.emit(cabinetList.mapNotNull { cab ->
-            val t = cab.toCabinet(productMap)
+            val t = cab.toCabinet(productMap, generalIngredientList)
             if ((selectedCabinet == null && settings.cabinet == t?.id) || selectedCabinet?.id == t?.id){
                 selectedCabinet = t
                 selectedCabinetFlow.emit(t)

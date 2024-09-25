@@ -2,11 +2,7 @@ package com.rannasta_suomeen.popup_windows
 
 import android.app.Activity
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.Product
