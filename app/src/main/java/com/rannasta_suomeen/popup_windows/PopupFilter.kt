@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.storage.Settings
+import java.text.Normalizer
 
 private val BASE_TAGS = listOf(R.string.cocktail,R.string.shot, R.string.punch, R.string.unmakeble, R.string.unmakebleGrocery, R.string.tagless)
 
@@ -41,6 +42,15 @@ abstract class PopupFilterBase(
         }
         dialog.setNegativeButton("Cancel") { _, _ -> }
         return dialog.create()
+    }
+
+    private fun removeAccentsFromString(s: String): String{
+        val t = Normalizer.normalize(s, Normalizer.Form.NFD)
+        return t.filter { it.isLetterOrDigit() }
+    }
+
+    fun String.normalize():String{
+        return removeAccentsFromString(this)
     }
 }
 
@@ -148,7 +158,7 @@ class PopupFilter(
             }
         }
 
-        quickRemove(settings.name){!it.name.contains(settings.name!!,true)}
+        quickRemove(settings.name){!it.name.normalize().contains(settings.name!!.normalize(),true)}
         quickRemove(settings.abvMin){it.abv<settings.abvMin!!}
         quickRemove(settings.abvMax){it.abv>settings.abvMax!!}
 
@@ -340,7 +350,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
             }
         }
 
-        quickRemove(settings.searchedName) { !it.drink.name.contains(settings.searchedName, true) }
+        quickRemove(settings.searchedName) { !it.drink.name.normalize().contains(settings.searchedName.normalize(), true) }
         quickRemove(settings.abvMin) { it.drink.abvAvg < settings.abvMin!! }
         quickRemove(settings.abvMax) { it.drink.abvAvg > settings.abvMax!! }
 
