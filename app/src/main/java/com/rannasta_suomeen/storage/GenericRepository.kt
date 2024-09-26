@@ -366,7 +366,7 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
             }
             t
         })
-        selectedCabinet?.products?.let { ownedIngredientFlow.emit(productsToIngredients(it)) }
+        selectedCabinet?.let { ownedIngredientFlow.emit(productsToIngredients(it.products) + it.mixers.map { it.ingredient } ) }
     }
 
     fun productsToIngredients(products: List<CabinetProduct>):List<GeneralIngredient>{
