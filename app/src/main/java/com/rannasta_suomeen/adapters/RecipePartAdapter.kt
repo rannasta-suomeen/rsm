@@ -13,13 +13,13 @@ import com.rannasta_suomeen.data_classes.IngredientsForDrinkPointer
 import com.rannasta_suomeen.storage.Settings
 import java.util.*
 
-class RecipePartAdapter(private var owned: List<GeneralIngredient>,private val settings: Settings): RecyclerView.Adapter<RecipePartAdapter.ProductViewHolder>() {
+class RecipePartAdapter(private var owned: TreeMap<Int,GeneralIngredient>,private val settings: Settings): RecyclerView.Adapter<RecipePartAdapter.ProductViewHolder>() {
 
     private var items: List<IngredientsForDrinkPointer.RecipePartPointer> = listOf()
     private var amount: Double = 1.0
 
     class ProductViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
-        fun bind(item: IngredientsForDrinkPointer.RecipePartPointer, amount: Double, owned: List<GeneralIngredient>, settings: Settings){
+        fun bind(item: IngredientsForDrinkPointer.RecipePartPointer, amount: Double, owned: TreeMap<Int,GeneralIngredient>, settings: Settings){
             with(itemView) {
                 findViewById<TextView>(R.id.textViewRecipePartName).text = item.name
                 findViewById<TextView>(R.id.textViewRecipePartVolume).text = item.unit.displayInDesiredUnit((item.amount * amount), settings.prefUnit)
@@ -31,7 +31,7 @@ class RecipePartAdapter(private var owned: List<GeneralIngredient>,private val s
                     R.string.ppl
                 )
                 val img = findViewById<ImageView>(R.id.imageViewRecipePartOwned)
-                when (owned.contains(item.ingredient)){
+                when (owned.containsKey(item.ingredient.id)){
                     true -> {
                         img.setImageResource(R.drawable.ic_baseline_check_24)
                         img.setColorFilter(context.resources.getColor(R.color.green))
@@ -51,7 +51,7 @@ class RecipePartAdapter(private var owned: List<GeneralIngredient>,private val s
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitItems(input: List<IngredientsForDrinkPointer.RecipePartPointer>, ownedNew: List<GeneralIngredient>){
+    fun submitItems(input: List<IngredientsForDrinkPointer.RecipePartPointer>, ownedNew: TreeMap<Int,GeneralIngredient>){
         items = input
         owned = ownedNew
         notifyDataSetChanged()

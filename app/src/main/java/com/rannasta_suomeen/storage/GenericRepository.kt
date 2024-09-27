@@ -540,15 +540,15 @@ class TotalDrinkRepository(context: Context) {
     /**
      * Returns list of drinks that can be made with current alcoholic ingredients
      */
-    fun makeableWith(owned: List<GeneralIngredient>): List<DrinkTotal>{
+    fun makeableWith(owned: TreeMap<Int,GeneralIngredient>): List<DrinkTotal>{
         return totalDrinkList.filter { it.canMakeAlcoholic(owned) }
     }
 
-    fun makeableWithNew(owned: List<GeneralIngredient>, new: List<GeneralIngredient>): List<DrinkTotal>{
+    fun makeableWithNew(owned: TreeMap<Int,GeneralIngredient>, new: List<GeneralIngredient>): List<DrinkTotal>{
         val previousMakeable = makeableWith(owned)
-        val newList = owned.toMutableList()
-        newList.addAll(new)
-        val makeableWithCart = totalDrinkList.filter { it.canMakeAlcoholic(newList)}
+        val newList = owned.toMutableMap()
+        newList += new.associateBy { it.id }
+        val makeableWithCart = totalDrinkList.filter { it.canMakeAlcoholic(newList.toSortedMap() as TreeMap<Int, GeneralIngredient>)}
         return makeableWithCart.filter { !previousMakeable.contains(it) }
     }
 }

@@ -30,10 +30,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var drawer: DrawerLayout
     private lateinit var navController : NavController
-    private lateinit var  encryptedStorage: EncryptedStorage
+    private lateinit var encryptedStorage: EncryptedStorage
     private lateinit var imageRepository: ImageRepository
     private lateinit var settings: Settings
     private lateinit var shoppingCart: ShoppingCart
+    private lateinit var totalIngredientRepository: IngredientRepository
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val target = when(item.itemId){
@@ -59,7 +60,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         encryptedStorage = EncryptedStorage(applicationContext)
         imageRepository = ImageRepository(applicationContext)
         shoppingCart = ShoppingCart(applicationContext)
-        supportFragmentManager.fragmentFactory = FragmentFactory(this, imageRepository, settings, totalCabinetRepository, shoppingCart)
+        totalIngredientRepository = IngredientRepository(applicationContext)
+        supportFragmentManager.fragmentFactory = FragmentFactory(this, imageRepository, settings, totalCabinetRepository, shoppingCart, totalIngredientRepository)
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.layout_activity_main)

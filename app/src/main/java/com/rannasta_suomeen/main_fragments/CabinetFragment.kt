@@ -2,7 +2,6 @@ package com.rannasta_suomeen.main_fragments
 
 import android.app.Activity
 import android.content.DialogInterface
-import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -10,37 +9,48 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.color.MaterialColors
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.tabs.TabLayout
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.CabinetProductAdapter
-import com.rannasta_suomeen.adapters.CabinetProductAdapterItemTouchHelper
+import com.rannasta_suomeen.adapters.MixerAdapter
 import com.rannasta_suomeen.data_classes.Cabinet
+import com.rannasta_suomeen.data_classes.CabinetMixer
+import com.rannasta_suomeen.data_classes.GeneralIngredient
+import com.rannasta_suomeen.data_classes.IngredientType
+import com.rannasta_suomeen.main_fragments.cabinet_fragments.CabinetFragmentFactory
 import com.rannasta_suomeen.popup_windows.PopupCabinetShare
 import com.rannasta_suomeen.popup_windows.PopupExportProducts
-import com.rannasta_suomeen.storage.ImageRepository
-import com.rannasta_suomeen.storage.Settings
-import com.rannasta_suomeen.storage.ShoppingCart
-import com.rannasta_suomeen.storage.TotalCabinetRepository
+import com.rannasta_suomeen.storage.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 import kotlin.math.max
 
-class CabinetFragment(private val activity: Activity, private val imageRepository: ImageRepository, private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository, private val shoppingCart: ShoppingCart): Fragment(R.layout.fragment_cabinets), AdapterView.OnItemSelectedListener{
+class CabinetFragment(
+    private val activity: Activity,
+    private val imageRepository: ImageRepository,
+    private val settings: Settings,
+    private val totalCabinetRepository: TotalCabinetRepository,
+    private val shoppingCart: ShoppingCart,
+    private val totalDrinkRepository: TotalDrinkRepository,
+    private val totalIngredientRepository: IngredientRepository): Fragment(R.layout.fragment_cabinets), AdapterView.OnItemSelectedListener{
 
-    private lateinit var adapter: CabinetProductAdapter
     private var cabinetList = listOf<Cabinet>()
     private lateinit var spinnerAdapter: ArrayAdapter<String>
+    private lateinit var navController: NavController
     private var selectedCabinet: Cabinet? = null
+    private lateinit var adapter: CabinetProductAdapter
+    private lateinit var mixerAdapter: MixerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("Cabinets", "Created Again")
         super.onCreate(savedInstanceState)
         adapter = CabinetProductAdapter(activity, totalCabinetRepository, imageRepository, settings, shoppingCart)
+        mixerAdapter = MixerAdapter(settings, totalDrinkRepository.totalDrinkList)
         spinnerAdapter = ArrayAdapter(requireContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item)
     }
 
@@ -53,14 +63,14 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
         with(view) {
             val spinner = findViewById<Spinner>(R.id.spinnerSelectCabinet)
             val buttonNewCabinet = findViewById<Button>(R.id.buttonNewCabinet)
-            val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewCabinetProducts)
             val fabShare = findViewById<FloatingActionButton>(R.id.fabSharing)
             val fabMove = findViewById<FloatingActionButton>(R.id.fabMove)
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
-            recyclerView.adapter = adapter
-            recyclerView.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
-            val helper = CabinetProductAdapterItemTouchHelper(adapter, MaterialColors.getColor(context, com.google.android.material.R.attr.colorTertiary, Color.GREEN),context)
-            helper.attachToRecyclerView(recyclerView)
+            val tabs = findViewById<TabLayout>(R.id.tabsCabinet)
+            childFragmentManager.fragmentFactory = CabinetFragmentFactory(adapter, mixerAdapter)
+            val navHostFragment = childFragmentManager.findFragmentById(R.id.recyclerHolder) as NavHostFragment
+            navController = navHostFragment.findNavController()
+            navController.setGraph(R.navigation.nav_cabinet)
+            tabs.addOnTabSelectedListener(TabListener(navController))
 
             spinner.adapter = spinnerAdapter
             spinner.onItemSelectedListener = this@CabinetFragment
@@ -104,9 +114,7 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
                                 }
                             }
                             totalCabinetRepository.changeSelectedCabinet(null)
-                            CoroutineScope(Dispatchers.Main).launch {
-                                changeSelectedCabinet()
-                            }
+                            onChangeCabinet()
                         }
                     }
                 }
@@ -144,30 +152,66 @@ class CabinetFragment(private val activity: Activity, private val imageRepositor
                             spinnerAdapter.addAll(cabinetList.map { it.name })
                             val pos = cabinetList.indexOfFirst { it.id == settings.cabinet }
                             spinner.setSelection(max(pos, 0))
-                            changeSelectedCabinet()
+                            onChangeCabinet()
+                        }
+                    }
+                }
+                launch {
+                    totalIngredientRepository.dataFlow.collect{
+                        CoroutineScope(Dispatchers.Main).launch {
+                            mixerAdapter.submitItems(it.filter { listOf(IngredientType.Mixer, IngredientType.Grocery, IngredientType.Common).contains(it.type) })
+                        }
+                    }
+                }
+                launch {
+                    totalDrinkRepository.dataFlow.collect{
+                        CoroutineScope(Dispatchers.Main).launch {
+                            mixerAdapter.submitNewDrinks(it)
                         }
                     }
                 }
                 totalCabinetRepository.selectedCabinetFlow.collect{
                     selectedCabinet = it
-                    changeSelectedCabinet()
+                    onChangeCabinet()
                 }
             }
         }
     }
 
-    private fun changeSelectedCabinet(){
+    private fun onChangeCabinet(){
         CoroutineScope(Dispatchers.Main).launch {
-            selectedCabinet?.products?.let { adapter.submitItems(it.sortedBy { it.product.name }) }
+            selectedCabinet?.let {
+                adapter.submitItems(it.products.sortedBy { it.product.name })
+                mixerAdapter.submitNewOwned(it.mixers.associateBy { it.ingredient.id }.toSortedMap() as TreeMap<Int, CabinetMixer>)
+                mixerAdapter.submitNewAlcohol(totalCabinetRepository.productsToIngredients(it.products).associateBy { it.id }.toSortedMap() as TreeMap<Int, GeneralIngredient>)
+            }
         }
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
         val item = spinnerAdapter.getItem(p2)
         totalCabinetRepository.changeSelectedCabinet(cabinetList.find { it.name == item })
-        changeSelectedCabinet()
     }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {
+    }
+
+    private class TabListener(private val navController: NavController): TabLayout.OnTabSelectedListener{
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+            val target = when (tab?.text){
+                "Alcoholic" -> R.id.fragmentCabinetProducts
+                "Mixers" -> R.id.fragmentCabinetMixers
+                else -> {
+                    Log.d("Cabinet", "Selected tab with id ${tab?.id}")
+                    R.id.fragmentCabinetProducts
+                }
+            }
+            navController.navigate(target)
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+
     }
 }

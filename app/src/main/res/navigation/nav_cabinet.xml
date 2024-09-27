@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_cabinet"
+    app:startDestination="@id/fragmentCabinetProducts">
+    <fragment
+        android:id="@+id/fragmentCabinetProducts"
+        android:name="com.rannasta_suomeen.main_fragments.cabinet_fragments.CabinetProductsFragment">
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentCabinetMixers"
+        android:name="com.rannasta_suomeen.main_fragments.cabinet_fragments.CabinetMixersFragment">
+    </fragment>
+
+</navigation>

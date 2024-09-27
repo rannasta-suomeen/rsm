@@ -12,6 +12,7 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.storage.Settings
 import java.text.Normalizer
+import java.util.*
 
 private val BASE_TAGS = listOf(R.string.cocktail,R.string.shot, R.string.punch, R.string.unmakeble, R.string.unmakebleGrocery, R.string.tagless)
 
@@ -187,7 +188,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
         var aerMax: Double?,
         var whiteListedIngredients: List<GeneralIngredient>,
     ){
-        fun filterTag(mutableList: MutableList<DrinkTotal>, ownedIngredients: List<GeneralIngredient>, allTags: List<String>){
+        fun filterTag(mutableList: MutableList<DrinkTotal>, ownedIngredients: TreeMap<Int,GeneralIngredient>, allTags: List<String>){
             val disAllowedTags = allTags.toMutableList()
             disAllowedTags.removeAll{allowedTags.contains(it)}
             fun checkTags(drink: DrinkTotal):Boolean{
@@ -197,8 +198,8 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
                             "Cocktail" -> drink.drink.type == DrinkType.Cocktail
                             "Shot" -> drink.drink.type == DrinkType.Shot
                             "Punch" -> drink.drink.type == DrinkType.Punch
-                            "Missing Alcohol" -> drink.missingIngredientsAlcoholic(ownedIngredients) != 0
-                            "Missing Groceries" -> drink.missingIngredientsNonAlcoholic(
+                            "Missing Alcohol" -> drink.amountOfMissingIngredientsAlcoholic(ownedIngredients) != 0
+                            "Missing Groceries" -> drink.amountOfMissingIngredientsNonAlcoholic(
                                 ownedIngredients
                             ) != 0
                             "Tagless" -> drink.drink.tagList.isEmpty()
@@ -363,7 +364,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
 
         quickRemove(settings.volMin) { it.drink.pricePerServing(appSettings) < settings.volMin!! }
         quickRemove(settings.volMax) { it.drink.pricePerServing(appSettings) > settings.volMax!! }
-        settings.filterTag(mutList, ownedIngredients, tags)
+        settings.filterTag(mutList, ownedIngredients.associateBy { it.id }.toSortedMap() as TreeMap<Int, GeneralIngredient>, tags)
         mutList.removeAll {
             !it.ingredients.recipeParts.map { it.ingredient }
                 .all { settings.whiteListedIngredients.contains(it) }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.rannasta_suomeen.storage.Settings
+import java.util.*
 import kotlin.math.roundToInt
 
 /**
@@ -56,6 +57,25 @@ data class GeneralIngredient(
                 }
             }
         }
+    }
+
+    fun isOwned(owned: TreeMap<Int, CabinetMixer>): Boolean{
+        return owned.contains(id)
+    }
+
+    private fun amountContained(owned: TreeMap<Int, CabinetMixer>): Optional<Optional<Int>>{
+        val t = owned[id]?: return Optional.empty<Optional<Int>>()
+        return Optional.of(Optional.ofNullable(t.amount))
+    }
+
+    fun showAmount(owned: TreeMap<Int, CabinetMixer>, settings: Settings): String{
+        val t = amountContained(owned).get()
+        val p = when (t.isPresent){
+            true -> t.get()
+            false -> null
+        }
+        val c = p?: return "infinite"
+        return unit.displayInDesiredUnit(c.toDouble(), settings.prefUnit)
     }
 }
 

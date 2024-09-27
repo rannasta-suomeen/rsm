@@ -8,6 +8,7 @@ import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import kotlin.math.absoluteValue
 
 abstract class RsmItemTouchHelper(callback: RsmCallback) : ItemTouchHelper(
     callback
@@ -47,7 +48,7 @@ abstract class RsmCallback(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && isCurrentlyActive) {
+        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && (isCurrentlyActive || dX.absoluteValue >= 0.1)) {
             val iW = viewHolder.itemView
             val paint = Paint()
             paint.color = color

@@ -23,6 +23,7 @@ import com.rannasta_suomeen.totalDrinkRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 class DrinksFragment(val activity: Activity, private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository) : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
 
@@ -93,7 +94,8 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
     }
 
     private fun updateSelection(){
-        drinkPreviewAdapter.submitItems(sortDrinkPreview(filterMenu.filter(drinkListFull, ownedIngredients), sortType, sortByAsc, settings), ownedIngredients)
+        val map = ownedIngredients.associateBy { it.id }
+        drinkPreviewAdapter.submitItems(sortDrinkPreview(filterMenu.filter(drinkListFull, ownedIngredients), sortType, sortByAsc, settings), map.toSortedMap() as TreeMap<Int, GeneralIngredient>)
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {

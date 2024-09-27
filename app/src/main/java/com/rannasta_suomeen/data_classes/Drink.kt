@@ -2,6 +2,7 @@ package com.rannasta_suomeen.data_classes
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.rannasta_suomeen.storage.Settings
+import java.util.*
 
 /**
  This is the equivalent of the RS-Struct Recipe
@@ -114,30 +115,39 @@ data class DrinkInfo(
  */
 data class DrinkTotal(val drink: DrinkInfo, val ingredients: IngredientsForDrinkPointer){
 
-    fun missingIngredientsAlcoholic(owned: List<GeneralIngredient>): Int{
-        return ingredients.recipeParts.map { it.ingredient }
-            .filter { it.type == IngredientType.LightAlcoholProduct || it.type == IngredientType.StrongAlcoholProduct }
-            .count {
-                !owned.contains(it)
-            }
+    fun amountOfMissingIngredientsAlcoholic(owned: TreeMap<Int,GeneralIngredient>): Int{
+        return missingIngredients(owned).count { it.type == IngredientType.StrongAlcoholProduct || it.type == IngredientType.LightAlcoholProduct }
     }
 
-    fun missingIngredientsNonAlcoholic(owned: List<GeneralIngredient>): Int{
-        return ingredients.recipeParts.map { it.ingredient }
-            .filter { it.type != IngredientType.LightAlcoholProduct && it.type != IngredientType.StrongAlcoholProduct }
-            .count {
-                !owned.contains(it)
-            }
+    fun amountOfMissingIngredientsNonAlcoholic(owned: TreeMap<Int,GeneralIngredient>): Int{
+        return missingIngredients(owned).count { it.type != IngredientType.StrongAlcoholProduct && it.type != IngredientType.LightAlcoholProduct }
     }
 
-    fun canMakeAlcoholic(owned: List<GeneralIngredient>): Boolean{
-        return missingIngredientsAlcoholic(owned) == 0
+    private fun missingIngredients(owned: TreeMap<Int,GeneralIngredient>): List<GeneralIngredient>{
+        return ingredients.recipeParts.map { it.ingredient }.filter { !owned.containsKey(it.id) }
     }
-    fun canMakeNonAlcoholic(owned: List<GeneralIngredient>): Boolean{
-        return missingIngredientsNonAlcoholic(owned) == 0
+
+    fun canMakeAlcoholic(owned: TreeMap<Int,GeneralIngredient>): Boolean{
+        return amountOfMissingIngredientsAlcoholic(owned) == 0
     }
-    fun canMakeStrict(owned: List<GeneralIngredient>):Boolean{
+    fun canMakeNonAlcoholic(owned: TreeMap<Int,GeneralIngredient>): Boolean{
+        return amountOfMissingIngredientsNonAlcoholic(owned) == 0
+    }
+    fun canMakeStrict(owned: TreeMap<Int,GeneralIngredient>):Boolean{
         return canMakeAlcoholic(owned) && canMakeNonAlcoholic(owned)
+    }
+
+    fun isMissing(owned: TreeMap<Int,GeneralIngredient>, ingredient: GeneralIngredient): Boolean{
+        return missingIngredients(owned).contains(ingredient)
+    }
+
+    fun isMissingButHasAlcoholic(owned: TreeMap<Int,GeneralIngredient>, ingredient: GeneralIngredient): Boolean{
+        return missingIngredients(owned).contains(ingredient) && canMakeAlcoholic(owned)
+    }
+
+    fun isMissingOnly(owned: TreeMap<Int,GeneralIngredient>, ingredient: GeneralIngredient): Boolean{
+        val missing = missingIngredients(owned)
+        return missing.size == 1 && missing.contains(ingredient)
     }
 }
 

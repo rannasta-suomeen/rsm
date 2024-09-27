@@ -45,17 +45,6 @@
 
     </androidx.cardview.widget.CardView>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewCabinetProducts"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView"
-        app:layout_constraintVertical_bias="0.0"
-        tools:listitem="@layout/item_product" />
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabSharing"
         android:layout_width="wrap_content"
@@ -79,5 +68,35 @@
         app:layout_constraintBottom_toTopOf="@+id/fabSharing"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_baseline_swap_horiz_24" />
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabsCabinet"
+        app:layout_constraintTop_toBottomOf="@id/cardView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabCabinetProducts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/alcoholic" />
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabCabinetMixers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mixers" />
+    </com.google.android.material.tabs.TabLayout>
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/recyclerHolder"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:layout_constraintTop_toBottomOf="@id/tabsCabinet"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout="@layout/view_cabinet_products">
+    </androidx.fragment.app.FragmentContainerView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

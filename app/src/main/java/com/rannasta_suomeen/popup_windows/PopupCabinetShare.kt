@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.*
 import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.data_classes.CabinetMember
+import com.rannasta_suomeen.data_classes.GeneralIngredient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupRsm(activity, R.layout.popup_cabinet_sharing, root = null) {
 
@@ -93,7 +95,7 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
                     }
                 }
             }
-            val makeableDrinks = totalDrinkRepository.makeableWith(totalCabinetRepository.productsToIngredients(cabinet.products))
+            val makeableDrinks = totalDrinkRepository.makeableWith(totalCabinetRepository.productsToIngredients(cabinet.products).associateBy { it.id }.toSortedMap() as TreeMap<Int, GeneralIngredient>)
             val allDrinks = totalDrinkRepository.totalDrinkList
             findViewById<TextView>(R.id.textViewCabinetCoverage).text = makeableDrinks.size.toString()
             findViewById<TextView>(R.id.textViewCabinetCoverageMax).text = allDrinks.size.toString()

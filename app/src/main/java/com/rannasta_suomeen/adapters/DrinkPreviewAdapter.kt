@@ -18,11 +18,11 @@ import java.util.*
 class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings): RecyclerView.Adapter<DrinkPreviewAdapter.DrinkPreviewViewHolder>() {
 
     private var items: List<DrinkTotal> = listOf()
-    private var owned: List<GeneralIngredient> = listOf()
+    private var owned: TreeMap<Int,GeneralIngredient> = TreeMap()
 
     class DrinkPreviewViewHolder(itemView: View,val activity: Activity):RecyclerView.ViewHolder(itemView){
         // TODO: sometimes drinks with multiline names fail to render the second line
-        fun bind(i: DrinkTotal, owned:List<GeneralIngredient>, settings: Settings){
+        fun bind(i: DrinkTotal, owned:TreeMap<Int,GeneralIngredient>, settings: Settings){
             val item = i.drink
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewName).text = item.name
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(
@@ -44,8 +44,8 @@ class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewAer).text = displayDecimal(item.pricePerServing(settings),
                 R.string.aer
             )
-            itemView.findViewById<TextView>(R.id.textViewDrinkMissingAlcohol).text = i.missingIngredientsAlcoholic(owned).toString()
-            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewMissingGrocery).text = i.missingIngredientsNonAlcoholic(owned).toString()
+            itemView.findViewById<TextView>(R.id.textViewDrinkMissingAlcohol).text = i.amountOfMissingIngredientsAlcoholic(owned).toString()
+            itemView.findViewById<TextView>(R.id.textViewDrinkPreviewMissingGrocery).text = i.amountOfMissingIngredientsNonAlcoholic(owned).toString()
             itemView.setOnClickListener {
                 PopupDrink(i, activity, owned, settings).show(it)
             }
@@ -57,7 +57,7 @@ class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitItems(input: List<DrinkTotal>, o: List<GeneralIngredient>){
+    fun submitItems(input: List<DrinkTotal>, o: TreeMap<Int,GeneralIngredient>){
         items = input
         owned = o
         notifyDataSetChanged()

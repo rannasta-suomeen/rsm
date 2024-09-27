@@ -16,9 +16,10 @@ import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.storage.DRINK_VOLUME_UNIT
 import com.rannasta_suomeen.storage.Settings
 import java.text.DecimalFormat
+import java.util.*
 import kotlin.math.max
 
-class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val owned: List<GeneralIngredient>,private val settings: Settings):PopupRsm(activity, R.layout.popup_drink_recipe, root = null) {
+class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val owned: TreeMap<Int,GeneralIngredient>,private val settings: Settings):PopupRsm(activity, R.layout.popup_drink_recipe, root = null) {
 
     private var amount = 1.0
     private var volume = DRINK_VOLUME_UNIT.convert(drink.drink.volume, settings.prefUnit) * amount
