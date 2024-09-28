@@ -16,7 +16,9 @@ import com.google.android.material.color.MaterialColors
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.CabinetProduct
 import com.rannasta_suomeen.data_classes.from
+import com.rannasta_suomeen.data_classes.from_id
 import com.rannasta_suomeen.popup_windows.PopupProductAdd
+import com.rannasta_suomeen.popup_windows.normalize
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.ShoppingCart
@@ -31,6 +33,8 @@ class CabinetProductAdapter(
     private val totalCabinetRepository: TotalCabinetRepository, private val imageRepository: ImageRepository, private val settings: Settings,private val shoppingCart: ShoppingCart): RecyclerView.Adapter<CabinetProductAdapter.ProductViewHolder>() {
 
     private var items: List<CabinetProduct> = listOf()
+    private var itemsTotal: List<CabinetProduct> = listOf()
+    private var search = ""
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -119,9 +123,23 @@ class CabinetProductAdapter(
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun submitItems(input: List<CabinetProduct>){
-        items = input
+        itemsTotal = input
+        calcNewItems()
+    }
+
+    fun submitNewSearch(input: String){
+        search = input
+        calcNewItems()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun calcNewItems(){
+        val t = search.normalize()
+        items = itemsTotal.filter { it.product.name.normalize().contains(t)
+                || from_id(it.product.categoryId).toString().normalize().contains(t)
+                || from(it.product.subcategoryId).toString().normalize().contains(t)
+        }
         notifyDataSetChanged()
     }
 

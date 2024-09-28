@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.storage.Settings
+import java.util.*
 
 data class CabinetCompact(
     val id: Int,
@@ -145,6 +146,10 @@ data class CabinetMixer(
     val usable: Boolean,
 )
 
+fun List<CabinetMixer>.toTreemap(): TreeMap<Int, CabinetMixer>{
+    return this.associateBy { it.ingredient.id }.toSortedMap() as TreeMap<Int, CabinetMixer>
+}
+
 data class Cabinet(
     val id: Int,
     val ownerId: Int,
@@ -171,6 +176,23 @@ data class Cabinet(
             }
         }
     }
+
+    fun containedAmount(x: GeneralIngredient): OwnedAmount{
+        val res = mixers.filter {
+            it.ingredient == x
+        }
+        val prefered = res.find { it.ownerId == getOwnUserId() }?:res.sortedBy { it.amount }.reversed().getOrNull(0)
+        val owner = prefered?.let {ownedBy(it)}
+        return if (prefered == null ){
+            None()
+        }else{
+            when(prefered.amount){
+                null -> Infinite(owner!!)
+                else -> Some(prefered.amount,owner!!)
+            }
+        }
+    }
+
     fun containedAmountCabinet(x: CabinetProduct): OwnedAmount{
         val owner = ownedBy(x)?:ProductOwner.Owned(CabinetMember(getOwnUserId(),NetworkController.username?:""))
         return when (val amount = x.amountMl){
@@ -180,6 +202,17 @@ data class Cabinet(
     }
 
     private fun ownedBy(x: CabinetProduct):ProductOwner?{
+        val member = members.find {x.ownerId == it.userId}
+        member?.let {
+            return when(it.userId == getOwnUserId()){
+                true -> ProductOwner.Owned(it)
+                false -> ProductOwner.Borrowed(it)
+            }
+        }
+        return null
+    }
+
+    private fun ownedBy(x: CabinetMixer):ProductOwner?{
         val member = members.find {x.ownerId == it.userId}
         member?.let {
             return when(it.userId == getOwnUserId()){

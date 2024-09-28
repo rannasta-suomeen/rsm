@@ -45,14 +45,16 @@ abstract class PopupFilterBase(
         return dialog.create()
     }
 
-    private fun removeAccentsFromString(s: String): String{
-        val t = Normalizer.normalize(s, Normalizer.Form.NFD)
-        return t.filter { it.isLetterOrDigit() }
-    }
 
-    fun String.normalize():String{
-        return removeAccentsFromString(this)
-    }
+
+}
+private fun removeAccentsFromString(s: String): String{
+    val t = Normalizer.normalize(s, Normalizer.Form.NFD)
+    return t.trim().lowercase().filter { it.isLetterOrDigit() }
+}
+
+fun String.normalize():String{
+    return removeAccentsFromString(this)
 }
 
 class PopupFilter(
@@ -364,7 +366,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
 
         quickRemove(settings.volMin) { it.drink.pricePerServing(appSettings) < settings.volMin!! }
         quickRemove(settings.volMax) { it.drink.pricePerServing(appSettings) > settings.volMax!! }
-        settings.filterTag(mutList, ownedIngredients.associateBy { it.id }.toSortedMap() as TreeMap<Int, GeneralIngredient>, tags)
+        settings.filterTag(mutList, ownedIngredients.toTreemap(), tags)
         mutList.removeAll {
             !it.ingredients.recipeParts.map { it.ingredient }
                 .all { settings.whiteListedIngredients.contains(it) }

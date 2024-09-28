@@ -12,10 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.DrinkPreviewAdapter
-import com.rannasta_suomeen.data_classes.DrinkInfo
-import com.rannasta_suomeen.data_classes.DrinkTotal
-import com.rannasta_suomeen.data_classes.GeneralIngredient
-import com.rannasta_suomeen.data_classes.sortDrinkPreview
+import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.popup_windows.PopupDrinkFilter
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.TotalCabinetRepository
@@ -23,7 +20,6 @@ import com.rannasta_suomeen.totalDrinkRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 
 class DrinksFragment(val activity: Activity, private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository) : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
 
@@ -94,8 +90,8 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
     }
 
     private fun updateSelection(){
-        val map = ownedIngredients.associateBy { it.id }
-        drinkPreviewAdapter.submitItems(sortDrinkPreview(filterMenu.filter(drinkListFull, ownedIngredients), sortType, sortByAsc, settings), map.toSortedMap() as TreeMap<Int, GeneralIngredient>)
+        val map = ownedIngredients.toTreemap()
+        drinkPreviewAdapter.submitItems(sortDrinkPreview(filterMenu.filter(drinkListFull, ownedIngredients), sortType, sortByAsc, settings), map)
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {

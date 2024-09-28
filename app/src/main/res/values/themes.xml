@@ -15,8 +15,8 @@
         <item name="colorButtonNormal">@color/green</item>
     </style>
     <style name="Theme.RannastaSuomeen.Switch" parent="Theme.RannastaSuomeen">
-        <item name="trackTint">?colorPrimary</item>
-        <item name="thumbTint">?colorOnPrimary</item>
+        <item name="trackTint">?colorOnPrimary</item>
+        <item name="thumbTint">?colorPrimary</item>
     </style>
     <style name="Theme.RannastaSuomeen.Button" parent="Theme.RannastaSuomeen">
         <item name="backgroundTint">?colorPrimary</item>

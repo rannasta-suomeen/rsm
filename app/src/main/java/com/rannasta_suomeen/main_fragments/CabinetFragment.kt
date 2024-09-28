@@ -18,17 +18,16 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.CabinetProductAdapter
 import com.rannasta_suomeen.adapters.MixerAdapter
 import com.rannasta_suomeen.data_classes.Cabinet
-import com.rannasta_suomeen.data_classes.CabinetMixer
-import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.IngredientType
+import com.rannasta_suomeen.data_classes.toTreemap
 import com.rannasta_suomeen.main_fragments.cabinet_fragments.CabinetFragmentFactory
 import com.rannasta_suomeen.popup_windows.PopupCabinetShare
 import com.rannasta_suomeen.popup_windows.PopupExportProducts
+import com.rannasta_suomeen.popup_windows.PopupMixer
 import com.rannasta_suomeen.storage.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 import kotlin.math.max
 
 class CabinetFragment(
@@ -50,7 +49,11 @@ class CabinetFragment(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         adapter = CabinetProductAdapter(activity, totalCabinetRepository, imageRepository, settings, shoppingCart)
-        mixerAdapter = MixerAdapter(settings, totalDrinkRepository.totalDrinkList)
+        mixerAdapter = MixerAdapter(settings, totalDrinkRepository.totalDrinkList){
+            this.view?.let { view ->
+                PopupMixer(activity, it, totalDrinkRepository, totalCabinetRepository, settings, view).show(view)
+            }
+        }
         spinnerAdapter = ArrayAdapter(requireContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item)
     }
 
@@ -182,8 +185,8 @@ class CabinetFragment(
         CoroutineScope(Dispatchers.Main).launch {
             selectedCabinet?.let {
                 adapter.submitItems(it.products.sortedBy { it.product.name })
-                mixerAdapter.submitNewOwned(it.mixers.associateBy { it.ingredient.id }.toSortedMap() as TreeMap<Int, CabinetMixer>)
-                mixerAdapter.submitNewAlcohol(totalCabinetRepository.productsToIngredients(it.products).associateBy { it.id }.toSortedMap() as TreeMap<Int, GeneralIngredient>)
+                mixerAdapter.submitNewOwned(it.mixers.toTreemap())
+                mixerAdapter.submitNewAlcohol(totalCabinetRepository.productsToIngredients(it.products).toTreemap())
             }
         }
     }

@@ -32,9 +32,9 @@
     <string name="close">Close</string>
     <string name="n_new_drinks">"%1$d new drinks"</string>
     <string name="percentage">"%1$d%%"</string>
-    <string name="new_now">"%1$d new drinks now"</string>
-    <string name="new_total">"%1$d new drinks in total"</string>
-    <string name="used_total">"%1$d drinks use this"</string>
+    <string name="new_now">"%1$d with this"</string>
+    <string name="new_total">"%1$d missing other mixers"</string>
+    <string name="used_total">"%1$d missing alcohol"</string>
     <string name="alcoholic">Alcoholic</string>
     <string name="mixers">Mixers</string>
 

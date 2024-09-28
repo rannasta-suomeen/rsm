@@ -34,7 +34,8 @@ class PopupProductAdd(private val product: Product,
             }
 
             findViewById<TextView>(R.id.textViewInvName).text = product.name
-            val edv = findViewById<EditText>(R.id.editTextInvVolume).text
+            val textView = findViewById<EditText>(R.id.editTextInvVolume)
+            val edv = textView.text
             edv.clear()
             edv.append("1")
 
@@ -43,6 +44,13 @@ class PopupProductAdd(private val product: Product,
             }
 
             val switch = findViewById<SwitchCompat>(R.id.switchInvInfinite)
+
+            switch.setOnCheckedChangeListener { compoundButton, b ->
+                textView.visibility = when (switch.isChecked){
+                    true -> View.INVISIBLE
+                    false -> View.VISIBLE
+                }
+            }
 
             findViewById<Button>(R.id.buttonInvAdd).setOnClickListener {
                 val t = parseVolume(edv.toString())

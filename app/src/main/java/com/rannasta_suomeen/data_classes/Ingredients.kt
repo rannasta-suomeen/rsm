@@ -79,6 +79,10 @@ data class GeneralIngredient(
     }
 }
 
+fun List<GeneralIngredient>.toTreemap(): TreeMap<Int, GeneralIngredient>{
+    return this.associateBy{it.id}.toSortedMap() as TreeMap<Int, GeneralIngredient>
+}
+
 enum class IngredientType {
     @JsonProperty("light_alcohol_product")
     LightAlcoholProduct,

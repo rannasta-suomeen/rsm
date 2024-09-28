@@ -5,10 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import com.rannasta_suomeen.R
-import com.rannasta_suomeen.data_classes.CabinetProduct
-import com.rannasta_suomeen.data_classes.DrinkTotal
-import com.rannasta_suomeen.data_classes.GeneralIngredient
-import com.rannasta_suomeen.data_classes.UnitType
+import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.displayDecimal
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.ShoppingCart
@@ -17,7 +14,6 @@ import com.rannasta_suomeen.storage.TotalDrinkRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 
 class PopupShoppingCartInfo(activity: Activity,private val shoppingCart: ShoppingCart,private val settings: Settings,private val totalCabinetRepository: TotalCabinetRepository,private val totalDrinkRepository: TotalDrinkRepository):PopupRsm(activity, R.layout.popup_shopping_cart, null) {
     private var owned = listOf<GeneralIngredient>()
@@ -61,6 +57,6 @@ class PopupShoppingCartInfo(activity: Activity,private val shoppingCart: Shoppin
     }
 
     private fun newDrinksWithThis(newProducts: List<CabinetProduct>):List<DrinkTotal>{
-        return totalDrinkRepository.makeableWithNew(owned.associateBy { it.id }.toSortedMap() as TreeMap<Int, GeneralIngredient>, totalCabinetRepository.productsToIngredients(newProducts))
+        return totalDrinkRepository.makeableWithNew(owned.toTreemap(), totalCabinetRepository.productsToIngredients(newProducts))
     }
 }

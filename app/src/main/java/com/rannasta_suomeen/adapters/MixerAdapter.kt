@@ -11,18 +11,28 @@ import com.rannasta_suomeen.data_classes.CabinetMixer
 import com.rannasta_suomeen.data_classes.DrinkTotal
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.displayDecimal
+import com.rannasta_suomeen.popup_windows.normalize
 import com.rannasta_suomeen.storage.Settings
 import java.util.*
+import kotlin.reflect.KFunction3
 
-class MixerAdapter(private val settings: Settings, private var drinkList: List<DrinkTotal>): RecyclerView.Adapter<MixerAdapter.ViewHolder>()  {
+class MixerAdapter(private val settings: Settings, private var drinkList: List<DrinkTotal>, private val onTouchCallBack: (GeneralIngredient) -> Unit): RecyclerView.Adapter<MixerAdapter.ViewHolder>()  {
 
     private var owned: TreeMap<Int, CabinetMixer> = TreeMap()
     private var items: List<GeneralIngredient> = listOf()
+    private var filter: String = ""
+    private var fullItems: List<GeneralIngredient> = listOf()
     private var ownedAlcohol: TreeMap<Int, GeneralIngredient> = TreeMap()
 
     class ViewHolder(itemView: View,private val settings: Settings): RecyclerView.ViewHolder(itemView){
-        fun bind(item: GeneralIngredient, owned: TreeMap<Int,CabinetMixer>, drinkList: List<DrinkTotal>, ownedAlcohol: TreeMap<Int, GeneralIngredient>){
+        fun bind(
+            item: GeneralIngredient,
+            owned: TreeMap<Int,CabinetMixer>,
+            drinkList: List<DrinkTotal>,
+            ownedAlcohol: TreeMap<Int, GeneralIngredient>,
+            onTouchCallBack: (GeneralIngredient) -> Unit){
             with(itemView){
+                setOnClickListener { onTouchCallBack(item) }
                 findViewById<TextView>(R.id.textViewMixerName).text = item.name
                 findViewById<TextView>(R.id.textViewMixerPrice).text = displayDecimal(item.price(settings), R.string.ppl)
                 val now = findViewById<TextView>(R.id.textViewMixerNewRecipesNow)
@@ -40,15 +50,22 @@ class MixerAdapter(private val settings: Settings, private var drinkList: List<D
                         ownedAmount.text = item.showAmount(owned, settings)
                     }
                     false -> {
+                        val ownedMap = (owned.mapValues { it.value.ingredient }.toSortedMap() + ownedAlcohol).toSortedMap() as TreeMap<Int, GeneralIngredient>
+
+                        fun fast(fn: KFunction3<DrinkTotal, TreeMap<Int, GeneralIngredient>, GeneralIngredient, Boolean>): List<DrinkTotal>{
+                            return drinkList.filter{fn(it, ownedMap, item)}
+                        }
+                        val nowList = fast(DrinkTotal::isMissingOnly)
+                        val totalList = fast(DrinkTotal::isMissingButHasAlcoholic).filter { !nowList.contains(it)}
+                        val usedList = drinkList.filter { it.contains(item) }.filter { !nowList.contains(it) && !totalList.contains(it)}
                         now.visibility = View.VISIBLE
                         total.visibility = View.VISIBLE
                         used.visibility = View.VISIBLE
                         ownedAmount.visibility = View.INVISIBLE
                         image.visibility = View.INVISIBLE
-                        val ownedMap = (owned.mapValues { it.value.ingredient }.toSortedMap() + ownedAlcohol).toSortedMap() as TreeMap<Int, GeneralIngredient>
-                        now.text = resources.getString(R.string.new_now,drinkList.count {it.isMissingOnly(ownedMap, item)})
-                        total.text = resources.getString(R.string.new_total,drinkList.count{it.isMissingButHasAlcoholic(ownedMap, item)})
-                        used.text = resources.getString(R.string.used_total, drinkList.count{it.isMissing(ownedMap, item)})
+                        now.text = resources.getString(R.string.new_now,nowList.count())
+                        total.text = resources.getString(R.string.new_total,totalList.count())
+                        used.text = resources.getString(R.string.used_total, usedList.count())
                     }
                 }
             }
@@ -62,12 +79,13 @@ class MixerAdapter(private val settings: Settings, private var drinkList: List<D
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position], owned, drinkList, ownedAlcohol)
+        holder.bind(items[position], owned, drinkList, ownedAlcohol, onTouchCallBack)
     }
 
     fun submitItems(l: List<GeneralIngredient>){
         if (l == items) return
-        items = l
+        fullItems = l
+
         reSort()
     }
 
@@ -89,11 +107,16 @@ class MixerAdapter(private val settings: Settings, private var drinkList: List<D
         reSort()
     }
 
+    fun submitNewSearch(s: String){
+        filter = s
+        reSort()
+    }
+
     @Suppress("NotifyDataSetChanged")
     private fun reSort(){
         val ownedMap = owned.filter { it.value.usable }.mapValues { it.value.ingredient }.toSortedMap() as TreeMap<Int, GeneralIngredient>
         ownedMap += ownedAlcohol
-        val t = items.sortedBy {d ->
+        val t = fullItems.filter { it.name.normalize().contains(filter.normalize()) }.sortedBy {d ->
             drinkList.count {it.isMissing(ownedMap, d)}
         }.sortedBy {d-> drinkList.count{it.isMissingOnly(ownedMap, d)} }.reversed()
         items = t

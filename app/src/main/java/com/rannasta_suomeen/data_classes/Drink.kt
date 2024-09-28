@@ -141,6 +141,10 @@ data class DrinkTotal(val drink: DrinkInfo, val ingredients: IngredientsForDrink
         return missingIngredients(owned).contains(ingredient)
     }
 
+    fun contains(ingredient: GeneralIngredient): Boolean{
+        return ingredients.recipeParts.map { it.ingredient }.contains(ingredient)
+    }
+
     fun isMissingButHasAlcoholic(owned: TreeMap<Int,GeneralIngredient>, ingredient: GeneralIngredient): Boolean{
         return missingIngredients(owned).contains(ingredient) && canMakeAlcoholic(owned)
     }
@@ -148,6 +152,15 @@ data class DrinkTotal(val drink: DrinkInfo, val ingredients: IngredientsForDrink
     fun isMissingOnly(owned: TreeMap<Int,GeneralIngredient>, ingredient: GeneralIngredient): Boolean{
         val missing = missingIngredients(owned)
         return missing.size == 1 && missing.contains(ingredient)
+    }
+
+    fun isMissingOnlyOrHas(owned: TreeMap<Int,GeneralIngredient>, ingredient: GeneralIngredient): Boolean{
+        val missing = missingIngredients(owned)
+        return (missing.size == 1 && missing.contains(ingredient)) || (contains(ingredient) && missing.isEmpty())
+    }
+
+    fun isMissingOrOwnsAndHasAlcoholic(owned: TreeMap<Int,GeneralIngredient>, ingredient: GeneralIngredient): Boolean{
+        return contains(ingredient) && canMakeAlcoholic(owned)
     }
 }
 
