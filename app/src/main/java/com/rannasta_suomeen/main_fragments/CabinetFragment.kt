@@ -18,6 +18,7 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.CabinetProductAdapter
 import com.rannasta_suomeen.adapters.MixerAdapter
 import com.rannasta_suomeen.data_classes.Cabinet
+import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.IngredientType
 import com.rannasta_suomeen.data_classes.toTreemap
 import com.rannasta_suomeen.main_fragments.cabinet_fragments.CabinetFragmentFactory
@@ -49,11 +50,18 @@ class CabinetFragment(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         adapter = CabinetProductAdapter(activity, totalCabinetRepository, imageRepository, settings, shoppingCart)
-        mixerAdapter = MixerAdapter(settings, totalDrinkRepository.totalDrinkList){
+        val openPopupCallback: (GeneralIngredient) -> Unit = {
             this.view?.let { view ->
                 PopupMixer(activity, it, totalDrinkRepository, totalCabinetRepository, settings, view).show(view)
             }
         }
+        val deleteCallBack: (GeneralIngredient) -> Unit = { i ->
+            totalCabinetRepository.selectedCabinet?.let { c ->
+                c.mixers.find {it.ingredient.id ==  i.id && it.ownerId ==  c.getOwnUserId()}?.let {
+                    totalCabinetRepository.removeMixer(c.id, it.id)}
+            }
+        }
+        mixerAdapter = MixerAdapter(settings, totalDrinkRepository.totalDrinkList, openPopupCallback, deleteCallBack)
         spinnerAdapter = ArrayAdapter(requireContext(), androidx.appcompat.R.layout.support_simple_spinner_dropdown_item)
     }
 

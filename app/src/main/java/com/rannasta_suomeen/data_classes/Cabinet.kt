@@ -60,12 +60,11 @@ data class CabinetMixerCompact(
     val ingredientId: Int,
     @JsonProperty("owner_id")
     val ownerId: Int,
-    val amount: Int?,
-    val unit: UnitType,
-    val usable: Boolean,
+    var amount: Int?,
+    var usable: Boolean,
 ){
     fun toCabinetMixer(ingredientMap: HashMap<Int, GeneralIngredient>): CabinetMixer?{
-        return ingredientMap[ingredientId]?.let { CabinetMixer(id,it,ownerId, amount, unit, usable) }
+        return ingredientMap[ingredientId]?.let { CabinetMixer(id,it,ownerId, amount, usable) }
     }
 }
 
@@ -142,7 +141,6 @@ data class CabinetMixer(
     val ingredient: GeneralIngredient,
     val ownerId: Int,
     val amount: Int?,
-    val unit: UnitType,
     val usable: Boolean,
 )
 

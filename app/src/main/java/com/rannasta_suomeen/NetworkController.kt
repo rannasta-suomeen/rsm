@@ -45,7 +45,7 @@ object NetworkController {
         val timestamp: Instant = Instant.now()
         class NewCabinet(val name: String): CabinetOperation()
         class DeleteCabinet(val id: Int): CabinetOperation()
-        class AddItemToCabinet(val id:Int, val pid: Int, val amount: Int?): CabinetOperation()
+        class AddItemToCabinet(val id: Int, val pid: Int, val amount: Int?): CabinetOperation()
         class ModifyCabinetProductAmount(val id: Int, val pid: Int, val amount: Int?): CabinetOperation()
         class RemoveItemFromCabinet(val id:Int, val pid: Int): CabinetOperation()
         class MakeItemUsable(val id:Int, val pid: Int): CabinetOperation()
@@ -53,6 +53,12 @@ object NetworkController {
         class JoinCabinet(val code: String): CabinetOperation()
         class ExitCabinet(val id:Int):CabinetOperation()
         class BulkMoveItems(val originId:Int, val targetId: Int, val items: List<Int>):CabinetOperation()
+        class AddMixer(val cabinetId: Int, val ingredientId: Int, val  amount: Int?): CabinetOperation()
+        class RemoveMixer(val cabinetId: Int, val mixerId: Int): CabinetOperation()
+        class SetMixerUsable(val cabinetId: Int, val mixerId: Int): CabinetOperation()
+        class SetMixerUnusable(val cabinetId: Int, val mixerId: Int): CabinetOperation()
+        class ModifyMixer(val cabinetId: Int, val mixerId: Int, val amount: Int?): CabinetOperation()
+        class BulkMoveMixers(val originId: Int,val targetId: Int, val items: List<Int>): CabinetOperation()
     }
 
     /** Logs the user in. First item of the pair is the username, second is the password.
@@ -236,6 +242,108 @@ object NetworkController {
         }
     }
 
+    /** Makes a request and tries to put a mixer into a cabinet
+     * @param payload [AddMixer]
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun insertCabinetMixer(payload: AddMixer): Result<Unit> {
+        val amountStr = when(payload.amount == null){
+            true -> ""
+            false -> "\\${payload.amount}"
+        }
+        val request = Request.Builder().url("$serverAddress/cabinet/mixer/${payload.cabinetId}/${payload.ingredientId}$amountStr").put("".toRequestBody())
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+                Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
+        }
+    }
+
+    /** Makes a request and tries to delete a mixer from a cabinet
+     * @param payload [RemoveMixer]
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun deleteCabinetMixer(payload: RemoveMixer): Result<Unit> {
+        val request = Request.Builder().url("$serverAddress/cabinet/mixer/${payload.cabinetId}/${payload.mixerId}").delete()
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+                Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
+        }
+    }
+
+    /** Makes a request and tries to make a mixer usable
+     * @param payload [SetMixerUsable] Cabinet and product.
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun usableCabinetMixer(payload: SetMixerUsable): Result<Unit> {
+        val request = Request.Builder().url("$serverAddress/cabinet/mixer/usable/${payload.cabinetId}/${payload.mixerId}").put("".toRequestBody())
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+                Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
+        }
+    }
+
+    /** Makes a request and tries to make a mixer unusable
+     * @param payload [SetMixerUnusable] Cabinet and product.
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun unusableCabinetMixer(payload: SetMixerUnusable): Result<Unit> {
+        val request = Request.Builder().url("$serverAddress/cabinet/mixer/usable/${payload.cabinetId}/${payload.mixerId}").delete()
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+                Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
+        }
+    }
+
+    /** Makes a request and tries to modify the amount of a mixer in a cabinet
+     * @param payload [ModifyMixer]
+     * @return Result, either [Unit] or an [Error]
+     */
+    suspend fun modifyCabinetMixer(payload: ModifyMixer): Result<Unit> {
+        val amountStr = when(payload.amount == null){
+            true -> ""
+            false -> "\\${payload.amount}"
+        }
+        val request = Request.Builder().url("$serverAddress/cabinet/mixer/${payload.cabinetId}/${payload.mixerId}$amountStr").post("".toRequestBody())
+        return makeTokenRequest(request) {
+            if (it.isSuccessful){
+                Result.success(Unit)
+            } else {
+                Result.failure(Error.MiscError(it.code, it.body?.string()?: "No body"))
+            }
+        }
+    }
+
+    /** Makes a request and tries to put multiple mixers into a cabinet
+     * @param payload [BulkMoveMixers]
+     * @return Result, either [Unit] or an [Error]
+     */
+    // TODO: Implement this in a better way, for example now it fails with amounts
+    suspend fun moveMixers(payload: BulkMoveMixers): Result<Unit> {
+        val x = payload.items.map {
+            CoroutineScope(Dispatchers.IO).async {
+                val t = deleteCabinetMixer(RemoveMixer(payload.originId,it))
+                if (t.isSuccess){
+                    insertCabinetMixer(AddMixer(payload.targetId, it, null))
+                } else {
+                    t
+                }
+            }
+        }
+        return x.awaitAll().find { it.isFailure }?: Result.success(Unit)
+    }
+
     /** Makes a request and returns a list of all IngredientProductFilters
      * @param _payload An empty parameter to fit with rest of the architecture
      * @return Result, either a list of [IngredientProductFilter] or [Error]
@@ -333,7 +441,7 @@ object NetworkController {
         }
     }
 
-    /** Tries to quit a cabinet with a certain id
+    /** Tries to move a list of products
      * @param payload [BulkMoveItems] object to tell what items to move
      * @return [Result] [Unit]
      */

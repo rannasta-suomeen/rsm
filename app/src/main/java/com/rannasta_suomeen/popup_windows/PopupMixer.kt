@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,7 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.DrinkCompactAdapter
 import com.rannasta_suomeen.data_classes.DrinkTotal
 import com.rannasta_suomeen.data_classes.GeneralIngredient
+import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.data_classes.toTreemap
 import com.rannasta_suomeen.displayDecimal
 import com.rannasta_suomeen.storage.Settings
@@ -21,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.math.roundToInt
 import kotlin.reflect.KFunction3
 
 class PopupMixer(
@@ -79,7 +82,23 @@ class PopupMixer(
             }
             findViewById<TextView>(R.id.textViewPopupMixerOwned).text = totalCabinetRepository.selectedCabinet?.containedAmount(mixer)?.show(settings)
             findViewById<Button>(R.id.buttonMixerInvAdd).setOnClickListener {
-                TODO()
+                totalCabinetRepository.selectedCabinet?.let {
+                    val t = parseVolume(textBox.text.toString())
+                    when (switch.isChecked){
+                        true -> {
+                            totalCabinetRepository.addOrModifyMixerToSelected(mixer.id, null)
+                            window.dismiss()
+                        }
+                        false -> {
+                            if (t.isFailure){
+                                Toast.makeText(context, "${textBox.text} is not a valid volume", Toast.LENGTH_SHORT).show()
+                            } else {
+                                totalCabinetRepository.addOrModifyMixerToSelected(mixer.id, t.getOrThrow())
+                                window.dismiss()
+                            }
+                        }
+                    }
+                }
             }
 
             findViewById<Button>(R.id.buttonMixerAddToCart).setOnClickListener {
@@ -113,6 +132,31 @@ class PopupMixer(
             nowAdapter.submitItems(now)
             totalAdapter.submitItems(total)
             usedAdapter.submitItems(used)
+        }
+    }
+
+    private fun parseVolume(input: String): Result<Int>{
+        val text = input.filter { !it.isWhitespace() }
+        val numbers = text.takeWhile { it.isDigit() || listOf('.', ',').contains(it) }.toDoubleOrNull()
+        val unit = text.dropWhile { it.isDigit() || listOf('.', ',').contains(it) }
+        val unitActual = when (unit.lowercase()) {
+            "cl" -> UnitType.Cl
+            "ml" -> UnitType.Ml
+            "oz" -> UnitType.Oz
+            "" -> UnitType.Kpl
+            "b" -> UnitType.Kpl
+            else -> null
+        }
+
+        val convertedVolume = when (unitActual) {
+            null -> 0.0
+            UnitType.Kpl -> numbers ?: 0.0
+            else -> numbers?.let { unitActual.convert(it, UnitType.Ml) }
+        }
+
+        return when(numbers != null && unitActual != null){
+            true -> Result.success(convertedVolume!!.roundToInt())
+            false -> Result.failure(java.lang.NumberFormatException("$text cannot be converted to volume"))
         }
     }
 }

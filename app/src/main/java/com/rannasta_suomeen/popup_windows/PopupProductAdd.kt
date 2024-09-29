@@ -97,7 +97,6 @@ class PopupProductAdd(private val product: Product,
     private fun addToShoppingCart(product: Product, amount: Int){
         shoppingCart.addItem(ShoppingCartItem(product, amount))
     }
-
     private fun parseVolume(input: String): Result<Int>{
         val text = input.filter { !it.isWhitespace() }
         val numbers = text.takeWhile { it.isDigit() || listOf('.', ',').contains(it) }.toDoubleOrNull()

@@ -158,8 +158,8 @@ class CabinetProductAdapter(
                 return
             }
             when (i.usable){
-                true -> totalCabinetRepository.makeItemUnusable(it.id,i.id)
-                false -> totalCabinetRepository.makeItemUsable(it.id,i.id)
+                true -> totalCabinetRepository.setProductUnusable(it.id,i.id)
+                false -> totalCabinetRepository.setProductUsable(it.id,i.id)
             }
         }
     }

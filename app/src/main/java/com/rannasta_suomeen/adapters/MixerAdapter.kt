@@ -16,7 +16,11 @@ import com.rannasta_suomeen.storage.Settings
 import java.util.*
 import kotlin.reflect.KFunction3
 
-class MixerAdapter(private val settings: Settings, private var drinkList: List<DrinkTotal>, private val onTouchCallBack: (GeneralIngredient) -> Unit): RecyclerView.Adapter<MixerAdapter.ViewHolder>()  {
+class MixerAdapter(
+    private val settings: Settings,
+    private var drinkList: List<DrinkTotal>,
+    private val onTouchCallBack: (GeneralIngredient) -> Unit,
+    private val onLongTouchCallback: (GeneralIngredient) -> Unit): RecyclerView.Adapter<MixerAdapter.ViewHolder>()  {
 
     private var owned: TreeMap<Int, CabinetMixer> = TreeMap()
     private var items: List<GeneralIngredient> = listOf()
@@ -30,9 +34,14 @@ class MixerAdapter(private val settings: Settings, private var drinkList: List<D
             owned: TreeMap<Int,CabinetMixer>,
             drinkList: List<DrinkTotal>,
             ownedAlcohol: TreeMap<Int, GeneralIngredient>,
-            onTouchCallBack: (GeneralIngredient) -> Unit){
+            onTouchCallBack: (GeneralIngredient) -> Unit,
+            onLongTouchCallBack: (GeneralIngredient) -> Unit){
             with(itemView){
                 setOnClickListener { onTouchCallBack(item) }
+                setOnLongClickListener {
+                    onLongTouchCallBack(item)
+                true
+                }
                 findViewById<TextView>(R.id.textViewMixerName).text = item.name
                 findViewById<TextView>(R.id.textViewMixerPrice).text = displayDecimal(item.price(settings), R.string.ppl)
                 val now = findViewById<TextView>(R.id.textViewMixerNewRecipesNow)
@@ -79,7 +88,7 @@ class MixerAdapter(private val settings: Settings, private var drinkList: List<D
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position], owned, drinkList, ownedAlcohol, onTouchCallBack)
+        holder.bind(items[position], owned, drinkList, ownedAlcohol, onTouchCallBack, onLongTouchCallback)
     }
 
     fun submitItems(l: List<GeneralIngredient>){

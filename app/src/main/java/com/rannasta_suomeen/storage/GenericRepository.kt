@@ -203,6 +203,12 @@ internal class CabinetRepository(context: Context){
            is JoinCabinet -> tryNTimes(5,oper,NetworkController::joinCabinet)
            is ExitCabinet -> tryNTimes(5,oper,NetworkController::quitCabinet)
            is BulkMoveItems -> tryNTimes(5,oper,NetworkController::moveItemsIntoCabinet)
+           is AddMixer -> tryNTimes(5, oper, NetworkController::insertCabinetMixer)
+           is BulkMoveMixers -> tryNTimes(5, oper, NetworkController::moveMixers)
+           is ModifyMixer -> tryNTimes(5, oper, NetworkController::modifyCabinetMixer)
+           is RemoveMixer -> tryNTimes(5, oper, NetworkController::deleteCabinetMixer)
+           is SetMixerUnusable -> tryNTimes(5, oper, NetworkController::unusableCabinetMixer)
+           is SetMixerUsable -> tryNTimes(5, oper, NetworkController::usableCabinetMixer)
        }
         if (res.isSuccess){
             netActionQueue.removeIf { it == oper }
@@ -268,12 +274,12 @@ internal class CabinetRepository(context: Context){
         runNetQueueAction(c)
     }
 
-    fun makeItemUsable(c: MakeItemUsable){
+    fun setProductUsable(c: MakeItemUsable){
         addActionToQueue(c)
         runNetQueueAction(c)
     }
 
-    fun makeItemUnUsable(c: MakeItemUnusable){
+    fun setProductUnUsable(c: MakeItemUnusable){
         addActionToQueue(c)
         runNetQueueAction(c)
     }
@@ -289,6 +295,11 @@ internal class CabinetRepository(context: Context){
     }
 
     fun bulkMoveItems(c: BulkMoveItems){
+        addActionToQueue(c)
+        runNetQueueAction(c)
+    }
+
+    fun runCabinetOperation(c: CabinetOperation){
         addActionToQueue(c)
         runNetQueueAction(c)
     }
@@ -329,6 +340,25 @@ internal class CabinetRepository(context: Context){
                         targetList.forEach {
                             origin.products.removeIf { targetList.contains(it) }
                             target.products.addAll(targetList)
+                        }
+                    }
+                }
+            }
+            is AddMixer -> updateState {
+                it.find { it.id == cabinetOperation.cabinetId }?.let{it.mixers.add(CabinetMixerCompact(0, cabinetOperation.ingredientId,it.getOwnUserId(), cabinetOperation.amount,true))}}
+            is ModifyMixer -> updateState { it.find {it.id == cabinetOperation.cabinetId}?.let {it.mixers.find { it.id == cabinetOperation.mixerId }?.let { it.amount = cabinetOperation.amount }} }
+            is RemoveMixer -> updateState { it.find { it.id == cabinetOperation.cabinetId }?.mixers?.removeIf { it.id == cabinetOperation.mixerId } }
+            is SetMixerUnusable -> updateState { it.find { it.id == cabinetOperation.cabinetId }?.mixers?.find { it.id == cabinetOperation.mixerId }?.usable = false }
+            is SetMixerUsable -> updateState { it.find { it.id == cabinetOperation.cabinetId }?.mixers?.find { it.id == cabinetOperation.mixerId }?.usable = true }
+            is BulkMoveMixers -> updateState {
+                val originCabint = it.find { it.id == cabinetOperation.originId }
+                val targetCabinet = it.find { it.id == cabinetOperation.targetId }
+                originCabint?.let { origin ->
+                    targetCabinet?.let {target ->
+                        val targetList = originCabint.mixers.filter { cabinetOperation.items.contains(it.id) }
+                        targetList.forEach {
+                            origin.mixers.removeIf { targetList.contains(it) }
+                            target.mixers.addAll(targetList)
                         }
                     }
                 }
@@ -413,6 +443,18 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
         }
     }
 
+    fun addOrModifyMixerToSelected(ingredientId: Int, amount: Int?){
+        selectedCabinet?.let {
+            val userId = it.getOwnUserId()
+            val owned = it.mixers.find { p-> p.ingredient.id == ingredientId && p.ownerId == userId }
+            if (owned != null){
+                modifyMixer(it.id, owned.id, amount)
+            } else {
+                addMixer(it.id, ingredientId, amount)
+            }
+        }
+    }
+
     fun deleteCabinet(id: Int) {
         cabinetRepository.deleteCabinet(DeleteCabinet(id))
     }
@@ -428,12 +470,12 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
         cabinetRepository.removeItemFromCabinet(RemoveItemFromCabinet(id,pid))
     }
 
-    fun makeItemUsable(id: Int, pid: Int){
-        cabinetRepository.makeItemUsable(MakeItemUsable(id,pid))
+    fun setProductUsable(id: Int, pid: Int){
+        cabinetRepository.setProductUsable(MakeItemUsable(id,pid))
     }
 
-    fun makeItemUnusable(id: Int, pid: Int){
-        cabinetRepository.makeItemUnUsable(MakeItemUnusable(id, pid))
+    fun setProductUnusable(id: Int, pid: Int){
+        cabinetRepository.setProductUnUsable(MakeItemUnusable(id, pid))
     }
 
     fun joinCabinet(code: String){
@@ -444,9 +486,33 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
         cabinetRepository.exitCabinet(ExitCabinet(id))
     }
 
+    fun addMixer(cabinetId: Int, ingredientId: Int, amount: Int?){
+        cabinetRepository.runCabinetOperation(AddMixer(cabinetId, ingredientId, amount))
+    }
+
+    fun removeMixer(cabinetId: Int, mixerId: Int){
+        cabinetRepository.runCabinetOperation(RemoveMixer(cabinetId, mixerId))
+    }
+
+    fun modifyMixer(cabinetId: Int, mixerId: Int, amount: Int?){
+        cabinetRepository.runCabinetOperation(ModifyMixer(cabinetId, mixerId, amount))
+    }
+
+    fun setMixerUsable(cabinetId: Int, mixerId: Int){
+        cabinetRepository.runCabinetOperation(SetMixerUsable(cabinetId, mixerId))
+    }
+
+    fun setMixerUnusable(cabinetId: Int, mixerId: Int){
+        cabinetRepository.runCabinetOperation(SetMixerUnusable(cabinetId, mixerId))
+    }
+
+    fun bulkMoveMixers(originId: Int, targetId: Int, mixerIds: List<Int>){
+        cabinetRepository.runCabinetOperation(BulkMoveMixers(originId, targetId, mixerIds))
+    }
+
     @Suppress("Unused")
-    fun bulkMoveItems(oid: Int, tid: Int, pids: List<Int>){
-        cabinetRepository.bulkMoveItems(BulkMoveItems(oid,tid,pids))
+    fun bulkMoveItems(originId: Int, targetId: Int, pids: List<Int>){
+        cabinetRepository.bulkMoveItems(BulkMoveItems(originId,targetId,pids))
     }
 
     private fun modifyCabinetProductAmount(id: Int, pid: Int, amount: Int?){
