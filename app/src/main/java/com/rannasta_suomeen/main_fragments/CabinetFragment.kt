@@ -52,7 +52,7 @@ class CabinetFragment(
         adapter = CabinetProductAdapter(activity, totalCabinetRepository, imageRepository, settings, shoppingCart)
         val openPopupCallback: (GeneralIngredient) -> Unit = {
             this.view?.let { view ->
-                PopupMixer(activity, it, totalDrinkRepository, totalCabinetRepository, settings, view).show(view)
+                PopupMixer(activity, it, totalDrinkRepository, totalCabinetRepository, settings, view, shoppingCart).show(view)
             }
         }
         val deleteCallBack: (GeneralIngredient) -> Unit = { i ->
@@ -213,7 +213,7 @@ class CabinetFragment(
                 "Alcoholic" -> R.id.fragmentCabinetProducts
                 "Mixers" -> R.id.fragmentCabinetMixers
                 else -> {
-                    Log.d("Cabinet", "Selected tab with id ${tab?.id}")
+                    Log.d("Cabinet", "Selected tab with text ${tab?.text}")
                     R.id.fragmentCabinetProducts
                 }
             }

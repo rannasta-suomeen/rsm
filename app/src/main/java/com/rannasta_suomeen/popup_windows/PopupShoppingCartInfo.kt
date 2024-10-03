@@ -25,21 +25,24 @@ class PopupShoppingCartInfo(activity: Activity,private val shoppingCart: Shoppin
             findViewById<TextView>(R.id.textViewShoppingCartPps).text = displayDecimal(shoppingCart.pps(),R.string.aer)
             findViewById<TextView>(R.id.textViewShoppingCartItems).text = resources.getString(R.string.kpl_int,shoppingCart.amountOfItems())
             findViewById<TextView>(R.id.textViewShoppingCartShots).text = displayDecimal(shoppingCart.amountOfShots(),R.string.shots)
-            val newDrinksText = findViewById<TextView>(R.id.textViewShoppingCartNewDrinks)
+            val newDrinksTextStrict = findViewById<TextView>(R.id.textViewShoppingCartNewDrinksStrict)
+            val newDrinksTextAlcohol = findViewById<TextView>(R.id.textViewShoppingCartNewDrinksAlcohol)
 
             CoroutineScope(Dispatchers.IO).launch {
                 launch {
                     totalCabinetRepository.ownedIngredientFlow.collect{
                         owned = it
                         CoroutineScope(Dispatchers.Main).launch {
-                            newDrinksText.text = newDrinksFromEither(view)
+                            newDrinksTextStrict.text = newDrinksFromEitherStrict(view)
+                            newDrinksTextAlcohol.text = newDrinksFromEitherAlcoholic(view)
                         }
                     }
                 }
                 totalDrinkRepository.dataFlow.collect{
                     drinks = it
                     CoroutineScope(Dispatchers.Main).launch {
-                        newDrinksText.text = newDrinksFromEither(view)
+                        newDrinksTextStrict.text = newDrinksFromEitherStrict(view)
+                        newDrinksTextAlcohol.text = newDrinksFromEitherAlcoholic(view)
                     }
                 }
             }
@@ -50,13 +53,23 @@ class PopupShoppingCartInfo(activity: Activity,private val shoppingCart: Shoppin
         }
     }
 
-    private fun newDrinksFromEither(v: View): String{
+    private fun newDrinksFromEitherAlcoholic(v: View): String{
         return v.resources.getString(
-            R.string.n_new_drinks,
-            newDrinksWithThis(shoppingCart.getItems().map { CabinetProduct(0,it.product,0,null,true) }).size)
+            R.string.new_drinks_alcohol,
+            newDrinksWithThisAlcoholic(shoppingCart.getItems().map { CabinetProduct(0,it.product,0,null,true) }).size)
     }
 
-    private fun newDrinksWithThis(newProducts: List<CabinetProduct>):List<DrinkTotal>{
-        return totalDrinkRepository.makeableWithNew(owned.toTreemap(), totalCabinetRepository.productsToIngredients(newProducts))
+    private fun newDrinksFromEitherStrict(v: View): String{
+        return v.resources.getString(
+            R.string.n_new_drinks,
+            newDrinksWithThisStrict(shoppingCart.getItems().map { CabinetProduct(0,it.product,0,null,true) },shoppingCart.getMixers().map { it.mixer }).size)
+    }
+
+    private fun newDrinksWithThisAlcoholic(newProducts: List<CabinetProduct>):List<DrinkTotal>{
+        return totalDrinkRepository.makeableWithNewAlcoholic(owned.toTreemap(), totalCabinetRepository.productsToIngredients(newProducts))
+    }
+
+    private fun newDrinksWithThisStrict(newProducts: List<CabinetProduct>, newMixers: List<GeneralIngredient>):List<DrinkTotal>{
+        return totalDrinkRepository.makeableWithNewStrict(owned.toTreemap(), totalCabinetRepository.productsToIngredients(newProducts) + newMixers)
     }
 }

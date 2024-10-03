@@ -3,6 +3,7 @@ package com.rannasta_suomeen.data_classes
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.rannasta_suomeen.adapters.NameableItem
 import com.rannasta_suomeen.storage.Settings
 import java.util.*
 import kotlin.math.roundToInt
@@ -14,7 +15,7 @@ data class GeneralIngredient(
     val id: Int,
     val type: IngredientType,
     val author_id: Int,
-    val name: String,
+    override val name: String,
     @JsonSerialize(using = CategoryJson.CategorySerializer::class)
     @JsonDeserialize(using = CategoryJson.CategoryDeserializer::class)
     val category: Category?,
@@ -40,7 +41,7 @@ data class GeneralIngredient(
     val static_filter: Int?,
     val static_filter_c: Int?,
     val unit: UnitType,
-){
+): NameableItem(){
 
     fun price(s: Settings): Double{
         return when (s.prefAlko){

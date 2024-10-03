@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_cart"
+    app:startDestination="@id/fragmentCartProducts">
+    <fragment
+        android:id="@+id/fragmentCartProducts"
+        android:name="com.rannasta_suomeen.main_fragments.shopping_cart_fragments.ShoppingProductsFragment">
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentCartMixers"
+        android:name="com.rannasta_suomeen.main_fragments.shopping_cart_fragments.ShoppingMixersFragment">
+    </fragment>
+</navigation>

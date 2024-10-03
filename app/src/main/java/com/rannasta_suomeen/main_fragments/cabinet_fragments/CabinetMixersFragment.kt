@@ -11,15 +11,15 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.MixerAdapter
 import com.rannasta_suomeen.addSimpleOnTextChangeLister
 
-class CabinetMixersFragment(private val adapter: MixerAdapter): Fragment(R.layout.view_cabinet_mixers) {
+class CabinetMixersFragment(private val adapter: MixerAdapter): Fragment(R.layout.view_recycler_search) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(view){
-            val recycler = findViewById<RecyclerView>(R.id.recyclerViewMixers)
+            val recycler = findViewById<RecyclerView>(R.id.recyclerViewSearch)
             recycler.adapter = adapter
             recycler.layoutManager = LinearLayoutManager(this.context)
             recycler.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
-            val searchBox = findViewById<EditText>(R.id.editTextMixerSearch)
+            val searchBox = findViewById<EditText>(R.id.editTextSearch)
             searchBox.addSimpleOnTextChangeLister {
                 adapter.submitNewSearch(it)
             }

@@ -11,12 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.DrinkCompactAdapter
-import com.rannasta_suomeen.data_classes.DrinkTotal
-import com.rannasta_suomeen.data_classes.GeneralIngredient
-import com.rannasta_suomeen.data_classes.UnitType
-import com.rannasta_suomeen.data_classes.toTreemap
+import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.displayDecimal
 import com.rannasta_suomeen.storage.Settings
+import com.rannasta_suomeen.storage.ShoppingCart
 import com.rannasta_suomeen.storage.TotalCabinetRepository
 import com.rannasta_suomeen.storage.TotalDrinkRepository
 import kotlinx.coroutines.CoroutineScope
@@ -32,7 +30,8 @@ class PopupMixer(
     private val totalDrinkRepository: TotalDrinkRepository,
     private val totalCabinetRepository: TotalCabinetRepository,
     private val settings: Settings,
-    private val parentView: View): PopupRsm(activity, R.layout.popup_mixer,null) {
+    private val parentView: View,
+    private val shoppingCart: ShoppingCart): PopupRsm(activity, R.layout.popup_mixer,null) {
 
     private var drinkList = listOf<DrinkTotal>()
     private var ownedTotal: TreeMap<Int, GeneralIngredient> = TreeMap()
@@ -102,7 +101,21 @@ class PopupMixer(
             }
 
             findViewById<Button>(R.id.buttonMixerAddToCart).setOnClickListener {
-                TODO()
+                val t = parseVolume(textBox.text.toString())
+                when (switch.isChecked){
+                    true -> {
+                        shoppingCart.addMixer(ShoppingCartMixer(mixer, null))
+                        window.dismiss()
+                    }
+                    false -> {
+                        if (t.isFailure){
+                            Toast.makeText(context, "${textBox.text} is not a valid volume", Toast.LENGTH_SHORT).show()
+                        } else {
+                            shoppingCart.addMixer(ShoppingCartMixer(mixer, t.getOrThrow()))
+                            window.dismiss()
+                        }
+                    }
+                }
             }
             val recyclerNow = findViewById<RecyclerView>(R.id.recyclerMixerNewList)
             val recyclerTotal = findViewById<RecyclerView>(R.id.recyclerTotalList)
@@ -145,6 +158,7 @@ class PopupMixer(
             "oz" -> UnitType.Oz
             "" -> UnitType.Kpl
             "b" -> UnitType.Kpl
+            "l" -> UnitType.L
             else -> null
         }
 

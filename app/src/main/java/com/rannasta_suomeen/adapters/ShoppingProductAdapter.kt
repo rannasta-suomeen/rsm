@@ -21,12 +21,12 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.math.roundToInt
 
-class ShoppingCartAdapter(
+class ShoppingProductAdapter(
     private val activity: Activity,
     private val imageRepository: ImageRepository,
     private val totalCabinetRepository: TotalCabinetRepository,
     private val settings: Settings,
-    private val shoppingCart: ShoppingCart): RecyclerView.Adapter<ShoppingCartAdapter.ProductViewHolder>() {
+    private val shoppingCart: ShoppingCart): RecyclerView.Adapter<ShoppingProductAdapter.ProductViewHolder>() {
 
     init {
         CoroutineScope(Dispatchers.IO).launch {

@@ -95,7 +95,7 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
                     }
                 }
             }
-            val makeableDrinks = totalDrinkRepository.makeableWith(totalCabinetRepository.productsToIngredients(cabinet.products).associateBy { it.id }.toSortedMap() as TreeMap<Int, GeneralIngredient>)
+            val makeableDrinks = totalDrinkRepository.makeableWithStrict(totalCabinetRepository.productsToIngredients(cabinet.products).associateBy { it.id }.toSortedMap() as TreeMap<Int, GeneralIngredient>)
             val allDrinks = totalDrinkRepository.totalDrinkList
             findViewById<TextView>(R.id.textViewCabinetCoverage).text = makeableDrinks.size.toString()
             findViewById<TextView>(R.id.textViewCabinetCoverageMax).text = allDrinks.size.toString()

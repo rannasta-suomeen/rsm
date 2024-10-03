@@ -320,10 +320,9 @@ internal class CabinetRepository(context: Context){
                     }
                 }
             }
-            // TODO: With no internet this creates a product with wrong id.
             is AddItemToCabinet -> updateState {
                 val t = it.find { it.id == cabinetOperation.id }
-                    t?.products?.add(CabinetProductCompact(cabinetOperation.id, cabinetOperation.pid, t.getOwnUserId(),cabinetOperation.amount, true))
+                    t?.products?.add(CabinetProductCompact(Random().nextInt(), cabinetOperation.pid, t.getOwnUserId(),cabinetOperation.amount, true))
             }
             is DeleteCabinet -> updateState { it.removeIf { it.id == cabinetOperation.id } }
             is MakeItemUnusable -> updateState { it.find { it.id == cabinetOperation.id }?.let { it.products.find { it.id == cabinetOperation.pid }?.let { it.usable = false} } }
@@ -345,7 +344,7 @@ internal class CabinetRepository(context: Context){
                 }
             }
             is AddMixer -> updateState {
-                it.find { it.id == cabinetOperation.cabinetId }?.let{it.mixers.add(CabinetMixerCompact(0, cabinetOperation.ingredientId,it.getOwnUserId(), cabinetOperation.amount,true))}}
+                it.find { it.id == cabinetOperation.cabinetId }?.let{it.mixers.add(CabinetMixerCompact(Random().nextInt(), cabinetOperation.ingredientId,it.getOwnUserId(), cabinetOperation.amount,true))}}
             is ModifyMixer -> updateState { it.find {it.id == cabinetOperation.cabinetId}?.let {it.mixers.find { it.id == cabinetOperation.mixerId }?.let { it.amount = cabinetOperation.amount }} }
             is RemoveMixer -> updateState { it.find { it.id == cabinetOperation.cabinetId }?.mixers?.removeIf { it.id == cabinetOperation.mixerId } }
             is SetMixerUnusable -> updateState { it.find { it.id == cabinetOperation.cabinetId }?.mixers?.find { it.id == cabinetOperation.mixerId }?.usable = false }
@@ -606,15 +605,27 @@ class TotalDrinkRepository(context: Context) {
     /**
      * Returns list of drinks that can be made with current alcoholic ingredients
      */
-    fun makeableWith(owned: TreeMap<Int,GeneralIngredient>): List<DrinkTotal>{
+    fun makeableWithAlcohol(owned: TreeMap<Int,GeneralIngredient>): List<DrinkTotal>{
         return totalDrinkList.filter { it.canMakeAlcoholic(owned) }
     }
 
-    fun makeableWithNew(owned: TreeMap<Int,GeneralIngredient>, new: List<GeneralIngredient>): List<DrinkTotal>{
-        val previousMakeable = makeableWith(owned)
+    fun makeableWithStrict(owned: TreeMap<Int,GeneralIngredient>): List<DrinkTotal>{
+        return totalDrinkList.filter { it.canMakeStrict(owned) }
+    }
+
+    fun makeableWithNewAlcoholic(owned: TreeMap<Int,GeneralIngredient>, new: List<GeneralIngredient>): List<DrinkTotal>{
+        val previousMakeable = makeableWithAlcohol(owned)
         val newList = owned.toMutableMap()
         newList += new.associateBy { it.id }
         val makeableWithCart = totalDrinkList.filter { it.canMakeAlcoholic(newList.toSortedMap() as TreeMap<Int, GeneralIngredient>)}
+        return makeableWithCart.filter { !previousMakeable.contains(it) }
+    }
+
+    fun makeableWithNewStrict(owned: TreeMap<Int,GeneralIngredient>, new: List<GeneralIngredient>): List<DrinkTotal>{
+        val previousMakeable = makeableWithStrict(owned)
+        val newList = owned.toMutableMap()
+        newList += new.associateBy { it.id }
+        val makeableWithCart = totalDrinkList.filter { it.canMakeStrict(newList.toSortedMap() as TreeMap<Int, GeneralIngredient>)}
         return makeableWithCart.filter { !previousMakeable.contains(it) }
     }
 }

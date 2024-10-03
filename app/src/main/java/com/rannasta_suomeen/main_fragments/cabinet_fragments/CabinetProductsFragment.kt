@@ -16,16 +16,16 @@ import com.rannasta_suomeen.addSimpleOnTextChangeLister
 
 class CabinetProductsFragment(
     private val adapter: CabinetProductAdapter
-    ): Fragment(R.layout.view_cabinet_products) {
+    ): Fragment(R.layout.view_recycler_search) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewCabinetProducts)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewSearch)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         recyclerView.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
         val helper = CabinetProductAdapterItemTouchHelper(adapter, MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorTertiary, Color.GREEN),requireContext())
         helper.attachToRecyclerView(recyclerView)
-        view.findViewById<EditText>(R.id.editTextProductSearch).addSimpleOnTextChangeLister {
+        view.findViewById<EditText>(R.id.editTextSearch).addSimpleOnTextChangeLister {
             adapter.submitNewSearch(it)
         }
         super.onViewCreated(view, savedInstanceState)
