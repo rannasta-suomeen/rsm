@@ -42,6 +42,15 @@ class ShoppingCart(context: Context) {
         }
     }
 
+    suspend fun clear(){
+        rwLock.writeLock().lock()
+        items.clear()
+        mixers.clear()
+        file.delete()
+        mixerFile.delete()
+        rwLock.writeLock().unlock()
+    }
+
     fun addItem(x: ShoppingCartItem){
         scope.launch {
         rwLock.writeLock().lock()

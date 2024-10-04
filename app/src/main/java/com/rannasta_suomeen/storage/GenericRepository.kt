@@ -83,6 +83,12 @@ abstract class GenericRepository<R,T>(context: Context, fn: String) {
     private fun writeToFile(list: List<R>){
         file.writeText(jackson.writeValueAsString(list))
     }
+
+    fun deleteFile(){
+        file.delete()
+        memoryCopy = Optional.empty()
+        syncedFromInternet = false
+    }
 }
 
 class DrinkRepository(context: Context):
@@ -181,6 +187,14 @@ internal class CabinetRepository(context: Context){
                 }
             }
         }
+    }
+
+    suspend fun delete(){
+        file.delete()
+        netQueueFile.delete()
+        netActionQueue.clear()
+        state = mutableListOf()
+        stateFlow.emit(state)
     }
 
     private suspend fun forceUpdate(){
@@ -383,6 +397,19 @@ class TotalCabinetRepository(context: Context, private val settings: Settings){
     val cabinetFlow: MutableSharedFlow<List<Cabinet>> = MutableSharedFlow(1)
 
     val ownedIngredientFlow: MutableSharedFlow<List<GeneralIngredient>> = MutableSharedFlow(1)
+
+    suspend fun clear(){
+        CoroutineScope(Dispatchers.IO).launch {
+            lock.withLock {
+                cabinetList = listOf()
+                cabinetRepository.delete()
+                selectedCabinetFlow.emit(null)
+                selectedCabinet = null
+                cabinetFlow.emit(listOf())
+                ownedIngredientFlow.emit(listOf())
+            }
+        }
+    }
 
     private suspend fun emitCurrent() {
         productIngredientListPointer = productIngredientList.mapNotNull { it.toPointer(generalIngredientList, productMap) }

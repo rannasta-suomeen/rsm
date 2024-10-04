@@ -17,7 +17,7 @@ import java.util.*
 private val BASE_TAGS = listOf(R.string.cocktail,R.string.shot, R.string.punch, R.string.unmakeble, R.string.unmakebleGrocery, R.string.tagless)
 
 abstract class PopupFilterBase(
-    protected val activity: Activity,
+    activity: Activity,
     @LayoutRes
     private val layout: Int,
 ):PopupRsm(activity, layout, root = null) {

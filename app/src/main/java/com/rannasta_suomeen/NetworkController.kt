@@ -30,6 +30,12 @@ object NetworkController {
         jackson.findAndRegisterModules()
     }
 
+    fun logout(){
+        jwtToken = null
+        username = null
+        password = null
+    }
+
     sealed class Error(override val message: String) : Throwable() {
         class NetworkError : Error("No network")
         class TokenError : Error("Token not valid")
@@ -38,6 +44,7 @@ object NetworkController {
         class RetryError(e: Throwable) : Error("Retried too many times, cause $e")
         class MiscError(code: Int, body: String) : Error("Error $code with body $body")
         class JsonError(s: String) : Error("Json $s could not be parsed")
+        class ConflictError(userName: String): Error("Username: $userName is allrady taken")
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
@@ -100,6 +107,39 @@ object NetworkController {
                 }
             }
         } catch (e: IOException) {
+            Log.d("Networking", "$e")
+            return Result.failure(Error.NetworkError())
+        }
+    }
+
+    suspend fun register(payload: Pair<String, String>): Result<Unit>{
+        val usr = payload.first
+        val pwd = payload.second
+        val body : RequestBody = (usr + "\n" + pwd).toRequestBody()
+        val request = Request.Builder().url("$serverAddress/register").post(body).build()
+        try {
+            client.newCall(request).execute().use {
+                return when (it.code){
+                    201 -> {
+                        username = usr
+                        password = pwd
+                        Result.success(Unit)
+                    }
+                    400 -> {
+                        Log.e("Networking", "Username and password given in the wrong format")
+                        Result.failure(Error.MiscError(400,"Wrong format for username and password"))
+                    }
+                    409 -> {
+                        Log.d("Networking", "Conflict")
+                        Result.failure(Error.ConflictError(usr))
+                    }
+                    else -> {
+                        Log.e("Networking", "${it.code}")
+                        Result.failure(Error.MiscError(it.code, it.body?.string()?:""))
+                    }
+                }
+            }
+        } catch (e: IOException){
             Log.d("Networking", "$e")
             return Result.failure(Error.NetworkError())
         }

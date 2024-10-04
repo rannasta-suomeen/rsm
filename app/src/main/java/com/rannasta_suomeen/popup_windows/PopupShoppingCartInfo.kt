@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
-class PopupShoppingCartInfo(private val fragmentView: View,private val activity: Activity,private val shoppingCart: ShoppingCart,private val settings: Settings,private val totalCabinetRepository: TotalCabinetRepository,private val totalDrinkRepository: TotalDrinkRepository):PopupRsm(activity, R.layout.popup_shopping_cart, null) {
+class PopupShoppingCartInfo(private val fragmentView: View,activity: Activity,private val shoppingCart: ShoppingCart,private val settings: Settings,private val totalCabinetRepository: TotalCabinetRepository,private val totalDrinkRepository: TotalDrinkRepository):PopupRsm(activity, R.layout.popup_shopping_cart, null) {
     private var owned = TreeMap<Int,GeneralIngredient>()
     private var drinks = listOf<DrinkTotal>()
     private val rwLock = ReentrantReadWriteLock()

@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 
-abstract class PopupRsm(activity: Activity, layout: Int, root: ViewGroup?) {
+abstract class PopupRsm(protected val activity: Activity, layout: Int, root: ViewGroup?) {
 
     val view = activity.layoutInflater.inflate(layout, root)
     protected val window: PopupWindow = PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)

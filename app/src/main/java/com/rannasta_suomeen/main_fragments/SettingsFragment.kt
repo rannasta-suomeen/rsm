@@ -4,14 +4,26 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.Spinner
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
+import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.UnitType
+import com.rannasta_suomeen.storage.EncryptedStorage
 import com.rannasta_suomeen.storage.Settings
+import com.rannasta_suomeen.storage.ShoppingCart
+import com.rannasta_suomeen.storage.TotalCabinetRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class SettingsFragment(private val settings: Settings): Fragment(R.layout.fragment_settings), AdapterView.OnItemSelectedListener{
+class SettingsFragment(
+    private val settings: Settings,
+    private val encryptedStorage: EncryptedStorage,
+    private val shoppingCart: ShoppingCart,
+    private val totalCabinetRepository: TotalCabinetRepository): Fragment(R.layout.fragment_settings), AdapterView.OnItemSelectedListener{
 
     private lateinit var spinnerAdapter: ArrayAdapter<String>
 
@@ -37,6 +49,15 @@ class SettingsFragment(private val settings: Settings): Fragment(R.layout.fragme
             switch.isChecked = settings.prefAlko
             switch.setOnCheckedChangeListener { compoundButton, b ->
                 settings.prefAlko = b
+            }
+            findViewById<Button>(R.id.buttonLogout).setOnClickListener {
+                encryptedStorage.password = null
+                encryptedStorage.userName = null
+                NetworkController.logout()
+                CoroutineScope(Dispatchers.IO).launch {
+                    shoppingCart.clear()
+                    totalCabinetRepository.clear()
+                }
             }
         }
     }

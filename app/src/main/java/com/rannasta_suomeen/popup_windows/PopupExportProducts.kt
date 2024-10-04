@@ -16,7 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class PopupExportProducts(private val activity: Activity, private val totalCabinetRepository: TotalCabinetRepository): PopupRsm(activity, R.layout.popup_export_products, null), AdapterView.OnItemSelectedListener {
+class PopupExportProducts(activity: Activity, private val totalCabinetRepository: TotalCabinetRepository): PopupRsm(activity, R.layout.popup_export_products, null), AdapterView.OnItemSelectedListener {
     private val originAdapter = ExportProductAdapter(::onClickItemOrigin)
     private val targetAdapter = ExportProductAdapter(::onClickItemTarget)
     private var targetCabinet: CabinetCompact? = null

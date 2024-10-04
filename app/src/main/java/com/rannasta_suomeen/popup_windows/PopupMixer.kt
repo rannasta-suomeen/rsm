@@ -25,7 +25,7 @@ import kotlin.math.roundToInt
 import kotlin.reflect.KFunction3
 
 class PopupMixer(
-    private val activity: Activity,
+    activity: Activity,
     private val mixer: GeneralIngredient,
     private val totalDrinkRepository: TotalDrinkRepository,
     private val totalCabinetRepository: TotalCabinetRepository,

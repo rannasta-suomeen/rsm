@@ -12,13 +12,14 @@ class FragmentFactory(
     private val settings: Settings,
     private val totalCabinetRepository: TotalCabinetRepository,
     private val shoppingCart: ShoppingCart,
-    private val totalIngredientRepository: IngredientRepository): FragmentFactory() {
+    private val totalIngredientRepository: IngredientRepository,
+    private val encryptedStorage: EncryptedStorage): FragmentFactory(){
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
         return when(className){
             CabinetFragment::class.java.name -> CabinetFragment(activity,imageRepository, settings, totalCabinetRepository,shoppingCart, totalDrinkRepository, totalIngredientRepository)
             DrinksFragment::class.java.name -> DrinksFragment(activity, settings, totalCabinetRepository)
             ProductsFragment::class.java.name -> ProductsFragment(activity, imageRepository, settings, totalCabinetRepository,shoppingCart)
-            SettingsFragment::class.java.name -> SettingsFragment(settings)
+            SettingsFragment::class.java.name -> SettingsFragment(settings, encryptedStorage, shoppingCart, totalCabinetRepository)
             ChartsFragment::class.java.name -> ChartsFragment()
             ShoppingCartFragment::class.java.name -> ShoppingCartFragment(activity,shoppingCart,imageRepository, totalCabinetRepository, totalDrinkRepository, settings)
             else -> super.instantiate(classLoader, className)

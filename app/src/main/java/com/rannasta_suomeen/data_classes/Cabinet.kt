@@ -1,5 +1,6 @@
 package com.rannasta_suomeen.data_classes
 
+import android.util.Log
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -221,11 +222,12 @@ data class Cabinet(
         return null
     }
 
-    /**
-     * @throws IllegalArgumentException when you are not in said cabinet
-     */
     fun getOwnUserId(): Int{
-        return members.find { it.userName == NetworkController.username }?.userId
-            ?: throw IllegalArgumentException("A cabinet you hold a reference to does not have yourself as a member")
+        val t = members.find { it.userName == NetworkController.username }?.userId
+        if (t == null){
+            Log.e("Cabinets", "A cabinet you hold a reference to does not have yourself as a member")
+            return 0
+        }
+        return t
     }
 }

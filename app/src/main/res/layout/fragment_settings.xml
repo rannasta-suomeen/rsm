@@ -18,8 +18,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="?colorOnBackground"
-            android:text="Prefer Alko" />
+            android:text="Alko Or Superalko"
+            android:textColor="?colorOnBackground" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchPreferAlko"
@@ -48,5 +48,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonLogout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="?colorTertiary"
+        android:backgroundTint="?colorPrimary"
+        android:text="Logout" />
 
 </LinearLayout>
