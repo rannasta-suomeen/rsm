@@ -13,8 +13,10 @@ import com.google.android.material.tabs.TabLayout
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.ShoppingMixerAdapter
 import com.rannasta_suomeen.adapters.ShoppingProductAdapter
+import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.toTreemap
 import com.rannasta_suomeen.main_fragments.shopping_cart_fragments.ShoppingFragmentFactory
+import com.rannasta_suomeen.popup_windows.PopupMixer
 import com.rannasta_suomeen.popup_windows.PopupShoppingCartInfo
 import com.rannasta_suomeen.storage.*
 import kotlinx.coroutines.CoroutineScope
@@ -30,9 +32,13 @@ class ShoppingCartFragment(
     private val settings: Settings)
     : Fragment(R.layout.fragment_shopping_cart){
     private val shoppingProductAdapter = ShoppingProductAdapter(activity,imageRepository, totalCabinetRepository, settings, shoppingCart)
-    private val shoppingMixerAdapter = ShoppingMixerAdapter(totalCabinetRepository,shoppingCart, settings, totalDrinkRepository.totalDrinkList)
+    private lateinit var shoppingMixerAdapter : ShoppingMixerAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        fun openPopupFun(m: GeneralIngredient){
+            PopupMixer(activity, m, totalDrinkRepository, totalCabinetRepository, settings, view, shoppingCart).show(view)
+        }
+        shoppingMixerAdapter = ShoppingMixerAdapter(::openPopupFun,totalCabinetRepository,shoppingCart, settings, totalDrinkRepository.totalDrinkList)
         with(view){
             val buttonInfo = findViewById<ImageButton>(R.id.imageButtonCartInfo)
             val tabs = findViewById<TabLayout>(R.id.tabsCart)
@@ -42,7 +48,7 @@ class ShoppingCartFragment(
             navController.setGraph(R.navigation.nav_cart)
             tabs.addOnTabSelectedListener(TabListener(navController))
             buttonInfo.setOnClickListener {
-                PopupShoppingCartInfo(activity,shoppingCart, settings, totalCabinetRepository, totalDrinkRepository).show(buttonInfo)
+                PopupShoppingCartInfo(view,activity,shoppingCart, settings, totalCabinetRepository, totalDrinkRepository).show(buttonInfo)
             }
             shoppingMixerAdapter.submitItems(shoppingCart.getMixers())
         }

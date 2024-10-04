@@ -97,8 +97,8 @@ class MixerAdapter(settings: Settings, drinkList: List<DrinkTotal>, onTouchCallB
     }
 }
 
-class ShoppingMixerAdapter(private val totalCabinetRepository: TotalCabinetRepository, private val shoppingCart: ShoppingCart, settings: Settings, drinkList: List<DrinkTotal>): MixerAdapterBase<ShoppingMixerAdapter.ViewHolder, ShoppingCartMixer>(settings, drinkList, {}, {}){
-    class ViewHolder(itemView: View): BindableViewHolder<ShoppingCartMixer>(itemView){
+class ShoppingMixerAdapter(private val openPopupFun: (GeneralIngredient) -> Unit,private val totalCabinetRepository: TotalCabinetRepository, private val shoppingCart: ShoppingCart, settings: Settings, drinkList: List<DrinkTotal>): MixerAdapterBase<ShoppingMixerAdapter.ViewHolder, ShoppingCartMixer>(settings, drinkList, {}, {}){
+    class ViewHolder(itemView: View,private val openPopupFun: (GeneralIngredient) -> Unit): BindableViewHolder<ShoppingCartMixer>(itemView){
         override fun bind(
             mixer: ShoppingCartMixer,
             owned: TreeMap<Int, CabinetMixer>,
@@ -106,12 +106,15 @@ class ShoppingMixerAdapter(private val totalCabinetRepository: TotalCabinetRepos
             settings: Settings,
             ownedAlcohol: TreeMap<Int, GeneralIngredient>,
             onTouchCallBack: (ShoppingCartMixer) -> Unit,
-            onLongTouchCallback: (ShoppingCartMixer) -> Unit
+            onLongTouchCallback: (ShoppingCartMixer) -> Unit,
         ) {
             with(itemView){
                 setOnLongClickListener {
                     onLongTouchCallback(mixer)
                     true
+                }
+                setOnClickListener {
+                    openPopupFun(mixer.mixer)
                 }
                 findViewById<TextView>(R.id.textViewShoppingMixerName).text = mixer.name
                 findViewById<TextView>(R.id.textViewShoppingMixerAmount).text = mixer.amount?.toDouble()
@@ -128,7 +131,7 @@ class ShoppingMixerAdapter(private val totalCabinetRepository: TotalCabinetRepos
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layout = R.layout.item_mixer_shopping
         val itemView = LayoutInflater.from(parent.context).inflate(layout, parent,false)
-        return ViewHolder(itemView)
+        return ViewHolder(itemView, openPopupFun)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -146,10 +149,14 @@ class ShoppingMixerAdapter(private val totalCabinetRepository: TotalCabinetRepos
     }
 
     private fun notifyDelete(shoppingCartMixer: ShoppingCartMixer){
-        val index = shoppingCart.getMixers().indexOf(shoppingCartMixer)
-        shoppingCart.removeMixerAt(index)
-        items = shoppingCart.getMixers()
-        notifyItemRemoved(index)
+        CoroutineScope(Dispatchers.IO).launch {
+            val index = shoppingCart.getMixers().indexOf(shoppingCartMixer)
+            shoppingCart.removeMixerAt(index)
+            items = shoppingCart.getMixers()
+            CoroutineScope(Dispatchers.Main).launch {
+                notifyItemRemoved(index)
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

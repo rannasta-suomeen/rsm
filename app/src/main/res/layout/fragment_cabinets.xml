@@ -55,6 +55,7 @@
         android:backgroundTint="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:tint="?colorTertiary"
         app:srcCompat="@android:drawable/ic_menu_share" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -65,6 +66,7 @@
         android:layout_marginBottom="8dp"
         android:backgroundTint="?attr/colorPrimary"
         android:clickable="true"
+        app:tint="?colorTertiary"
         app:layout_constraintBottom_toTopOf="@+id/fabSharing"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_baseline_swap_horiz_24" />

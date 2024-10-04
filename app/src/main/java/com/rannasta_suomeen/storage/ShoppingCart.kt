@@ -129,11 +129,9 @@ class ShoppingCart(context: Context) {
     }
 
     fun removeMixerAt(index: Int){
-        scope.launch {
-            rwLock.writeLock().lock()
-            mixers.removeAt(index)
-            mixerFile.writeText(jackson.writeValueAsString(mixers))
-            rwLock.writeLock().unlock()
-        }
+        rwLock.writeLock().lock()
+        mixers.removeAt(index)
+        mixerFile.writeText(jackson.writeValueAsString(mixers))
+        rwLock.writeLock().unlock()
     }
 }
