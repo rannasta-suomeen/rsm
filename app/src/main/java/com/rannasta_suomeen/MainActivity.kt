@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     @SuppressLint("InflateParams")
     private fun login(root: View){
         root.post {
-            PopupLogin(this,encryptedStorage, shoppingCart).show(root)
+            PopupLogin(this,encryptedStorage, shoppingCart).show()
         }
     }
 }

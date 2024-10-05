@@ -1,7 +1,8 @@
 package com.rannasta_suomeen.popup_windows
 
 import android.app.Activity
-import android.view.View
+import android.app.Dialog
+import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -15,14 +16,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class PopupLogin(activity: Activity, private val encryptedStorage: EncryptedStorage, private val shoppingCart: ShoppingCart): PopupRsm(activity, R.layout.popup_login, null) {
-    override fun bind(view: View) {
+class PopupLogin(private val activity: Activity, private val encryptedStorage: EncryptedStorage, private val shoppingCart: ShoppingCart): Dialog(activity){
 
-        val usernameText = view.findViewById<EditText>(R.id.editTextTextLoginUsername)
-        val passwordText = view.findViewById<EditText>(R.id.editTextLoginPassword)
-        val rememberSwitch = view.findViewById<SwitchCompat>(R.id.switchLoginRemember)
-        val buttonLogin = view.findViewById<Button>(R.id.buttonLogin)
-        val buttonRegister = view.findViewById<Button>(R.id.buttonRegister)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        this.setCancelable(false)
+        setContentView(R.layout.popup_login)
+
+        val usernameText = findViewById<EditText>(R.id.editTextTextLoginUsername)
+        val passwordText = findViewById<EditText>(R.id.editTextLoginPassword)
+        val rememberSwitch = findViewById<SwitchCompat>(R.id.switchLoginRemember)
+        val buttonLogin = findViewById<Button>(R.id.buttonLogin)
+        val buttonRegister = findViewById<Button>(R.id.buttonRegister)
 
         usernameText.setText(encryptedStorage.userName)
         passwordText.setText(encryptedStorage.password)
@@ -39,7 +44,7 @@ class PopupLogin(activity: Activity, private val encryptedStorage: EncryptedStor
                 if (password != "" && username != ""){
                     val res = NetworkController.tryNTimes(5, Pair(username, password), NetworkController::login)
                     if (res.isSuccess){
-                        CoroutineScope(Dispatchers.Main).launch { window.dismiss() }
+                        CoroutineScope(Dispatchers.Main).launch { this@PopupLogin.dismiss() }
                     } else{
                         when(val e = res.exceptionOrNull()){
                             is NetworkController.Error.CredentialsError -> CoroutineScope(Dispatchers.Main).launch { Toast.makeText(activity, "Username or password is wrong", Toast.LENGTH_LONG).show() }
@@ -70,7 +75,7 @@ class PopupLogin(activity: Activity, private val encryptedStorage: EncryptedStor
                         encryptedStorage.password = password
                         if (!save) encryptedStorage.password = null
                         else encryptedStorage.password = password
-                        CoroutineScope(Dispatchers.Main).launch { window.dismiss() }
+                        CoroutineScope(Dispatchers.Main).launch { this@PopupLogin.dismiss() }
                     } else{
                         fun makeToast(s: String){
                             CoroutineScope(Dispatchers.Main).launch { Toast.makeText(activity, s, Toast.LENGTH_SHORT).show() }
@@ -92,6 +97,10 @@ class PopupLogin(activity: Activity, private val encryptedStorage: EncryptedStor
                 CoroutineScope(Dispatchers.Main).launch { Toast.makeText(activity, "You must give username and password", Toast.LENGTH_LONG).show()}
             }
         }
+    }
 
+    override fun onBackPressed() {
+        activity.finish()
+        super.onBackPressed()
     }
 }

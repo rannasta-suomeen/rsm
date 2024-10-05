@@ -1,5 +1,6 @@
 package com.rannasta_suomeen.main_fragments
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment
 import com.rannasta_suomeen.NetworkController
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.data_classes.UnitType
+import com.rannasta_suomeen.popup_windows.PopupLogin
 import com.rannasta_suomeen.storage.EncryptedStorage
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.ShoppingCart
@@ -20,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SettingsFragment(
+    private val activity: Activity,
     private val settings: Settings,
     private val encryptedStorage: EncryptedStorage,
     private val shoppingCart: ShoppingCart,
@@ -58,6 +61,7 @@ class SettingsFragment(
                     shoppingCart.clear()
                     totalCabinetRepository.clear()
                 }
+                PopupLogin(activity,encryptedStorage, shoppingCart).show()
             }
         }
     }
