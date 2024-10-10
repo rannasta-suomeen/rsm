@@ -640,6 +640,10 @@ class TotalDrinkRepository(context: Context) {
         return totalDrinkList.filter { it.canMakeStrict(owned) }
     }
 
+    fun makeableWithMixers(owned: TreeMap<Int, GeneralIngredient>): List<DrinkTotal>{
+        return totalDrinkList.filter { it.canMakeNonAlcoholic(owned) }
+    }
+
     fun makeableWithNewAlcoholic(owned: TreeMap<Int,GeneralIngredient>, new: List<GeneralIngredient>): List<DrinkTotal>{
         val previousMakeable = makeableWithAlcohol(owned)
         val newList = owned.toMutableMap()

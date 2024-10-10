@@ -14,11 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rannasta_suomeen.*
 import com.rannasta_suomeen.data_classes.Cabinet
 import com.rannasta_suomeen.data_classes.CabinetMember
-import com.rannasta_suomeen.data_classes.GeneralIngredient
+import com.rannasta_suomeen.data_classes.toTreemap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 
 class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupRsm(activity, R.layout.popup_cabinet_sharing, root = null) {
 
@@ -51,7 +50,6 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
                     findViewById<TextView>(R.id.textViewMemberValue).text = showMemberValue(item, itemView)
                     findViewById<ImageView>(R.id.imageViewMemberOwner).isVisible = cabinet.ownerId == item.userId
                 }
-
             }
         }
 
@@ -95,13 +93,27 @@ class PopupCabinetShare(activity: Activity,private val cabinet: Cabinet): PopupR
                     }
                 }
             }
-            val makeableDrinks = totalDrinkRepository.makeableWithStrict(totalCabinetRepository.productsToIngredients(cabinet.products).associateBy { it.id }.toSortedMap() as TreeMap<Int, GeneralIngredient>)
+            val makeableDrinksTotal = totalDrinkRepository.makeableWithStrict((totalCabinetRepository.productsToIngredients(cabinet.products) + cabinet.mixers.map { it.ingredient }).toTreemap())
+            val makeableDrinksAlcoholic = totalDrinkRepository.makeableWithAlcohol(totalCabinetRepository.productsToIngredients(cabinet.products).toTreemap())
+            val makeableDrinksMixers = totalDrinkRepository.makeableWithMixers(cabinet.mixers.map { it.ingredient }.toTreemap())
             val allDrinks = totalDrinkRepository.totalDrinkList
-            findViewById<TextView>(R.id.textViewCabinetCoverage).text = makeableDrinks.size.toString()
+            findViewById<TextView>(R.id.textViewCabinetCoverage).text = makeableDrinksTotal.size.toString()
             findViewById<TextView>(R.id.textViewCabinetCoverageMax).text = allDrinks.size.toString()
-            val percent = (100*makeableDrinks.size)/allDrinks.size
-            findViewById<ProgressBar>(R.id.progressBarCabinetCoverage).progress = percent
-            findViewById<TextView>(R.id.textViewCabinetCoveragePercent).text = resources.getString(R.string.percentage, percent)
+            val percentTotal = (100*makeableDrinksTotal.size)/allDrinks.size
+            findViewById<ProgressBar>(R.id.progressBarCabinetCoverage).progress = percentTotal
+            findViewById<TextView>(R.id.textViewCabinetCoveragePercent).text = resources.getString(R.string.percentage, percentTotal)
+
+            findViewById<TextView>(R.id.textViewCabinetAlcoholCoverage).text = makeableDrinksAlcoholic.size.toString()
+            findViewById<TextView>(R.id.textViewCabinetAlcoholCoverageMax).text = allDrinks.size.toString()
+            val percentAlcohol = (100*makeableDrinksAlcoholic.size)/allDrinks.size
+            findViewById<ProgressBar>(R.id.progressBarCabinetAlcoholCoverage).progress = percentAlcohol
+            findViewById<TextView>(R.id.textViewCabinetAlcoholCoveragePercent).text = resources.getString(R.string.percentage, percentAlcohol)
+
+            findViewById<TextView>(R.id.textViewCabinetMixerCoverage).text = makeableDrinksMixers.size.toString()
+            findViewById<TextView>(R.id.textViewCabinetMixerCoverageMax).text = allDrinks.size.toString()
+            val percentMixer = (100*makeableDrinksMixers.size)/allDrinks.size
+            findViewById<ProgressBar>(R.id.progressBarCabinetMixerCoverage).progress = percentMixer
+            findViewById<TextView>(R.id.textViewCabinetMixerCoveragePercent).text = resources.getString(R.string.percentage, percentMixer)
         }
     }
 
