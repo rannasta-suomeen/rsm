@@ -12,17 +12,18 @@ import com.rannasta_suomeen.data_classes.DrinkTotal
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.data_classes.UnitType
 import com.rannasta_suomeen.popup_windows.PopupDrink
+import com.rannasta_suomeen.storage.Randomizer
 import com.rannasta_suomeen.storage.Settings
 import java.util.*
 
-class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings): RecyclerView.Adapter<DrinkPreviewAdapter.DrinkPreviewViewHolder>() {
+class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings,private val randomizer: Randomizer): RecyclerView.Adapter<DrinkPreviewAdapter.DrinkPreviewViewHolder>() {
 
     private var items: List<DrinkTotal> = listOf()
     private var owned: TreeMap<Int,GeneralIngredient> = TreeMap()
 
     class DrinkPreviewViewHolder(itemView: View,val activity: Activity):RecyclerView.ViewHolder(itemView){
         // TODO: sometimes drinks with multiline names fail to render the second line
-        fun bind(i: DrinkTotal, owned:TreeMap<Int,GeneralIngredient>, settings: Settings){
+        fun bind(i: DrinkTotal, owned:TreeMap<Int,GeneralIngredient>, randomizer: Randomizer, settings: Settings){
             val item = i.drink
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewName).text = item.name
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewShots).text = displayDecimal(
@@ -47,7 +48,7 @@ class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings
             itemView.findViewById<TextView>(R.id.textViewDrinkMissingAlcohol).text = i.amountOfMissingIngredientsAlcoholic(owned).toString()
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewMissingGrocery).text = i.amountOfMissingIngredientsNonAlcoholic(owned).toString()
             itemView.setOnClickListener {
-                PopupDrink(i, activity, owned, settings).show(it)
+                PopupDrink(i, activity, owned, randomizer,settings).show(it)
             }
         }
         private fun displayDecimal(x: Double, stringId: Int): String{
@@ -71,7 +72,7 @@ class DrinkPreviewAdapter(val activity: Activity, private val settings: Settings
 
     override fun onBindViewHolder(holder: DrinkPreviewViewHolder, position: Int) {
         val item = items[position]
-        holder.bind(item, owned, settings)
+        holder.bind(item, owned,randomizer, settings)
     }
 
     override fun getItemCount(): Int {

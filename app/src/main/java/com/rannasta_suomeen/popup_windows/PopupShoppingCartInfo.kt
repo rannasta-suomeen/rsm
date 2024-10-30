@@ -10,17 +10,21 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.DrinkCompactAdapter
 import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.displayDecimal
-import com.rannasta_suomeen.storage.Settings
-import com.rannasta_suomeen.storage.ShoppingCart
-import com.rannasta_suomeen.storage.TotalCabinetRepository
-import com.rannasta_suomeen.storage.TotalDrinkRepository
+import com.rannasta_suomeen.storage.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
-class PopupShoppingCartInfo(private val fragmentView: View,activity: Activity,private val shoppingCart: ShoppingCart,private val settings: Settings,private val totalCabinetRepository: TotalCabinetRepository,private val totalDrinkRepository: TotalDrinkRepository):PopupRsm(activity, R.layout.popup_shopping_cart, null) {
+class PopupShoppingCartInfo(
+    private val fragmentView: View,
+    activity: Activity,
+    private val shoppingCart: ShoppingCart,
+    private val settings: Settings,
+    private val totalCabinetRepository: TotalCabinetRepository,
+    private val totalDrinkRepository: TotalDrinkRepository,
+    private val randomizer: Randomizer):PopupRsm(activity, R.layout.popup_shopping_cart, null) {
     private var owned = TreeMap<Int,GeneralIngredient>()
     private var drinks = listOf<DrinkTotal>()
     private val rwLock = ReentrantReadWriteLock()
@@ -39,7 +43,7 @@ class PopupShoppingCartInfo(private val fragmentView: View,activity: Activity,pr
             recyclerAlcohol.layoutManager = LinearLayoutManager(view.context)
             fun onClickDrink(x: DrinkTotal){
                 rwLock.readLock().lock()
-                PopupDrink(x, activity, owned, settings).show(fragmentView)
+                PopupDrink(x, activity, owned, randomizer,settings).show(fragmentView)
                 rwLock.readLock().unlock()
             }
             val strictAdapter = DrinkCompactAdapter(::onClickDrink)

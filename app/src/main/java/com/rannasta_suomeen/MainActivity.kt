@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.menuMainSettings -> R.id.fragmentSettings
             R.id.menuMainStorage -> R.id.fragmentCabinets
             R.id.menuMainCart -> R.id.fragmentCart
+            R.id.menuMainRandomizer -> R.id.fragmentRandomizer
             else -> throw IllegalArgumentException("Attempted to navigate to ${item.itemId} witch is not possible")
         }
         navController.navigate(target)
@@ -56,7 +57,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         imageRepository = ImageRepository(applicationContext)
         shoppingCart = ShoppingCart(applicationContext)
         totalIngredientRepository = IngredientRepository(applicationContext)
-        supportFragmentManager.fragmentFactory = FragmentFactory(this, imageRepository, settings, totalCabinetRepository, shoppingCart, totalIngredientRepository, encryptedStorage)
+        val randomizer = Randomizer(applicationContext)
+        supportFragmentManager.fragmentFactory = FragmentFactory(this, imageRepository, settings, totalCabinetRepository, shoppingCart, totalIngredientRepository, randomizer ,encryptedStorage)
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.layout_activity_main)

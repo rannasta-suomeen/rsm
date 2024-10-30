@@ -38,7 +38,8 @@ class CabinetFragment(
     private val totalCabinetRepository: TotalCabinetRepository,
     private val shoppingCart: ShoppingCart,
     private val totalDrinkRepository: TotalDrinkRepository,
-    private val totalIngredientRepository: IngredientRepository): Fragment(R.layout.fragment_cabinets), AdapterView.OnItemSelectedListener{
+    private val totalIngredientRepository: IngredientRepository,
+    private val randomizer: Randomizer): Fragment(R.layout.fragment_cabinets), AdapterView.OnItemSelectedListener{
 
     private var cabinetList = listOf<Cabinet>()
     private lateinit var spinnerAdapter: ArrayAdapter<String>
@@ -52,7 +53,7 @@ class CabinetFragment(
         adapter = CabinetProductAdapter(activity, totalCabinetRepository, imageRepository, settings, shoppingCart)
         val openPopupCallback: (GeneralIngredient) -> Unit = {
             this.view?.let { view ->
-                PopupMixer(activity, it, totalDrinkRepository, totalCabinetRepository, settings, view, shoppingCart).show(view)
+                PopupMixer(activity, it, totalDrinkRepository, totalCabinetRepository, settings, view, shoppingCart, randomizer).show(view)
             }
         }
         val deleteCallBack: (GeneralIngredient) -> Unit = { i ->

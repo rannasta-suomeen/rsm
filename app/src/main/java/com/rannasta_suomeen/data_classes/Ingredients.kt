@@ -152,6 +152,10 @@ data class IngredientsForDrinkPointer(
             }
 
         }
+
+        fun multipliedBy(rhs: Double): RecipePartPointer{
+            return RecipePartPointer(ingredient, (amount * rhs).roundToInt(), name, unit)
+        }
     }
 }
 

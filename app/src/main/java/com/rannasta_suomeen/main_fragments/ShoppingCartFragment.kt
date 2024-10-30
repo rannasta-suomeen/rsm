@@ -29,14 +29,15 @@ class ShoppingCartFragment(
     imageRepository: ImageRepository,
     private val totalCabinetRepository: TotalCabinetRepository,
     private val totalDrinkRepository: TotalDrinkRepository,
-    private val settings: Settings)
+    private val settings: Settings,
+    private val randomizer: Randomizer)
     : Fragment(R.layout.fragment_shopping_cart){
     private val shoppingProductAdapter = ShoppingProductAdapter(activity,imageRepository, totalCabinetRepository, settings, shoppingCart)
     private lateinit var shoppingMixerAdapter : ShoppingMixerAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         fun openPopupFun(m: GeneralIngredient){
-            PopupMixer(activity, m, totalDrinkRepository, totalCabinetRepository, settings, view, shoppingCart).show(view)
+            PopupMixer(activity, m, totalDrinkRepository, totalCabinetRepository, settings, view, shoppingCart, randomizer).show(view)
         }
         shoppingMixerAdapter = ShoppingMixerAdapter(::openPopupFun,totalCabinetRepository,shoppingCart, settings, totalDrinkRepository.totalDrinkList)
         with(view){
@@ -48,7 +49,7 @@ class ShoppingCartFragment(
             navController.setGraph(R.navigation.nav_cart)
             tabs.addOnTabSelectedListener(TabListener(navController))
             buttonInfo.setOnClickListener {
-                PopupShoppingCartInfo(view,activity,shoppingCart, settings, totalCabinetRepository, totalDrinkRepository).show(buttonInfo)
+                PopupShoppingCartInfo(view,activity,shoppingCart, settings, totalCabinetRepository, totalDrinkRepository, randomizer).show(buttonInfo)
             }
             shoppingMixerAdapter.submitItems(shoppingCart.getMixers())
         }

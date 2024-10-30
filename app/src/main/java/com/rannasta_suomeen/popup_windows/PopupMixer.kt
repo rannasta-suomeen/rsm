@@ -13,10 +13,7 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.DrinkCompactAdapter
 import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.displayDecimal
-import com.rannasta_suomeen.storage.Settings
-import com.rannasta_suomeen.storage.ShoppingCart
-import com.rannasta_suomeen.storage.TotalCabinetRepository
-import com.rannasta_suomeen.storage.TotalDrinkRepository
+import com.rannasta_suomeen.storage.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,7 +28,8 @@ class PopupMixer(
     private val totalCabinetRepository: TotalCabinetRepository,
     private val settings: Settings,
     private val parentView: View,
-    private val shoppingCart: ShoppingCart): PopupRsm(activity, R.layout.popup_mixer,null) {
+    private val shoppingCart: ShoppingCart,
+    private val randomizer: Randomizer): PopupRsm(activity, R.layout.popup_mixer,null) {
 
     private var drinkList = listOf<DrinkTotal>()
     private var ownedTotal: TreeMap<Int, GeneralIngredient> = TreeMap()
@@ -40,7 +38,7 @@ class PopupMixer(
     private val usedAdapter = DrinkCompactAdapter(::onClickDrink)
 
     private fun onClickDrink(x: DrinkTotal){
-        PopupDrink(x, activity, ownedTotal, settings).show(parentView)
+        PopupDrink(x, activity, ownedTotal, randomizer, settings).show(parentView)
     }
 
     override fun bind(view: View) {

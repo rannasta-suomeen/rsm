@@ -2,6 +2,7 @@ package com.rannasta_suomeen.popup_windows
 
 import android.app.Activity
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
@@ -14,12 +15,13 @@ import com.rannasta_suomeen.adapters.RecipePartAdapter
 import com.rannasta_suomeen.data_classes.DrinkTotal
 import com.rannasta_suomeen.data_classes.GeneralIngredient
 import com.rannasta_suomeen.storage.DRINK_VOLUME_UNIT
+import com.rannasta_suomeen.storage.Randomizer
 import com.rannasta_suomeen.storage.Settings
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.max
 
-class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val owned: TreeMap<Int,GeneralIngredient>,private val settings: Settings):PopupRsm(activity, R.layout.popup_drink_recipe, root = null) {
+class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val owned: TreeMap<Int,GeneralIngredient>,private val randomizer: Randomizer,private val settings: Settings):PopupRsm(activity, R.layout.popup_drink_recipe, root = null) {
 
     private var amount = 1.0
     private var volume = DRINK_VOLUME_UNIT.convert(drink.drink.volume, settings.prefUnit) * amount
@@ -117,6 +119,11 @@ class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val o
                 updateByAmount()
             }
 
+            findViewById<Button>(R.id.buttonRecipeDrink).setOnClickListener {
+                drinkTheDrink()
+                window.dismiss()
+            }
+
         }
         adapter.submitItems(drink.ingredients.recipeParts.toList(), owned)
         adapter.submitAmount(amount)
@@ -124,5 +131,9 @@ class PopupDrink(private val drink: DrinkTotal, activity: Activity,private val o
 
     private fun calculatePrice(): Double{
         return drink.drink.price(settings) * amount
+    }
+    private fun drinkTheDrink(){
+        val index = randomizer.getItems().indexOfFirst { it.drinkTotal == drink }
+        randomizer.removeItemAt(index)
     }
 }

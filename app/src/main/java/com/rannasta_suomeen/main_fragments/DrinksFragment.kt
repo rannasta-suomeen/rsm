@@ -14,6 +14,7 @@ import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.DrinkPreviewAdapter
 import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.popup_windows.PopupDrinkFilter
+import com.rannasta_suomeen.storage.Randomizer
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.TotalCabinetRepository
 import com.rannasta_suomeen.totalDrinkRepository
@@ -21,7 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class DrinksFragment(val activity: Activity, private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository) : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
+class DrinksFragment(val activity: Activity, private val settings: Settings, private val totalCabinetRepository: TotalCabinetRepository, private val randomizer: Randomizer) : Fragment(R.layout.fragment_drinks), AdapterView.OnItemSelectedListener {
 
     private lateinit var drinkPreviewAdapter: DrinkPreviewAdapter
     private var drinkListFull = listOf<DrinkTotal>()
@@ -33,7 +34,7 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
 
     override fun onCreate(savedInstanceState: Bundle?) {
         filterMenu = PopupDrinkFilter(activity, ::updateSelection,drinkListFull,settings)
-        drinkPreviewAdapter = DrinkPreviewAdapter(activity, settings)
+        drinkPreviewAdapter = DrinkPreviewAdapter(activity, settings, randomizer)
         super.onCreate(savedInstanceState)
         updateSelection()
     }
