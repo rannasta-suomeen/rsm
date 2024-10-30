@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rannasta_suomeen.R
-import com.rannasta_suomeen.adapters.DrinkPreviewAdapter
+import com.rannasta_suomeen.adapters.DrinkRandomizerAdapter
 import com.rannasta_suomeen.data_classes.*
 import com.rannasta_suomeen.storage.Randomizer
 import com.rannasta_suomeen.storage.Settings
@@ -26,7 +26,10 @@ class RandomizerFragment(
     private val totalCabinetRepository: TotalCabinetRepository,
     private val totalDrinkRepository: TotalDrinkRepository,
     private val randomizer: Randomizer): Fragment(R.layout.fragment_randomizer) {
-    val adapter = DrinkPreviewAdapter(activity, settings, randomizer)
+    private val callBack: (RandomizerItem) -> Unit = {
+        randomizer.removeItem(it)
+    }
+    val adapter = DrinkRandomizerAdapter(activity, settings, randomizer, callBack)
     private var allDrinks = listOf<DrinkTotal>()
     private var ownedProducts: List<CabinetProduct> = listOf()
     private var ownedMixers: List<CabinetMixer> = listOf()
@@ -63,7 +66,6 @@ class RandomizerFragment(
             val fab = findViewById<FloatingActionButton>(R.id.fabAddDrinkToRandomizer)
             fab.setOnClickListener {
                 randomizer.addItem(generateRandomDrink())
-                adapter.submitItems(randomizer.getItems().map { it.drinkTotal },combineOwned())
             }
         }
         super.onViewCreated(view, savedInstanceState)
@@ -74,7 +76,7 @@ class RandomizerFragment(
 
     private fun updateRecycler(){
         mainScope.launch {
-            adapter.submitItems(randomizerItems.map{it.drinkTotal}, combineOwned())
+            adapter.submitItems(randomizerItems, combineOwned())
         }
     }
 
