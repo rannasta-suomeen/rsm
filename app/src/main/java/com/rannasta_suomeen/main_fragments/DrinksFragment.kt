@@ -33,14 +33,14 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
     private var sortByAsc = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        filterMenu = PopupDrinkFilter(activity, ::updateSelection,drinkListFull,settings)
         drinkPreviewAdapter = DrinkPreviewAdapter(activity, settings, randomizer)
         super.onCreate(savedInstanceState)
-        updateSelection()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        filterMenu = PopupDrinkFilter(activity, ::updateSelection,drinkListFull,settings, requireView())
+        updateSelection()
 
         val recyclerViewDrinks = view.findViewById<RecyclerView>(R.id.recyclerViewPreviewDrinks)
         recyclerViewDrinks.layoutManager = LinearLayoutManager(this.context)
@@ -72,7 +72,7 @@ class DrinksFragment(val activity: Activity, private val settings: Settings, pri
             launch {
                 totalDrinkRepository.dataFlow.collect{
                     drinkListFull = it
-                    filterMenu = PopupDrinkFilter(activity, ::updateSelection,drinkListFull,settings)
+                    filterMenu = PopupDrinkFilter(activity, ::updateSelection,drinkListFull,settings, view)
                     drinkListFull
                     activity.runOnUiThread { updateSelection() }
                 }

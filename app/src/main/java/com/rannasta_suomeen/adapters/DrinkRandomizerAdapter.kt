@@ -18,7 +18,7 @@ import java.util.*
 
 class DrinkRandomizerAdapter(val activity: Activity, private val settings: Settings, private val randomizer: Randomizer, private val onLongClickCallback: (RandomizerItem) -> Unit): RecyclerView.Adapter<DrinkRandomizerAdapter.DrinkPreviewViewHolder>() {
 
-    private var items: List<RandomizerItem> = listOf()
+    private var items: MutableList<RandomizerItem> = mutableListOf()
     private var owned: TreeMap<Int,GeneralIngredient> = TreeMap()
 
     class DrinkPreviewViewHolder(itemView: View,val activity: Activity):RecyclerView.ViewHolder(itemView){
@@ -64,7 +64,7 @@ class DrinkRandomizerAdapter(val activity: Activity, private val settings: Setti
 
     @SuppressLint("NotifyDataSetChanged")
     fun submitItems(input: List<RandomizerItem>, o: TreeMap<Int,GeneralIngredient>){
-        items = input
+        items = input.toMutableList()
         owned = o
         notifyDataSetChanged()
     }

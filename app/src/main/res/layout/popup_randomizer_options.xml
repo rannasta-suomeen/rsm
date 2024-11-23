@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?colorSecondary">
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_margin="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="?colorOnBackground"
+            android:text="How many"/>
+        <EditText
+            android:id="@+id/editTextRandomizerAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="50dp"
+            android:text="1"
+            android:inputType="number"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchRandomizerAlcoholic"
+        android:layout_margin="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Allow Non Owned alcohol"/>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchRandomizerDuplicates"
+        android:layout_margin="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Allow Duplicates"/>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchRandomizerNonAlcoholic"
+        android:layout_margin="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Allow Non Owned Mixers"/>
+    <Button
+        android:id="@+id/buttonRandomizerIngredients"
+        android:layout_margin="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?colorTertiary"
+        android:text="Ingredients"/>
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        style="?buttonBarButtonStyle">
+        <Button
+            android:id="@+id/buttonRandomizerCancel"
+            android:layout_margin="4dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="?buttonBarButtonStyle"
+            android:textColor="?colorTertiary"
+            android:backgroundTint="?colorPrimary"
+            android:text="@string/cancel"/>
+        <Button
+            android:id="@+id/buttonRandomizerOk"
+            android:layout_margin="4dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="?buttonBarButtonStyle"
+            android:textColor="?colorTertiary"
+            android:backgroundTint="?colorPrimary"
+            android:text="@string/ok"/>
+        <Button
+            android:id="@+id/buttonRandomizerClear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="?buttonBarButtonStyle"
+            android:textColor="?colorTertiary"
+            android:backgroundTint="?colorPrimary"
+            android:text="@string/clear"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

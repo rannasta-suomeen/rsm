@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.withLock
 
 abstract class GenericLocalStorage<T>(context: Context, filename: String,type: Class<Array<T>>) {
     private val items: MutableList<T> = mutableListOf()
@@ -42,32 +43,38 @@ abstract class GenericLocalStorage<T>(context: Context, filename: String,type: C
     }
 
     suspend fun clear(){
-        rwLock.writeLock().lock()
-        items.clear()
-        file.delete()
+        rwLock.writeLock().withLock {
+            items.clear()
+            file.delete()
+        }
         dataFlow.emit(listOf())
-        rwLock.writeLock().unlock()
     }
 
     fun addItem(x: T){
         scope.launch {
-            rwLock.writeLock().lock()
-            items.add(x)
-            dataFlow.emit(items)
-            file.writeText(jackson.writeValueAsString(items))
-            rwLock.writeLock().unlock()
+            rwLock.writeLock().withLock {
+                items.add(x)
+                file.writeText(jackson.writeValueAsString(items))
+            }
+            rwLock.readLock().lock()
+            val t = items
+            rwLock.readLock().unlock()
+            dataFlow.emit(t)
         }
     }
 
     fun removeItem(x: T){
         scope.launch {
-            rwLock.writeLock().lock()
-            items.removeIf {
-                it == x
+            rwLock.writeLock().withLock {
+                items.removeIf {
+                    it == x
+                }
+                file.writeText(jackson.writeValueAsString(items))
             }
-            dataFlow.emit(items)
-            file.writeText(jackson.writeValueAsString(items))
-            rwLock.writeLock().unlock()
+            rwLock.readLock().lock()
+            val t = items
+            rwLock.readLock().unlock()
+            dataFlow.emit(t)
         }
     }
 

@@ -3,6 +3,7 @@ package com.rannasta_suomeen.main_fragments
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -10,6 +11,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.DrinkRandomizerAdapter
 import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.popup_windows.PopupRandomizerOptions
+import com.rannasta_suomeen.popup_windows.RandomizerSettings
 import com.rannasta_suomeen.storage.Randomizer
 import com.rannasta_suomeen.storage.Settings
 import com.rannasta_suomeen.storage.TotalCabinetRepository
@@ -18,7 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.math.absoluteValue
 
 class RandomizerFragment(
     private val activity: Activity,
@@ -36,7 +38,7 @@ class RandomizerFragment(
     private var randomizerItems = listOf<RandomizerItem>()
     private val scope = CoroutineScope(Dispatchers.IO)
     private val mainScope = CoroutineScope(Dispatchers.Main)
-    private val random = Random()
+    private val randomizerSettings =  RandomizerSettings()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(view){
@@ -65,7 +67,18 @@ class RandomizerFragment(
             }
             val fab = findViewById<FloatingActionButton>(R.id.fabAddDrinkToRandomizer)
             fab.setOnClickListener {
-                randomizer.addItem(generateRandomDrink())
+                val t: (RandomizerSettings, Int) -> Unit = {it, n ->
+                    val t = it.generateDrink(allDrinks, combineOwned(), n)
+                    when (t.isSuccess){
+                        true -> t.getOrThrow().forEach { randomizer.addItem(RandomizerItem(it,true)) }
+                        false -> Toast.makeText(activity, "Not possible to complete list with current settings", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                PopupRandomizerOptions(activity, randomizerSettings,view,t){
+                    scope.launch {
+                        randomizer.clear()
+                    }
+                }.show(this)
             }
         }
         super.onViewCreated(view, savedInstanceState)
@@ -78,10 +91,5 @@ class RandomizerFragment(
         mainScope.launch {
             adapter.submitItems(randomizerItems, combineOwned())
         }
-    }
-
-    private fun generateRandomDrink(): RandomizerItem{
-        val drink = allDrinks[random.nextInt().absoluteValue % allDrinks.size]
-        return RandomizerItem(drink, true)
     }
 }

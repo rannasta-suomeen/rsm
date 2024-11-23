@@ -9,7 +9,10 @@ import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AlertDialog
 import com.rannasta_suomeen.R
+import com.rannasta_suomeen.adapters.FilterMap
+import com.rannasta_suomeen.adapters.checkDrinkAllowed
 import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.ingredientRepository
 import com.rannasta_suomeen.storage.Settings
 import java.text.Normalizer
 import java.util.*
@@ -176,7 +179,7 @@ class PopupFilter(
     }
 }
 
-class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, private val drinksList: List<DrinkTotal>,private val appSettings: Settings): PopupFilterBase(activity, R.layout.popup_drink_filer){
+class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, private val drinksList: List<DrinkTotal>,private val appSettings: Settings, private val parentView: View): PopupFilterBase(activity, R.layout.popup_drink_filer){
     private class FilterSettings(
         var searchedName: String,
         var allowedTags: List<String>,
@@ -188,7 +191,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
         var priceMax: Double?,
         var aerMin: Double?,
         var aerMax: Double?,
-        var whiteListedIngredients: List<GeneralIngredient>,
+        var filterMap: FilterMap,
     ){
         fun filterTag(mutableList: MutableList<DrinkTotal>, ownedIngredients: TreeMap<Int,GeneralIngredient>, allTags: List<String>){
             val disAllowedTags = allTags.toMutableList()
@@ -261,7 +264,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
             null,
             null,
             null,
-            ingredients
+            FilterMap()
         )
     }
     private val settings = createDefault()
@@ -292,11 +295,12 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
         val buttonTags: Button = t(R.id.buttonTags)
         val buttonIngredients: Button = t(R.id.buttonIngredients)
         var tagDialogue = multiOptionDialog(tags,{it},settings.allowedTags,"Select Criteria"){settings.allowedTags = it.toList()}
-        var ingredientDialog = multiOptionDialog(ingredients,{it.name}, settings.whiteListedIngredients,"Select Allowed Ingredients"){settings.whiteListedIngredients = it.toList()}
+        var ingredientDialog = PopupFilterIngredients(activity, ingredientRepository, settings.filterMap){
+            settings.filterMap = it
+        }
 
         fun updateDialogs(){
             tagDialogue = multiOptionDialog(tags,{it},settings.allowedTags,"Select Criteria"){settings.allowedTags = it.toList()}
-            ingredientDialog = multiOptionDialog(ingredients,{it.name}, settings.whiteListedIngredients,"Select Allowed Ingredients"){settings.whiteListedIngredients = it.toList()}
         }
 
         buttonTags.setOnClickListener { tagDialogue.show() }
@@ -312,19 +316,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
             updateFun
             true
         }
-        buttonIngredients.setOnClickListener { ingredientDialog.show() }
-        buttonIngredients.setOnLongClickListener {
-            if (settings.whiteListedIngredients.isNotEmpty()){
-                settings.whiteListedIngredients = listOf()
-                Toast.makeText(activity, "Deselected all ingredients",Toast.LENGTH_SHORT).show()
-            } else {
-                settings.whiteListedIngredients = ingredients
-                Toast.makeText(activity, "Selected all ingredients",Toast.LENGTH_SHORT).show()
-            }
-            updateDialogs()
-            updateFun
-            true
-        }
+        buttonIngredients.setOnClickListener { ingredientDialog.show(parentView) }
 
         buttonDismiss.setOnClickListener {
             this.settings.searchedName = nameSelect.text.toString()
@@ -368,8 +360,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
         quickRemove(settings.volMax) { it.drink.pricePerServing(appSettings) > settings.volMax!! }
         settings.filterTag(mutList, ownedIngredients.toTreemap(), tags)
         mutList.removeAll {
-            !it.ingredients.recipeParts.map { it.ingredient }
-                .all { settings.whiteListedIngredients.contains(it) }
+            !settings.filterMap.checkDrinkAllowed(it)
         }
 
         return mutList.toList()

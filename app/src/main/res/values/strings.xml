@@ -39,6 +39,12 @@
     <string name="mixers">Mixers</string>
     <string name="new_drinks_alcohol">%1$d new drinks that need mixers</string>
     <string name="randomizer">Randomizer</string>
+    <string name="include">Include</string>
+    <string name="neutral">Neutral</string>
+    <string name="exclude">Exclude</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
+    <string name="clear">Clear</string>
 
     <string-array name="drinks_possible_sort">
         <item>Name</item>
