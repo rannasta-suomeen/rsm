@@ -157,6 +157,7 @@ class PopupMixer(
             "" -> UnitType.Kpl
             "b" -> UnitType.Kpl
             "l" -> UnitType.L
+            "dl" -> UnitType.Dl
             else -> null
         }
 

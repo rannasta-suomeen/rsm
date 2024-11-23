@@ -179,7 +179,10 @@ enum class UnitType {
     Dash,
 
     @JsonProperty("l")
-    L;
+    L,
+
+    @JsonProperty("dl")
+    Dl;
 
     fun convert(amount: Int, newUnit: UnitType): Double {
         val ml = this.convertToMl(amount.toDouble())
@@ -203,6 +206,7 @@ enum class UnitType {
             Kpl -> throw IllegalArgumentException("Unreachable")
             Tl -> "tl"
             L -> "l"
+            Dl -> "dl"
             Dash -> throw IllegalArgumentException("Unreachable")
         }
 
@@ -222,6 +226,7 @@ enum class UnitType {
             Kpl -> throw IllegalArgumentException("Cant convert Kpl to ml")
             Tl -> 15 * amount
             Dash -> 0.625 * amount
+            Dl -> amount * 100
             L -> amount*1000
         }
     }
@@ -234,12 +239,13 @@ enum class UnitType {
             Kpl -> throw IllegalArgumentException("Cant convert ml to kpl")
             Tl -> 0.06666666666 * amount
             Dash -> 1.6 * amount
-            L -> amount/1000
+            Dl -> amount / 100
+            L -> amount / 1000
         }
     }
 
     fun listVolumeOptions(): List<Pair<UnitType, String>>{
-        return listOf(Pair(Cl, "cl"), Pair(Ml, "ml"), Pair(Oz, "oz"), Pair(Tl, "tl"), Pair(L,"l"))
+        return listOf(Pair(Cl, "cl"), Pair(Ml, "ml"), Pair(Oz, "oz"), Pair(Tl, "tl"), Pair(L,"l"), Pair(Dl, "dl"))
     }
 }
 

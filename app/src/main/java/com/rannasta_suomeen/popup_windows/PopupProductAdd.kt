@@ -106,6 +106,7 @@ class PopupProductAdd(private val product: Product,
             "ml" -> UnitType.Ml
             "oz" -> UnitType.Oz
             "" -> UnitType.Kpl
+            "dl" -> UnitType.Dl
             "l" -> UnitType.L
             "b" -> UnitType.Kpl
             else -> null
