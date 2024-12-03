@@ -184,16 +184,25 @@ enum class UnitType {
     @JsonProperty("dl")
     Dl;
 
+    /**
+     * @throws IllegalArgumentException
+     */
     fun convert(amount: Int, newUnit: UnitType): Double {
         val ml = this.convertToMl(amount.toDouble())
         return newUnit.convertFromMl(ml)
     }
 
+    /**
+    * @throws IllegalArgumentException
+    */
     fun convert(amount: Double, newUnit: UnitType): Double {
         val ml = this.convertToMl(amount)
         return newUnit.convertFromMl(ml)
     }
 
+    /**
+    * @throws IllegalArgumentException
+    */
     fun displayInDesiredUnit(amount: Double, desiredUnit: UnitType): String{
         if (this == Kpl) {
             return String.format("%.1f kpl", amount)

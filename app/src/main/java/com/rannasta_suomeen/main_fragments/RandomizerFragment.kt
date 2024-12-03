@@ -3,6 +3,7 @@ package com.rannasta_suomeen.main_fragments
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,6 +12,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.DrinkRandomizerAdapter
 import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.popup_windows.PopupRandomizerInfo
 import com.rannasta_suomeen.popup_windows.PopupRandomizerOptions
 import com.rannasta_suomeen.popup_windows.RandomizerSettings
 import com.rannasta_suomeen.storage.Randomizer
@@ -24,7 +26,7 @@ import java.util.*
 
 class RandomizerFragment(
     private val activity: Activity,
-    settings: Settings,
+    private val settings: Settings,
     private val totalCabinetRepository: TotalCabinetRepository,
     private val totalDrinkRepository: TotalDrinkRepository,
     private val randomizer: Randomizer): Fragment(R.layout.fragment_randomizer) {
@@ -79,6 +81,9 @@ class RandomizerFragment(
                         randomizer.clear()
                     }
                 }.show(this)
+            }
+            findViewById<ImageButton>(R.id.imageButtonRandomizerInfo).setOnClickListener {
+                PopupRandomizerInfo(activity, RandomizerList(randomizerItems),settings,combineOwned()).show(it)
             }
         }
         super.onViewCreated(view, savedInstanceState)

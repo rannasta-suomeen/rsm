@@ -61,7 +61,7 @@
             style="?buttonBarButtonStyle"
             android:textColor="?colorTertiary"
             android:backgroundTint="?colorPrimary"
-            android:text="@string/cancel"/>
+            android:text="@android:string/cancel"/>
         <Button
             android:id="@+id/buttonRandomizerOk"
             android:layout_margin="4dp"
@@ -71,7 +71,7 @@
             style="?buttonBarButtonStyle"
             android:textColor="?colorTertiary"
             android:backgroundTint="?colorPrimary"
-            android:text="@string/ok"/>
+            android:text="@android:string/ok"/>
         <Button
             android:id="@+id/buttonRandomizerClear"
             android:layout_width="0dp"

@@ -42,9 +42,9 @@
     <string name="include">Include</string>
     <string name="neutral">Neutral</string>
     <string name="exclude">Exclude</string>
-    <string name="cancel">Cancel</string>
-    <string name="ok">Ok</string>
     <string name="clear">Clear</string>
+    <string name="needed_mixers">%1$d Needed mixers</string>
+    <string name="needed_alcoholic">%1$d Needed alcoholic</string>
 
     <string-array name="drinks_possible_sort">
         <item>Name</item>

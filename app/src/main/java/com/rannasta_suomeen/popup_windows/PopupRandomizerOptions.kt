@@ -37,7 +37,7 @@ data class RandomizerSettings(
     fun generateDrink(drinks: List<DrinkTotal>, owned: TreeMap<Int, GeneralIngredient>, amount: Int): Result<List<DrinkTotal>>{
         val t = filterDrinks(drinks, owned).toMutableList()
         val x = mutableListOf<DrinkTotal>()
-        (0..amount).forEach { _ ->
+        (0 until amount).forEach { _ ->
             if (t.isEmpty()){
                 return Result.failure(IllegalStateException())
             }
