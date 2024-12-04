@@ -45,6 +45,7 @@
     <string name="clear">Clear</string>
     <string name="needed_mixers">%1$d Needed mixers</string>
     <string name="needed_alcoholic">%1$d Needed alcoholic</string>
+    <string name="reveal_drinks">Want to reveal the drink?</string>
 
     <string-array name="drinks_possible_sort">
         <item>Name</item>

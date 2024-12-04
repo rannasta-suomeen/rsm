@@ -1,6 +1,7 @@
 package com.rannasta_suomeen.main_fragments
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
@@ -29,11 +30,25 @@ class RandomizerFragment(
     private val settings: Settings,
     private val totalCabinetRepository: TotalCabinetRepository,
     private val totalDrinkRepository: TotalDrinkRepository,
+
     private val randomizer: Randomizer): Fragment(R.layout.fragment_randomizer) {
     private val callBack: (RandomizerItem) -> Unit = {
         randomizer.removeItem(it)
     }
-    val adapter = DrinkRandomizerAdapter(activity, settings, randomizer, callBack)
+    private val hiddenCallback: (RandomizerItem) -> Unit = {
+        val b = AlertDialog.Builder(activity)
+        b.setTitle(R.string.reveal_drinks)
+        b.setPositiveButton(android.R.string.ok){_,_ ->
+            randomizer.modifyItem(it){
+                it.hidden = false
+            }
+            updateRecycler()
+        }
+        b.setNegativeButton(android.R.string.cancel){dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+        b.show()
+    }
     private var allDrinks = listOf<DrinkTotal>()
     private var ownedProducts: List<CabinetProduct> = listOf()
     private var ownedMixers: List<CabinetMixer> = listOf()
@@ -41,6 +56,7 @@ class RandomizerFragment(
     private val scope = CoroutineScope(Dispatchers.IO)
     private val mainScope = CoroutineScope(Dispatchers.Main)
     private val randomizerSettings =  RandomizerSettings()
+    val adapter = DrinkRandomizerAdapter(activity, settings, randomizer,hiddenCallback, callBack)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(view){

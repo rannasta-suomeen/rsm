@@ -16,14 +16,14 @@ import com.rannasta_suomeen.storage.Randomizer
 import com.rannasta_suomeen.storage.Settings
 import java.util.*
 
-class DrinkRandomizerAdapter(val activity: Activity, private val settings: Settings, private val randomizer: Randomizer, private val onLongClickCallback: (RandomizerItem) -> Unit): RecyclerView.Adapter<DrinkRandomizerAdapter.DrinkPreviewViewHolder>() {
+class DrinkRandomizerAdapter(val activity: Activity, private val settings: Settings, private val randomizer: Randomizer,private val hiddenItemClickCallback: (RandomizerItem) -> Unit, private val onLongClickCallback: (RandomizerItem) -> Unit): RecyclerView.Adapter<DrinkRandomizerAdapter.DrinkPreviewViewHolder>() {
 
     private var items: MutableList<RandomizerItem> = mutableListOf()
     private var owned: TreeMap<Int,GeneralIngredient> = TreeMap()
 
     class DrinkPreviewViewHolder(itemView: View,val activity: Activity):RecyclerView.ViewHolder(itemView){
         // TODO: sometimes drinks with multiline names fail to render the second line
-        fun bind(rItem: RandomizerItem, owned:TreeMap<Int,GeneralIngredient>, randomizer: Randomizer, settings: Settings, onLongClickCallback: (RandomizerItem) -> Unit){
+        fun bindVisible(rItem: RandomizerItem, owned:TreeMap<Int,GeneralIngredient>, randomizer: Randomizer, settings: Settings,onLongClickCallback: (RandomizerItem) -> Unit){
             val i = rItem.drinkTotal
             val item = i.drink
             itemView.findViewById<TextView>(R.id.textViewDrinkPreviewName).text = item.name
@@ -56,6 +56,15 @@ class DrinkRandomizerAdapter(val activity: Activity, private val settings: Setti
                 true
             }
         }
+        fun bindHidden(rItem: RandomizerItem, hiddenItemClickCallback: (RandomizerItem) -> Unit, onLongClickCallback: (RandomizerItem) -> Unit){
+            itemView.setOnLongClickListener {
+                onLongClickCallback(rItem)
+                true
+            }
+            itemView.setOnClickListener {
+                hiddenItemClickCallback(rItem)
+            }
+        }
         private fun displayDecimal(x: Double, stringId: Int): String{
             val number = String.format(Locale.UK,"%.1f", x)
             return itemView.resources.getString(stringId, number)
@@ -70,17 +79,37 @@ class DrinkRandomizerAdapter(val activity: Activity, private val settings: Setti
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrinkPreviewViewHolder {
-        val layout = R.layout.item_drink
+        val layout = when (viewType){
+            TYPE_HIDDEN -> R.layout.item_hidden
+            TYPE_VISIBLE -> R.layout.item_drink
+            else -> throw IllegalStateException("Illegal number")
+        }
         val itemView = LayoutInflater.from(parent.context).inflate(layout, parent,false)
         return DrinkPreviewViewHolder(itemView, activity)
     }
 
     override fun onBindViewHolder(holder: DrinkPreviewViewHolder, position: Int) {
         val item = items[position]
-        holder.bind(item, owned,randomizer, settings, onLongClickCallback)
+        when (item.hidden){
+            true -> holder.bindHidden(item, hiddenItemClickCallback,onLongClickCallback)
+            false -> holder.bindVisible(item, owned,randomizer, settings, onLongClickCallback)
+        }
+
     }
 
     override fun getItemCount(): Int {
         return items.size
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (items[position].hidden){
+            true -> TYPE_HIDDEN
+            false -> TYPE_VISIBLE
+        }
+    }
+
+    companion object{
+        private const val TYPE_HIDDEN = 0
+        private const val TYPE_VISIBLE = 1
     }
 }

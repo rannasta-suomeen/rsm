@@ -4,7 +4,7 @@ import com.rannasta_suomeen.storage.Settings
 
 class RandomizerItem(
     val drinkTotal: DrinkTotal,
-    val hidden: Boolean,
+    var hidden: Boolean,
     val multiplier: Double = 1.0,
 ) {
     fun requiredIngredients(): List<IngredientsForDrinkPointer.RecipePartPointer>{

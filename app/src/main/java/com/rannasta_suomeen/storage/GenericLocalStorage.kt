@@ -94,4 +94,15 @@ abstract class GenericLocalStorage<T>(context: Context, filename: String,type: C
             rwLock.writeLock().unlock()
         }
     }
+    fun modifyItem(item: T,function: (T) -> Unit){
+        scope.launch {
+            rwLock.writeLock().lock()
+
+            items.find { it == item }?.let { function(it)}
+            val i = items
+            rwLock.writeLock().unlock()
+            dataFlow.emit(i)
+            file.writeText(jackson.writeValueAsString(items))
+        }
+    }
 }
