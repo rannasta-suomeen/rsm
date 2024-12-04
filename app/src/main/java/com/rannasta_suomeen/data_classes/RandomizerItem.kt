@@ -1,6 +1,7 @@
 package com.rannasta_suomeen.data_classes
 
 import com.rannasta_suomeen.storage.Settings
+import kotlin.math.roundToInt
 
 class RandomizerItem(
     val drinkTotal: DrinkTotal,
@@ -42,8 +43,17 @@ class RandomizerList(
             ings.forEach {
                 try {
                     val old = map.getOrDefault(it.ingredient.id,Pair(it,0.0))
-                    val newAmount = old.second + it.unit.convert(it.amount*randomizerItem.multiplier,old.first.unit)
-                    map[it.ingredient.id] = Pair(it,newAmount)
+                    when (it.unit){
+                            UnitType.Kpl -> {
+                                val newAmount = old.second + it.unit.convert(it.amount*randomizerItem.multiplier,old.first.unit)
+                                map[it.ingredient.id] = Pair(it,newAmount)
+                            }
+                            else -> {
+                                val newAmount = old.second + it.unit.convert(it.amount*randomizerItem.multiplier,UnitType.Ml)
+                                it.unit = UnitType.Ml
+                                map[it.ingredient.id] = Pair(it,newAmount)
+                            }
+                    }
                     // This catch is there in case someone has inserted nonsensical drinks into the database
                 } catch (_ : IllegalArgumentException){}
 
@@ -52,7 +62,7 @@ class RandomizerList(
         return map.map {
             val ingredient = it.value.first
             val amount = it.value.second
-            IngredientsForDrinkPointer.RecipePartPointer(ingredient.ingredient, amount.toInt(), ingredient.name,ingredient.unit)
+            IngredientsForDrinkPointer.RecipePartPointer(ingredient.ingredient, amount.roundToInt(), ingredient.name,ingredient.unit)
         }
     }
     fun requiredAlcoholic(): List<IngredientsForDrinkPointer.RecipePartPointer>{

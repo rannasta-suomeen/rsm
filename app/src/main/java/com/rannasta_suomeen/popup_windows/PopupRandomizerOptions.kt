@@ -20,9 +20,10 @@ data class RandomizerSettings(
     var allowNewAlcohol: Boolean,
     var allowNewMixers: Boolean,
     var allowDuplicates: Boolean,
+    var hidden: Boolean,
 ){
     private val random = Random()
-    constructor():this(FilterMap(),true, true, true)
+    constructor():this(FilterMap(),false, false, false, true)
     private fun filterDrinks(drinks: List<DrinkTotal>, owned: TreeMap<Int, GeneralIngredient>): List<DrinkTotal>{
         var t = drinks
         if (!allowNewAlcohol){
@@ -63,6 +64,7 @@ class PopupRandomizerOptions(activity: Activity,private val randomizerSettings: 
             val buttonOk = findViewById<Button>(R.id.buttonRandomizerOk)
             val buttonCancel = findViewById<Button>(R.id.buttonRandomizerCancel)
             val buttonClear = findViewById<Button>(R.id.buttonRandomizerClear)
+            val switchHide = findViewById<SwitchCompat>(R.id.switchRandomizerHidden)
 
             amountText.addSimpleOnTextChangeLister {
                 amount = it.toIntOrNull()?:1
@@ -82,6 +84,7 @@ class PopupRandomizerOptions(activity: Activity,private val randomizerSettings: 
             switchAlcohol.isChecked = randomizerSettings.allowNewAlcohol
             switchMixers.isChecked = randomizerSettings.allowNewMixers
             switchDuplicates.isChecked = randomizerSettings.allowDuplicates
+            switchHide.isChecked = randomizerSettings.hidden
 
             switchDuplicates.setOnCheckedChangeListener { compoundButton, b ->
                 randomizerSettings.allowDuplicates = b
@@ -92,6 +95,9 @@ class PopupRandomizerOptions(activity: Activity,private val randomizerSettings: 
 
             switchMixers.setOnCheckedChangeListener { _, b ->
                 randomizerSettings.allowNewMixers = b
+            }
+            switchHide.setOnCheckedChangeListener { _, b ->
+                randomizerSettings.hidden = b
             }
 
             buttonOk.setOnClickListener {

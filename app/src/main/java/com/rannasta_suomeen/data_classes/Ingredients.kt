@@ -143,7 +143,7 @@ data class IngredientsForDrinkPointer(
         val ingredient: GeneralIngredient,
         val amount: Int,
         val name: String,
-        val unit: UnitType
+        var unit: UnitType
     ){
         fun price(s: Settings): Double{
             return when (unit) {

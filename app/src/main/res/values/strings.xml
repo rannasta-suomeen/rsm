@@ -46,6 +46,12 @@
     <string name="needed_mixers">%1$d Needed mixers</string>
     <string name="needed_alcoholic">%1$d Needed alcoholic</string>
     <string name="reveal_drinks">Want to reveal the drink?</string>
+    <string name="how_many">How many</string>
+    <string name="allow_non_owned_alcohol">Allow Non Owned alcohol</string>
+    <string name="allow_non_owned_mixers">Allow Non Owned Mixers</string>
+    <string name="allow_duplicates">Allow Duplicates</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="hide_drinks">Hide Drinks</string>
 
     <string-array name="drinks_possible_sort">
         <item>Name</item>

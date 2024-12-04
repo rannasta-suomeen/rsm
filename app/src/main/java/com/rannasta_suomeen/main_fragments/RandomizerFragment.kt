@@ -85,10 +85,10 @@ class RandomizerFragment(
             }
             val fab = findViewById<FloatingActionButton>(R.id.fabAddDrinkToRandomizer)
             fab.setOnClickListener {
-                val t: (RandomizerSettings, Int) -> Unit = {it, n ->
-                    val t = it.generateDrink(allDrinks, combineOwned(), n)
+                val t: (RandomizerSettings, Int) -> Unit = {randomizerSettings, n ->
+                    val t = randomizerSettings.generateDrink(allDrinks, combineOwned(), n)
                     when (t.isSuccess){
-                        true -> t.getOrThrow().forEach { randomizer.addItem(RandomizerItem(it,true)) }
+                        true -> t.getOrThrow().forEach { randomizer.addItem(RandomizerItem(it,randomizerSettings.hidden)) }
                         false -> Toast.makeText(activity, "Not possible to complete list with current settings", Toast.LENGTH_SHORT).show()
                     }
                 }

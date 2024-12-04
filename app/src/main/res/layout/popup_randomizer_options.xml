@@ -13,7 +13,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="?colorOnBackground"
-            android:text="How many"/>
+            android:text="@string/how_many"/>
         <EditText
             android:id="@+id/editTextRandomizerAmount"
             android:layout_width="wrap_content"
@@ -27,26 +27,32 @@
         android:layout_margin="4dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Allow Non Owned alcohol"/>
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switchRandomizerDuplicates"
-        android:layout_margin="4dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Allow Duplicates"/>
+        android:text="@string/allow_non_owned_alcohol"/>
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switchRandomizerNonAlcoholic"
         android:layout_margin="4dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Allow Non Owned Mixers"/>
+        android:text="@string/allow_non_owned_mixers"/>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchRandomizerDuplicates"
+        android:layout_margin="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/allow_duplicates"/>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchRandomizerHidden"
+        android:layout_margin="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hide_drinks"/>
     <Button
         android:id="@+id/buttonRandomizerIngredients"
         android:layout_margin="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="?colorTertiary"
-        android:text="Ingredients"/>
+        android:text="@string/ingredients"/>
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
