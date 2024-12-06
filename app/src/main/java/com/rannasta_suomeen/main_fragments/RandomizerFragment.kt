@@ -12,7 +12,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.DrinkRandomizerAdapter
-import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.data_classes.CabinetMixer
+import com.rannasta_suomeen.data_classes.CabinetProduct
+import com.rannasta_suomeen.data_classes.DrinkTotal
+import com.rannasta_suomeen.data_classes.GeneralIngredient
+import com.rannasta_suomeen.data_classes.RandomizerItem
+import com.rannasta_suomeen.data_classes.RandomizerList
+import com.rannasta_suomeen.data_classes.findAllTags
+import com.rannasta_suomeen.data_classes.toTreemap
+import com.rannasta_suomeen.popup_windows.BASE_TAGS
 import com.rannasta_suomeen.popup_windows.PopupRandomizerInfo
 import com.rannasta_suomeen.popup_windows.PopupRandomizerOptions
 import com.rannasta_suomeen.popup_windows.RandomizerSettings
@@ -23,7 +31,7 @@ import com.rannasta_suomeen.storage.TotalDrinkRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.TreeMap
 
 class RandomizerFragment(
     private val activity: Activity,
@@ -55,7 +63,7 @@ class RandomizerFragment(
     private var randomizerItems = listOf<RandomizerItem>()
     private val scope = CoroutineScope(Dispatchers.IO)
     private val mainScope = CoroutineScope(Dispatchers.Main)
-    private val randomizerSettings =  RandomizerSettings()
+    private var randomizerSettings =  RandomizerSettings(BASE_TAGS.map { activity.getString(it) }+allDrinks.findAllTags())
     val adapter = DrinkRandomizerAdapter(activity, settings, randomizer,hiddenCallback, callBack)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,6 +89,7 @@ class RandomizerFragment(
                 }
                 totalDrinkRepository.dataFlow.collect{
                     allDrinks = it
+                    randomizerSettings = RandomizerSettings(BASE_TAGS.map { activity.getString(it) }+allDrinks.findAllTags())
                 }
             }
             val fab = findViewById<FloatingActionButton>(R.id.fabAddDrinkToRandomizer)
@@ -92,7 +101,7 @@ class RandomizerFragment(
                         false -> Toast.makeText(activity, "Not possible to complete list with current settings", Toast.LENGTH_SHORT).show()
                     }
                 }
-                PopupRandomizerOptions(activity, randomizerSettings,view,t){
+                PopupRandomizerOptions(activity,allDrinks,randomizerSettings,view,t){
                     scope.launch {
                         randomizer.clear()
                     }

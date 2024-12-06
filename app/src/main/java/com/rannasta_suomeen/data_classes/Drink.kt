@@ -2,7 +2,7 @@ package com.rannasta_suomeen.data_classes
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.rannasta_suomeen.storage.Settings
-import java.util.*
+import java.util.TreeMap
 
 /**
  This is the equivalent of the RS-Struct Recipe
@@ -177,6 +177,12 @@ fun sortDrinkPreview(list: List<DrinkTotal>, type: DrinkInfo.SortTypes, asc: Boo
 
     if (!asc){sortedAsc = sortedAsc.reversed()}
     return sortedAsc
+}
+
+fun List<DrinkTotal>.findAllTags(): List<String>{
+    val tagMap = mutableSetOf<String>()
+    this.forEach { tagMap.addAll(it.drink.tagList) }
+    return tagMap.toList()
 }
 
 enum class DrinkType {

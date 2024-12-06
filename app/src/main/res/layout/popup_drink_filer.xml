@@ -236,7 +236,7 @@
                     android:backgroundTint="?colorPrimary"
                     android:textColor="?colorTertiary"
                     style="?attr/buttonBarStyle"
-                    android:text="Tags"/>
+                    android:text="@string/tags"/>
 
                 <Button
                     android:id="@+id/buttonIngredients"

@@ -11,13 +11,21 @@ import androidx.appcompat.app.AlertDialog
 import com.rannasta_suomeen.R
 import com.rannasta_suomeen.adapters.FilterMap
 import com.rannasta_suomeen.adapters.checkDrinkAllowed
-import com.rannasta_suomeen.data_classes.*
+import com.rannasta_suomeen.data_classes.DrinkTotal
+import com.rannasta_suomeen.data_classes.DrinkType
+import com.rannasta_suomeen.data_classes.GeneralIngredient
+import com.rannasta_suomeen.data_classes.Product
+import com.rannasta_suomeen.data_classes.Retailer
+import com.rannasta_suomeen.data_classes.Subcategory
+import com.rannasta_suomeen.data_classes.findAllTags
+import com.rannasta_suomeen.data_classes.from
+import com.rannasta_suomeen.data_classes.toTreemap
 import com.rannasta_suomeen.ingredientRepository
 import com.rannasta_suomeen.storage.Settings
 import java.text.Normalizer
-import java.util.*
+import java.util.TreeMap
 
-private val BASE_TAGS = listOf(R.string.cocktail,R.string.shot, R.string.punch, R.string.unmakeble, R.string.unmakebleGrocery, R.string.tagless)
+val BASE_TAGS = listOf(R.string.cocktail,R.string.shot, R.string.punch, R.string.unmakeble, R.string.unmakebleGrocery, R.string.tagless)
 
 abstract class PopupFilterBase(
     activity: Activity,
@@ -48,8 +56,6 @@ abstract class PopupFilterBase(
         return dialog.create()
     }
 
-
-
 }
 private fun removeAccentsFromString(s: String): String{
     val t = Normalizer.normalize(s, Normalizer.Form.NFD)
@@ -60,7 +66,7 @@ fun String.normalize():String{
     return removeAccentsFromString(this)
 }
 
-class PopupFilter(
+class PopupProductFilter(
     activity: Activity,
     private val updateFun: () -> Unit
 ):PopupFilterBase(activity, R.layout.popup_product_filer) {
@@ -222,11 +228,6 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
             }
         }
     }
-    private fun findAllTags(): List<String>{
-        val tagMap = mutableSetOf<String>()
-        drinksList.forEach { tagMap.addAll(it.drink.tagList) }
-        return tagMap.toList()
-    }
 
     private fun getAllIngredientsFromDrink(): List<GeneralIngredient>{
         val ingredientMap = hashMapOf<Int, Pair<Int,GeneralIngredient>>()
@@ -245,12 +246,11 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
         return ingredientMap.toList().map {it.second}.sortedBy { -it.first }.map { it.second }
     }
 
-    private fun gsl(list: List<Int>):List<String>{
+    private fun getStringList(list: List<Int>):List<String>{
         return list.map { activity.getString(it)}
     }
 
-    private val tags = gsl(BASE_TAGS) + findAllTags()
-    private val ingredients = getAllIngredientsFromDrink()
+    private val tags = getStringList(BASE_TAGS) + drinksList.findAllTags()
 
     private fun createDefault():FilterSettings{
         return FilterSettings(
@@ -295,7 +295,7 @@ class PopupDrinkFilter(activity: Activity, private val updateFun: () -> Unit, pr
         val buttonTags: Button = t(R.id.buttonTags)
         val buttonIngredients: Button = t(R.id.buttonIngredients)
         var tagDialogue = multiOptionDialog(tags,{it},settings.allowedTags,"Select Criteria"){settings.allowedTags = it.toList()}
-        var ingredientDialog = PopupFilterIngredients(activity, ingredientRepository, settings.filterMap){
+        val ingredientDialog = PopupFilterIngredients(activity, ingredientRepository, settings.filterMap){
             settings.filterMap = it
         }
 

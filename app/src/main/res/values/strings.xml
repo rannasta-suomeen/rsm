@@ -52,6 +52,7 @@
     <string name="allow_duplicates">Allow Duplicates</string>
     <string name="ingredients">Ingredients</string>
     <string name="hide_drinks">Hide Drinks</string>
+    <string name="tags">Tags</string>
 
     <string-array name="drinks_possible_sort">
         <item>Name</item>

@@ -18,7 +18,7 @@ import com.rannasta_suomeen.adapters.ProductAdapterItemTouchHelper
 import com.rannasta_suomeen.data_classes.Product
 import com.rannasta_suomeen.data_classes.Product.SortTypes
 import com.rannasta_suomeen.data_classes.sort
-import com.rannasta_suomeen.popup_windows.PopupFilter
+import com.rannasta_suomeen.popup_windows.PopupProductFilter
 import com.rannasta_suomeen.productRepository
 import com.rannasta_suomeen.storage.ImageRepository
 import com.rannasta_suomeen.storage.Settings
@@ -36,12 +36,12 @@ class ProductsFragment(private val activity: Activity, private val imageReposito
     private var sortType = SortTypes.Pps
     private var sortByAsc = true
 
-    private lateinit var filterMenu: PopupFilter
+    private lateinit var filterMenu: PopupProductFilter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         productAdapter = ProductAdapter(activity, totalCabinetRepository, imageRepository, settings, shoppingCart)
-        filterMenu = PopupFilter(activity, ::updateSelection)
+        filterMenu = PopupProductFilter(activity, ::updateSelection)
 
         CoroutineScope(Dispatchers.IO).launch {
             launch {
